@@ -131,21 +131,6 @@ const Profile: React.FC = () => {
             <h2 className="text-xl font-semibold text-gray-900">
               Post your Ads (up to 4/10)
             </h2>
-            <div className="bg-orange-500 text-white px-3 py-1 rounded-full">
-              <svg
-                className="w-5 h-5 inline-block mr-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-            </div>
           </div>
 
           {/* Ad Listings */}

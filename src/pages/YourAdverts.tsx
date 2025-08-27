@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAds } from "../contexts/AdsContext";
+import { useAds, Advertisement } from "../contexts/AdsContext";
 
 const YourAdverts: React.FC = () => {
   const navigate = useNavigate();
   const { ads } = useAds();
   const [showPlansModal, setShowPlansModal] = useState(false);
   const [billingPeriod, setBillingPeriod] = useState<"month" | "day">("month");
+  const [viewingAd, setViewingAd] = useState<Advertisement | null>(null);
 
   const PlansModal = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -186,6 +187,143 @@ const YourAdverts: React.FC = () => {
     </div>
   );
 
+  const ViewAdModal = ({
+    ad,
+    onClose,
+  }: {
+    ad: Advertisement;
+    onClose: () => void;
+  }) => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="flex justify-between items-start mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">
+            Advertisement Details
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="space-y-6">
+          {/* Ad Image */}
+          {ad.image && (
+            <div className="text-center">
+              <img
+                src={ad.image}
+                alt="Advertisement"
+                className="w-32 h-32 rounded-lg object-cover mx-auto shadow-md"
+              />
+            </div>
+          )}
+
+          {/* Basic Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Title
+              </label>
+              <p className="text-gray-900 bg-gray-50 p-3 rounded-md">
+                {ad.title}
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Category
+              </label>
+              <p className="text-gray-900 bg-gray-50 p-3 rounded-md">
+                {ad.category}
+              </p>
+            </div>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <p className="text-gray-900 bg-gray-50 p-3 rounded-md min-h-[100px]">
+              {ad.description}
+            </p>
+          </div>
+
+          {/* Location */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                State
+              </label>
+              <p className="text-gray-900 bg-gray-50 p-3 rounded-md">
+                {ad.state}
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                City
+              </label>
+              <p className="text-gray-900 bg-gray-50 p-3 rounded-md">
+                {ad.city}
+              </p>
+            </div>
+          </div>
+
+          {/* Contact Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone Number
+              </label>
+              <p className="text-gray-900 bg-gray-50 p-3 rounded-md">
+                {ad.phone}
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                WhatsApp Number
+              </label>
+              <p className="text-gray-900 bg-gray-50 p-3 rounded-md">
+                {ad.whatsapp}
+              </p>
+            </div>
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <p className="text-gray-900 bg-gray-50 p-3 rounded-md">
+              {ad.email}
+            </p>
+          </div>
+
+          {/* Status */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <div className="bg-gray-50 p-3 rounded-md">
+              {getStatusBadge(ad.status)}
+            </div>
+          </div>
+        </div>
+
+        {/* Close Button */}
+        <div className="mt-8 text-center">
+          <button
+            onClick={onClose}
+            className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   // Sort adverts by priority: VIP Prime -> VIP -> Published -> Waiting -> Inactive
   const sortedAdverts = [...ads].sort((a, b) => {
     const statusOrder = {
@@ -220,8 +358,9 @@ const YourAdverts: React.FC = () => {
         );
       case "waiting-approval":
         return (
-          <span className="bg-yellow-500 text-white px-3 py-1 rounded text-sm font-medium">
-            Waiting to be approve
+          <span className="bg-yellow-500 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm font-medium">
+            <span className="hidden sm:inline">Pending</span>
+            <span className="sm:hidden">Pending</span>
           </span>
         );
       case "inactive":
@@ -316,8 +455,43 @@ const YourAdverts: React.FC = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-blue-600 hover:text-blue-800 cursor-pointer">
+                          <h3
+                            className={`text-lg font-semibold hover:text-blue-800 ${
+                              advert.status === "published" ||
+                              advert.status === "vip" ||
+                              advert.status === "vip-prime" ||
+                              advert.status === "waiting-approval"
+                                ? "text-blue-600 cursor-pointer underline-offset-2 hover:underline"
+                                : "text-blue-600"
+                            }`}
+                            onClick={() => {
+                              if (
+                                advert.status === "published" ||
+                                advert.status === "vip" ||
+                                advert.status === "vip-prime" ||
+                                advert.status === "waiting-approval"
+                              ) {
+                                setViewingAd(advert);
+                              }
+                            }}
+                            title={
+                              advert.status === "published" ||
+                              advert.status === "vip" ||
+                              advert.status === "vip-prime" ||
+                              advert.status === "waiting-approval"
+                                ? "Click to view details"
+                                : undefined
+                            }
+                          >
                             {advert.title}
+                            {(advert.status === "published" ||
+                              advert.status === "vip" ||
+                              advert.status === "vip-prime" ||
+                              advert.status === "waiting-approval") && (
+                              <span className="ml-2 text-xs text-gray-500">
+                                (click to view)
+                              </span>
+                            )}
                           </h3>
                           <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                             {advert.description}
@@ -343,9 +517,11 @@ const YourAdverts: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Status Badge and Edit Button */}
+                        {/* Status Badge and Action Buttons */}
                         <div className="flex-shrink-0 ml-4 flex items-center space-x-2">
                           {getStatusBadge(advert.status)}
+
+                          {/* Edit button - only for inactive ads */}
                           {advert.status === "inactive" && (
                             <button
                               onClick={() =>
@@ -365,6 +541,38 @@ const YourAdverts: React.FC = () => {
                                   strokeLinejoin="round"
                                   strokeWidth={2}
                                   d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                />
+                              </svg>
+                            </button>
+                          )}
+
+                          {/* View button - for published and waiting approval ads */}
+                          {(advert.status === "published" ||
+                            advert.status === "vip" ||
+                            advert.status === "vip-prime" ||
+                            advert.status === "waiting-approval") && (
+                            <button
+                              onClick={() => setViewingAd(advert)}
+                              className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors"
+                              title="View Advertisement Details"
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                                 />
                               </svg>
                             </button>
@@ -419,6 +627,11 @@ const YourAdverts: React.FC = () => {
 
       {/* Plans Modal */}
       {showPlansModal && <PlansModal />}
+
+      {/* View Ad Modal */}
+      {viewingAd && (
+        <ViewAdModal ad={viewingAd} onClose={() => setViewingAd(null)} />
+      )}
     </div>
   );
 };

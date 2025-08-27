@@ -1,12 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
-import {
-  Phone,
-  Car,
-  MessageCircle,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Phone, Car, MessageCircle, Crown, Star, Shield } from "lucide-react";
 
 interface Driver {
   id: string;
@@ -205,118 +198,6 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
         isVIP: false,
         priority: 3,
       },
-      {
-        id: "106",
-        name: "Sanjay Sharma",
-        rating: 4.3,
-        vehicleType: "SUV",
-        vehicleModel: "Tata Safari",
-        location: "Electronic City, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543225",
-        profileImage:
-          "https://images.pexels.com/photos/1212984/pexels-photo-1212984.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: false,
-        priority: 3,
-      },
-      {
-        id: "107",
-        name: "Manish Gupta",
-        rating: 4.0,
-        vehicleType: "Sedan",
-        vehicleModel: "Skoda Rapid",
-        location: "Powai, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543226",
-        profileImage:
-          "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: false,
-        priority: 3,
-      },
-      {
-        id: "108",
-        name: "Arjun Singh",
-        rating: 4.4,
-        vehicleType: "Hatchback",
-        vehicleModel: "Maruti Baleno",
-        location: "Karol Bagh, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543227",
-        profileImage:
-          "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: false,
-        priority: 3,
-      },
-      {
-        id: "109",
-        name: "Rohit Verma",
-        rating: 4.2,
-        vehicleType: "SUV",
-        vehicleModel: "Mahindra Scorpio",
-        location: "HSR Layout, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543228",
-        profileImage:
-          "https://images.pexels.com/photos/1212984/pexels-photo-1212984.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: false,
-        priority: 3,
-      },
-      {
-        id: "110",
-        name: "Ajay Kumar",
-        rating: 4.1,
-        vehicleType: "Sedan",
-        vehicleModel: "Volkswagen Vento",
-        location: "Thane West, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543229",
-        profileImage:
-          "https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: false,
-        priority: 3,
-      },
-      {
-        id: "111",
-        name: "Dinesh Yadav",
-        rating: 4.3,
-        vehicleType: "Hatchback",
-        vehicleModel: "Ford Figo",
-        location: "Janakpuri, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543230",
-        profileImage:
-          "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: false,
-        priority: 3,
-      },
-      {
-        id: "112",
-        name: "Krishna Prasad",
-        rating: 4.0,
-        vehicleType: "SUV",
-        vehicleModel: "Ford EcoSport",
-        location: "Marathahalli, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543231",
-        profileImage:
-          "https://images.pexels.com/photos/1212984/pexels-photo-1212984.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: false,
-        priority: 3,
-      },
       // Additional VIP Prime drivers
       {
         id: "4",
@@ -383,55 +264,6 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
         isVIP: true,
         priority: 2,
       },
-      // Additional Regular drivers
-      {
-        id: "113",
-        name: "Ramesh Choudhary",
-        rating: 4.2,
-        vehicleType: "Sedan",
-        vehicleModel: "Nissan Sunny",
-        location: "Malviya Nagar, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543236",
-        profileImage:
-          "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: false,
-        priority: 3,
-      },
-      {
-        id: "114",
-        name: "Sunil Mehta",
-        rating: 4.1,
-        vehicleType: "Hatchback",
-        vehicleModel: "Tata Tiago",
-        location: "Vastrapur, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543237",
-        profileImage:
-          "https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: false,
-        priority: 3,
-      },
-      {
-        id: "115",
-        name: "Prakash Nair",
-        rating: 4.3,
-        vehicleType: "SUV",
-        vehicleModel: "Renault Duster",
-        location: "Kochi, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543238",
-        profileImage:
-          "https://images.pexels.com/photos/1212984/pexels-photo-1212984.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: false,
-        priority: 3,
-      },
     ],
     []
   );
@@ -460,24 +292,6 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
   const startIndex = (currentPage - 1) * driversPerPage;
   const endIndex = startIndex + driversPerPage;
   const currentDrivers = filteredDrivers.slice(startIndex, endIndex);
-
-  // Pagination handlers
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      handlePageChange(currentPage + 1);
-    }
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      handlePageChange(currentPage - 1);
-    }
-  };
 
   // Show message if no drivers match the filter
   if (filteredDrivers.length === 0 && (selectedState || selectedCity)) {
@@ -523,9 +337,9 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       return {
         containerClass: "relative",
         frameClass:
-          "bg-white rounded-3xl border-4 border-orange-400 shadow-lg hover:shadow-xl transition-shadow",
+          "bg-white rounded-3xl border-4 border-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-[1.02]",
         backgroundClass: "p-8",
-        badgeClass: "bg-yellow-400 text-black",
+        badgeClass: "",
         badgeText: "VIP Prime",
         hasFloatingBadge: true,
       };
@@ -534,9 +348,9 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       return {
         containerClass: "relative",
         frameClass:
-          "bg-white rounded-3xl border-4 border-purple-400 shadow-lg hover:shadow-xl transition-shadow",
+          "bg-white rounded-3xl border-4 border-gradient-to-r from-purple-400 via-purple-500 to-purple-600 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.01]",
         backgroundClass: "p-8",
-        badgeClass: "bg-purple-600 text-white",
+        badgeClass: "",
         badgeText: "VIP",
         hasFloatingBadge: true,
       };
@@ -547,9 +361,91 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
         "bg-white rounded-xl border-2 border-gray-200 shadow-md hover:shadow-lg transition-shadow",
       backgroundClass: "p-6",
       badgeClass: "",
-      badgeText: "",
-      hasFloatingBadge: false,
+      badgeText: "Standard",
+      hasFloatingBadge: true,
     };
+  };
+
+  const getPremiumBadge = (driver: Driver) => {
+    if (driver.isPrime) {
+      return (
+        <div className="absolute -top-3 -right-3 z-20">
+          <div className="relative">
+            {/* Outer glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 rounded-2xl blur-sm opacity-75 animate-pulse"></div>
+
+            {/* Main badge */}
+            <div className="relative bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 px-6 py-3 rounded-2xl shadow-2xl border-2 border-white transform rotate-3 hover:rotate-0 transition-transform duration-300">
+              {/* Inner shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent rounded-2xl"></div>
+
+              {/* Badge content */}
+              <div className="relative flex items-center gap-2">
+                <Crown className="h-5 w-5 text-amber-800 drop-shadow-sm" />
+                <span className="text-amber-900 font-bold text-sm tracking-wide drop-shadow-sm">
+                  VIP PRIME
+                </span>
+                <div className="flex">
+                  <Star className="h-3 w-3 text-amber-800 fill-current" />
+                  <Star className="h-3 w-3 text-amber-800 fill-current" />
+                  <Star className="h-3 w-3 text-amber-800 fill-current" />
+                </div>
+              </div>
+
+              {/* Decorative elements */}
+              <div className="absolute -top-1 -left-1 w-2 h-2 bg-white rounded-full opacity-60"></div>
+              <div className="absolute -bottom-1 -right-1 w-1 h-1 bg-amber-200 rounded-full opacity-80"></div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (driver.isVIP) {
+      return (
+        <div className="absolute -top-3 -right-3 z-20">
+          <div className="relative">
+            {/* Outer glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 rounded-xl blur-sm opacity-60"></div>
+
+            {/* Main badge */}
+            <div className="relative bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 px-5 py-2.5 rounded-xl shadow-xl border-2 border-white transform -rotate-2 hover:rotate-0 transition-transform duration-300">
+              {/* Inner shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent rounded-xl"></div>
+
+              {/* Badge content */}
+              <div className="relative flex items-center gap-2">
+                <Shield className="h-4 w-4 text-purple-200 drop-shadow-sm" />
+                <span className="text-white font-bold text-sm tracking-wide drop-shadow-sm">
+                  VIP
+                </span>
+                <div className="flex">
+                  <Star className="h-3 w-3 text-purple-200 fill-current" />
+                  <Star className="h-3 w-3 text-purple-200 fill-current" />
+                </div>
+              </div>
+
+              {/* Decorative elements */}
+              <div className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-white rounded-full opacity-70"></div>
+              <div className="absolute -bottom-1 -left-1 w-1 h-1 bg-purple-300 rounded-full opacity-60"></div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="absolute -top-2 -right-2 z-20">
+        <div className="bg-gradient-to-r from-gray-500 to-gray-600 px-4 py-2 rounded-lg shadow-md border border-gray-300">
+          <div className="flex items-center gap-1">
+            <Star className="h-3 w-3 text-gray-200 fill-current" />
+            <span className="text-white font-medium text-xs tracking-wide">
+              STANDARD
+            </span>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -560,7 +456,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
             Available Drivers - Sorted by Priority
           </h2>
           <p className="text-lg text-gray-600">
-            VIP Prime → VIP → Regular drivers available for booking. Premium
+            VIP Prime → VIP → Standard drivers available for booking. Premium
             service guaranteed across India
           </p>
           {/* Pagination Info */}
@@ -575,51 +471,93 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
           </div>
         </div>
 
-        {/* Unified Drivers List - Exact Mockup Style */}
+        {/* Unified Drivers List with Premium Badges */}
         <div className="space-y-6">
           {currentDrivers.map((driver) => {
             const styling = getCardStyling(driver);
 
             return (
               <div key={driver.id} className={styling.containerClass}>
-                {/* Main Card with Frame Border */}
-                <Link
-                  to={`/driver/${driver.id}`}
-                  className={`block cursor-pointer ${styling.frameClass}`}
-                >
-                  {/* Floating Badge - Positioned absolute on the card */}
-                  {styling.hasFloatingBadge && (
-                    <div className="absolute -top-2 right-8 z-10">
-                      <div
-                        className={`px-4 py-2 rounded-lg font-semibold text-sm shadow-md ${styling.badgeClass}`}
-                      >
-                        {styling.badgeText}
-                      </div>
-                    </div>
-                  )}
+                {/* Premium Badge */}
+                {getPremiumBadge(driver)}
 
+                {/* Main Card with Frame Border */}
+                <div
+                  className={`block cursor-pointer ${styling.frameClass}`}
+                  style={
+                    driver.isPrime
+                      ? {
+                          background:
+                            "linear-gradient(145deg, #ffffff 0%, #fefce8 100%)",
+                          borderImage:
+                            "linear-gradient(145deg, #f59e0b, #eab308, #f59e0b) 1",
+                        }
+                      : driver.isVIP
+                      ? {
+                          background:
+                            "linear-gradient(145deg, #ffffff 0%, #faf5ff 100%)",
+                          borderImage:
+                            "linear-gradient(145deg, #8b5cf6, #a855f7, #8b5cf6) 1",
+                        }
+                      : {}
+                  }
+                >
                   <div className={styling.backgroundClass}>
                     <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
                       {/* Driver Info Section */}
                       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 lg:gap-8 flex-1">
-                        {/* Driver Profile Image */}
-                        <div className="flex-shrink-0">
+                        {/* Driver Profile Image with Premium Ring */}
+                        <div className="flex-shrink-0 relative">
+                          {driver.isPrime && (
+                            <div className="absolute -inset-2 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 rounded-xl blur-sm opacity-30 animate-pulse"></div>
+                          )}
+                          {driver.isVIP && !driver.isPrime && (
+                            <div className="absolute -inset-2 bg-gradient-to-r from-purple-400 via-purple-500 to-purple-600 rounded-xl blur-sm opacity-25"></div>
+                          )}
                           <img
                             src={driver.profileImage}
                             alt={driver.name}
-                            className="w-32 h-32 rounded-xl object-cover shadow-md"
+                            className={`relative w-32 h-32 rounded-xl object-cover shadow-lg ${
+                              driver.isPrime
+                                ? "ring-4 ring-amber-300"
+                                : driver.isVIP
+                                ? "ring-4 ring-purple-300"
+                                : "ring-2 ring-gray-200"
+                            }`}
                           />
                         </div>
 
                         {/* Driver Details */}
                         <div className="flex-1 space-y-4 text-center sm:text-left">
-                          {/* Name */}
-                          <h3 className="text-2xl font-bold text-gray-900 leading-tight">
+                          {/* Name with Premium Styling */}
+                          <h3
+                            className={`text-2xl font-bold leading-tight ${
+                              driver.isPrime
+                                ? "text-amber-900 drop-shadow-sm"
+                                : driver.isVIP
+                                ? "text-purple-900"
+                                : "text-gray-900"
+                            }`}
+                          >
                             {driver.name}
+                            {driver.isPrime && (
+                              <Crown className="inline ml-2 h-6 w-6 text-amber-600" />
+                            )}
+                            {driver.isVIP && !driver.isPrime && (
+                              <Shield className="inline ml-2 h-5 w-5 text-purple-600" />
+                            )}
                           </h3>
 
-                          {/* Experience Description */}
-                          <p className="text-gray-700 text-base leading-relaxed">
+                          {/* Premium Description */}
+                          <p
+                            className={`text-base leading-relaxed ${
+                              driver.isPrime
+                                ? "text-amber-800"
+                                : driver.isVIP
+                                ? "text-purple-800"
+                                : "text-gray-700"
+                            }`}
+                          >
                             {driver.name} Is One Of Our Most Reliable Drivers
                             With Over{" "}
                             {driver.isPrime
@@ -630,9 +568,9 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                             Years Of Experience In City And Outstation Travel.
                             Known For{" "}
                             {driver.isPrime
-                              ? "His Exceptional Service"
+                              ? "His Exceptional Luxury Service"
                               : driver.isVIP
-                              ? "His Professional Service"
+                              ? "His Professional Premium Service"
                               : "His Reliable Service"}
                             , Punctuality, And Safe Driving,{" "}
                             {driver.isPrime
@@ -643,14 +581,53 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                             .
                           </p>
 
-                          {/* Location */}
-                          <p className="text-gray-600 text-base font-medium">
-                            {driver.location}
+                          {/* Location with Premium Accent */}
+                          <p
+                            className={`text-base font-medium ${
+                              driver.isPrime
+                                ? "text-amber-700"
+                                : driver.isVIP
+                                ? "text-purple-700"
+                                : "text-gray-600"
+                            }`}
+                          >
+                            📍 {driver.location}
                           </p>
+
+                          {/* Rating with Premium Stars */}
+                          <div className="flex items-center justify-center sm:justify-start gap-2">
+                            <div className="flex">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-5 w-5 ${
+                                    i < Math.floor(driver.rating)
+                                      ? driver.isPrime
+                                        ? "text-amber-500 fill-current"
+                                        : driver.isVIP
+                                        ? "text-purple-500 fill-current"
+                                        : "text-yellow-500 fill-current"
+                                      : "text-gray-300"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            <span
+                              className={`font-semibold ${
+                                driver.isPrime
+                                  ? "text-amber-700"
+                                  : driver.isVIP
+                                  ? "text-purple-700"
+                                  : "text-gray-700"
+                              }`}
+                            >
+                              {driver.rating}
+                            </span>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Action Buttons - Stacked vertically like in mockup */}
+                      {/* Action Buttons with Premium Styling */}
                       <div className="flex flex-col gap-3 min-w-[160px]">
                         <a
                           href={`https://wa.me/${driver.phone.replace(
@@ -662,12 +639,18 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                             driver.isPrime
                               ? "VIP Prime luxury"
                               : driver.isVIP
-                              ? "VIP"
-                              : ""
+                              ? "VIP premium"
+                              : "standard"
                           } taxi%20service.`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 transition-colors relative z-10"
+                          className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 transition-all duration-300 relative z-10 transform hover:scale-105 ${
+                            driver.isPrime
+                              ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl"
+                              : driver.isVIP
+                              ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-md hover:shadow-lg"
+                              : "bg-green-500 hover:bg-green-600 text-white shadow-md hover:shadow-lg"
+                          }`}
                           onClick={(e) => e.stopPropagation()}
                         >
                           <MessageCircle size={20} />
@@ -676,124 +659,39 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
 
                         <a
                           href={`tel:${driver.phone}`}
-                          className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 transition-colors relative z-10"
+                          className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 transition-all duration-300 relative z-10 transform hover:scale-105 ${
+                            driver.isPrime
+                              ? "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl"
+                              : driver.isVIP
+                              ? "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md hover:shadow-lg"
+                              : "bg-blue-500 hover:bg-blue-600 text-white shadow-md hover:shadow-lg"
+                          }`}
                           onClick={(e) => e.stopPropagation()}
                         >
                           <Phone size={20} />
                           Contact
                         </a>
 
-                        <div className="w-full bg-teal-500 hover:bg-teal-600 text-white py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 transition-colors cursor-pointer">
+                        <div
+                          className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+                            driver.isPrime
+                              ? "bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white shadow-lg hover:shadow-xl"
+                              : driver.isVIP
+                              ? "bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white shadow-md hover:shadow-lg"
+                              : "bg-teal-500 hover:bg-teal-600 text-white shadow-md hover:shadow-lg"
+                          }`}
+                        >
                           <span>👤</span>
                           View AD
                         </div>
                       </div>
                     </div>
                   </div>
-                </Link>
+                </div>
               </div>
             );
           })}
         </div>
-
-        {/* Pagination Controls */}
-        {totalPages > 1 && (
-          <div className="mt-12">
-            <div className="flex items-center justify-center space-x-2">
-              {/* Previous Button */}
-              <button
-                onClick={handlePrevPage}
-                disabled={currentPage === 1}
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg ${
-                  currentPage === 1
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                    : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
-                }`}
-              >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                Previous
-              </button>
-
-              {/* Page Numbers */}
-              <div className="flex items-center space-x-1">
-                {/* First page */}
-                {currentPage > 3 && (
-                  <>
-                    <button
-                      onClick={() => handlePageChange(1)}
-                      className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                    >
-                      1
-                    </button>
-                    {currentPage > 4 && (
-                      <span className="px-2 text-gray-500">...</span>
-                    )}
-                  </>
-                )}
-
-                {/* Current page and surrounding pages */}
-                {Array.from({ length: totalPages }, (_, index) => index + 1)
-                  .filter((pageNum) => {
-                    return (
-                      pageNum === currentPage ||
-                      pageNum === currentPage - 1 ||
-                      pageNum === currentPage + 1 ||
-                      (currentPage <= 2 && pageNum <= 3) ||
-                      (currentPage >= totalPages - 1 &&
-                        pageNum >= totalPages - 2)
-                    );
-                  })
-                  .map((pageNum) => (
-                    <button
-                      key={pageNum}
-                      onClick={() => handlePageChange(pageNum)}
-                      className={`px-3 py-2 text-sm font-medium rounded-lg ${
-                        pageNum === currentPage
-                          ? "bg-blue-600 text-white"
-                          : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  ))}
-
-                {/* Last page */}
-                {currentPage < totalPages - 2 && (
-                  <>
-                    {currentPage < totalPages - 3 && (
-                      <span className="px-2 text-gray-500">...</span>
-                    )}
-                    <button
-                      onClick={() => handlePageChange(totalPages)}
-                      className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                    >
-                      {totalPages}
-                    </button>
-                  </>
-                )}
-              </div>
-
-              {/* Next Button */}
-              <button
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg ${
-                  currentPage === totalPages
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                    : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
-                }`}
-              >
-                Next
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </button>
-            </div>
-
-            {/* Mobile-friendly pagination info */}
-            <div className="mt-4 text-center text-sm text-gray-600">
-              Page {currentPage} of {totalPages} • {totalDrivers} total drivers
-            </div>
-          </div>
-        )}
       </div>
     </section>
   );

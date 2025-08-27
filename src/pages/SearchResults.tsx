@@ -3,6 +3,11 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { Search, ChevronDown } from "lucide-react";
 import PrimeMembersCarousel from "../components/PrimeMembersCarousel";
 import UnifiedDriverSection from "../components/UnifiedDriverSection";
+import {
+  getAllStates,
+  getCitiesByState,
+  getCategories,
+} from "../utils/statesAndCities";
 
 const SearchResults: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -11,6 +16,7 @@ const SearchResults: React.FC = () => {
   // States for the hero search form
   const [searchFormState, setSearchFormState] = useState("");
   const [searchFormCity, setSearchFormCity] = useState("");
+  const [searchFormCategory, setSearchFormCategory] = useState("");
 
   // States for filtering results (used by PrimeMembersCarousel and RegularDriversSection)
   const [selectedCity, setSelectedCity] = useState("");
@@ -67,19 +73,36 @@ const SearchResults: React.FC = () => {
               onSubmit={handleFormSearch}
               className="flex flex-col sm:flex-row gap-1 xs:gap-1.5 sm:gap-4"
             >
+              <div className="relative flex-1 sm:flex-[1.3] min-w-0">
+                <select
+                  value={searchFormCategory}
+                  onChange={(e) => setSearchFormCategory(e.target.value)}
+                  className="w-full px-2 xs:px-2.5 sm:px-4 py-1 xs:py-1.5 sm:py-3 border border-gray-300 rounded-md text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none text-[10px] xs:text-xs sm:text-base"
+                >
+                  <option value="">Select Category</option>
+                  {getCategories().map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-1.5 xs:right-2.5 top-1/2 transform -translate-y-1/2 h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-4 sm:w-4 text-gray-400 pointer-events-none" />
+              </div>
               <div className="relative flex-1">
                 <select
                   value={searchFormState}
-                  onChange={(e) => setSearchFormState(e.target.value)}
+                  onChange={(e) => {
+                    setSearchFormState(e.target.value);
+                    setSearchFormCity(""); // Clear city when state changes
+                  }}
                   className="w-full px-2 xs:px-2.5 sm:px-4 py-1 xs:py-1.5 sm:py-3 border border-gray-300 rounded-md text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none text-[10px] xs:text-xs sm:text-base"
                 >
                   <option value="">Select State</option>
-                  <option value="Delhi">Delhi</option>
-                  <option value="Maharashtra">Maharashtra</option>
-                  <option value="Karnataka">Karnataka</option>
-                  <option value="Tamil Nadu">Tamil Nadu</option>
-                  <option value="Rajasthan">Rajasthan</option>
-                  <option value="Gujarat">Gujarat</option>
+                  {getAllStates().map((state) => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))}
                 </select>
                 <ChevronDown className="absolute right-1.5 xs:right-2.5 top-1/2 transform -translate-y-1/2 h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-4 sm:w-4 text-gray-400 pointer-events-none" />
               </div>
@@ -90,16 +113,14 @@ const SearchResults: React.FC = () => {
                   className="w-full px-2 xs:px-2.5 sm:px-4 py-1 xs:py-1.5 sm:py-3 border border-gray-300 rounded-md text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none text-[10px] xs:text-xs sm:text-base"
                 >
                   <option value="">Select City</option>
-                  <option value="Mumbai">Mumbai</option>
-                  <option value="Delhi">Delhi</option>
-                  <option value="Bangalore">Bangalore</option>
-                  <option value="Chennai">Chennai</option>
-                  <option value="Pune">Pune</option>
-                  <option value="Kolkata">Kolkata</option>
-                  <option value="Hyderabad">Hyderabad</option>
-                  <option value="Ahmedabad">Ahmedabad</option>
-                  <option value="Jaipur">Jaipur</option>
-                  <option value="Surat">Surat</option>
+                  {(searchFormState
+                    ? getCitiesByState(searchFormState)
+                    : []
+                  ).map((city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  ))}
                 </select>
                 <ChevronDown className="absolute right-1.5 xs:right-2.5 top-1/2 transform -translate-y-1/2 h-2.5 w-2.5 xs:h-3 xs:w-3 sm:h-4 sm:w-4 text-gray-400 pointer-events-none" />
               </div>
