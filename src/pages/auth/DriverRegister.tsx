@@ -91,9 +91,6 @@ const DriverRegister: React.FC = () => {
       const success = await register(driverData);
 
       if (success) {
-        alert(
-          "Registration successful! Please complete your profile to start driving."
-        );
         navigate("/driver/login");
       } else {
         setErrors({ general: "Registration failed. Please try again." });
@@ -306,15 +303,6 @@ const DriverRegister: React.FC = () => {
                   </p>
                 )}
               </div>
-            </div>
-
-            {/* Info Box */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-700">
-                <strong>What's next?</strong> After registration, complete your
-                profile with vehicle details, documents, and photos to start
-                driving.
-              </p>
             </div>
 
             <button

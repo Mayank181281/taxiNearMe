@@ -418,7 +418,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
           <div
             className="flex transition-transform duration-500 ease-in-out space-x-3"
             style={{
-              transform: `translateX(-${currentIndex * (128 + 12)}px)`, // 128px card width + 12px gap
+              transform: `translateX(-${currentIndex * (96 + 12)}px)`, // 96px card width + 12px gap
             }}
           >
             {/* Triple the drivers for smooth infinite scroll */}
@@ -440,20 +440,20 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
                   <Link
                     key={`${driver.id}-${globalIndex}`}
                     to={`/driver/${driver.id}`}
-                    className="w-32 flex-shrink-0"
+                    className="w-24 flex-shrink-0"
                   >
                     <div
-                      className={`${bgColor} rounded-lg relative text-center text-white hover:opacity-90 transition-all duration-200 shadow-md hover:shadow-lg overflow-hidden h-32`}
+                      className={`${bgColor} rounded-lg relative text-center text-white hover:opacity-90 transition-all duration-200 shadow-md hover:shadow-lg overflow-hidden h-24`}
                     >
                       {/* Prime Badge */}
-                      <div className="absolute top-2 right-2 z-10">
-                        <span className="bg-yellow-400 text-black text-xs px-2 py-1 rounded font-bold shadow-sm">
+                      <div className="absolute top-1 right-1 z-10">
+                        <span className="bg-yellow-400 text-black text-[10px] px-1.5 py-0.5 rounded font-bold shadow-sm">
                           Prime
                         </span>
                       </div>
 
                       {/* Profile Image - Full frame coverage */}
-                      <div className="relative h-24">
+                      <div className="relative h-16">
                         <img
                           src={driver.profileImage}
                           alt={driver.name}
@@ -464,8 +464,8 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
                       </div>
 
                       {/* Name at bottom */}
-                      <div className="absolute bottom-2 left-0 right-0 px-2">
-                        <h3 className="text-sm font-semibold leading-tight text-white drop-shadow-sm">
+                      <div className="absolute bottom-1 left-0 right-0 px-1">
+                        <h3 className="text-xs font-semibold leading-tight text-white drop-shadow-sm">
                           {driver.name}
                         </h3>
                       </div>

@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import SimilarProfiles from "../components/SimilarProfiles";
 
 interface Vehicle {
   id: string;
@@ -18,19 +19,14 @@ interface DriverDetail {
   email: string;
   phone: string;
   profileImage?: string;
-  gender: "Male" | "Female";
-  age?: number;
   city: string;
   state: string;
   address: string;
   licenseNumber: string;
-  experience: string;
-  languages: string[];
   specialServices: string[];
   vehicles: Vehicle[];
   availability: {
     status: "online" | "offline" | "busy";
-    workingHours: string;
     days: string[];
   };
   // Remove system fields: rating, totalRatings, isVerified, isPremium, joinDate
@@ -55,15 +51,11 @@ const DriverProfile: React.FC = () => {
       phone: "+91 9876543210",
       profileImage:
         "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop",
-      gender: "Male",
-      age: 35,
       city: "Delhi",
       state: "Delhi",
       address: "Delhi, Delhi",
       role: "prime-driver", // Used to determine premium status
       licenseNumber: "DL-1420110012345",
-      experience: "8 years",
-      languages: ["Hindi", "English", "Punjabi"],
       specialServices: [
         "Airport Transfer",
         "Wedding Services",
@@ -107,7 +99,6 @@ const DriverProfile: React.FC = () => {
       ],
       availability: {
         status: "online",
-        workingHours: "24/7",
         days: [
           "Monday",
           "Tuesday",
@@ -126,15 +117,11 @@ const DriverProfile: React.FC = () => {
       phone: "+91 9876543211",
       profileImage:
         "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop",
-      gender: "Female",
-      age: 28,
       city: "Mumbai",
       state: "Maharashtra",
       address: "Mumbai, Maharashtra",
       role: "prime-driver",
       licenseNumber: "MH-1220110067890",
-      experience: "5 years",
-      languages: ["Hindi", "English", "Marathi"],
       specialServices: [
         "Airport Transfer",
         "Business Trips",
@@ -167,7 +154,6 @@ const DriverProfile: React.FC = () => {
       ],
       availability: {
         status: "online",
-        workingHours: "6:00 AM - 10:00 PM",
         days: [
           "Monday",
           "Tuesday",
@@ -185,15 +171,11 @@ const DriverProfile: React.FC = () => {
       phone: "+91 9876543212",
       profileImage:
         "https://images.pexels.com/photos/1587009/pexels-photo-1587009.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop",
-      gender: "Male",
-      age: 42,
       city: "Ahmedabad",
       state: "Gujarat",
       address: "Ahmedabad, Gujarat",
       role: "regular-driver",
       licenseNumber: "GJ-0520110098765",
-      experience: "12 years",
-      languages: ["Hindi", "English", "Gujarati"],
       specialServices: ["City Tours", "Local Transport", "Market Visits"],
       vehicles: [
         {
@@ -210,7 +192,6 @@ const DriverProfile: React.FC = () => {
       ],
       availability: {
         status: "online",
-        workingHours: "5:00 AM - 11:00 PM",
         days: [
           "Monday",
           "Tuesday",
@@ -229,15 +210,11 @@ const DriverProfile: React.FC = () => {
       phone: "+91 9876543213",
       profileImage:
         "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop",
-      gender: "Male",
-      age: 38,
       city: "Jaipur",
       state: "Rajasthan",
       address: "Jaipur, Rajasthan",
       role: "regular-driver",
       licenseNumber: "RJ-1420110045678",
-      experience: "9 years",
-      languages: ["Hindi", "English", "Rajasthani"],
       specialServices: [
         "Tourist Services",
         "Local Sightseeing",
@@ -258,7 +235,6 @@ const DriverProfile: React.FC = () => {
       ],
       availability: {
         status: "online",
-        workingHours: "6:00 AM - 8:00 PM",
         days: [
           "Monday",
           "Tuesday",
@@ -276,15 +252,11 @@ const DriverProfile: React.FC = () => {
       phone: "+91 9876543214",
       profileImage:
         "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop",
-      gender: "Female",
-      age: 31,
       city: "Pune",
       state: "Maharashtra",
       address: "Pune, Maharashtra",
       role: "prime-driver",
       licenseNumber: "MH-1220110088899",
-      experience: "6 years",
-      languages: ["Hindi", "English", "Marathi"],
       specialServices: [
         "Women's Safety Service",
         "Airport Transfer",
@@ -306,7 +278,6 @@ const DriverProfile: React.FC = () => {
       ],
       availability: {
         status: "online",
-        workingHours: "7:00 AM - 9:00 PM",
         days: [
           "Monday",
           "Tuesday",
@@ -362,15 +333,12 @@ const DriverProfile: React.FC = () => {
               </div>
 
               <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                {driver.name} Is One Of Our Most Reliable Drivers With Over{" "}
-                {driver.experience.split(" ")[0]} Years Of Experience.{" "}
-                {driver.gender === "Male" ? "He" : "She"} City And Outstanding
-                Travel. Known For {driver.gender === "Male" ? "His" : "Her"}{" "}
-                Polite Behavior, Punctuality, And Safe Driving.{" "}
-                {driver.gender === "Male" ? "He" : "She"} Ensures Every Ride Is
-                Smooth And Stress-Free. Whether It's A Quick Trip To The Airport
-                Or A Late-Night Pickup, {driver.name} Is Always Ready To Serve
-                With A Smile.
+                {driver.name} is one of our most reliable drivers with extensive
+                experience in the city and outstanding travel service. Known for
+                polite behavior, punctuality, and safe driving, ensuring every
+                ride is smooth and stress-free. Whether it's a quick trip to the
+                airport or a late-night pickup, {driver.name} is always ready to
+                serve with a smile.
               </p>
 
               <p className="text-xs sm:text-sm text-gray-600 font-medium">
@@ -403,108 +371,108 @@ const DriverProfile: React.FC = () => {
           </div>
         </div>
 
-        {/* Profile Info Section - Responsive Table */}
+        {/* Vehicles Section - Responsive Grid */}
         <div className="bg-white rounded-lg shadow-lg border border-gray-200 mb-4 sm:mb-6">
           <div className="p-4 sm:p-6 border-b border-gray-200">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Profile Info</h2>
-          </div>
-
-          <div className="divide-y divide-gray-200">
-            <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">
-              <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">Name:</div>
-              <div className="text-gray-700 text-sm sm:text-base break-words">{driver.name}</div>
-            </div>
-            <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-white">
-              <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">Phone:</div>
-              <div className="text-gray-700 text-sm sm:text-base">
-                <a href={`tel:${driver.phone}`} className="text-blue-600 hover:text-blue-800">
-                  {driver.phone}
-                </a>
-              </div>
-            </div>
-            <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">
-              <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
-                Working Hours:
-              </div>
-              <div className="text-gray-700 text-sm sm:text-base">
-                {driver.availability.workingHours}
-              </div>
-            </div>
-            <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-white">
-              <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">Languages:</div>
-              <div className="text-gray-700 text-sm sm:text-base">{driver.languages.join(", ")}</div>
-            </div>
-            <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">
-              <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">City:</div>
-              <div className="text-gray-700 text-sm sm:text-base">{driver.city}</div>
-            </div>
-            <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-white">
-              <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">Gender:</div>
-              <div className="text-gray-700 text-sm sm:text-base">{driver.gender}</div>
-            </div>
-            <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">
-              <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">Age:</div>
-              <div className="text-gray-700 text-sm sm:text-base">{driver.age}</div>
-            </div>
-            <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-white">
-              <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
-                Experience:
-              </div>
-              <div className="text-gray-700 text-sm sm:text-base">{driver.experience}</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Vehicles Section - Responsive Grid */}
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200">
-          <div className="p-4 sm:p-6 border-b border-gray-200">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Vehicles</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+              Photos
+            </h2>
           </div>
 
           <div className="p-4 sm:p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-4 gap-3">
               {driver.vehicles.map((vehicle) => (
                 <div
                   key={vehicle.id}
-                  className="bg-blue-50 rounded-lg p-3 sm:p-4 border border-gray-200"
+                  className="aspect-square bg-gray-200 rounded-lg overflow-hidden"
                 >
                   <img
                     src={vehicle.image}
-                    alt={vehicle.model}
-                    className="w-full h-32 sm:h-40 object-cover rounded-lg mb-3 sm:mb-4"
+                    alt={`Vehicle ${vehicle.id}`}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
                   />
-                  <div className="space-y-1.5 sm:space-y-2">
-                    <div className="flex flex-col xs:flex-row">
-                      <span className="font-semibold text-gray-800 text-sm sm:text-base w-full xs:w-16 mb-1 xs:mb-0">
-                        Name:
-                      </span>
-                      <span className="text-gray-700 text-sm sm:text-base break-words">{vehicle.model}</span>
-                    </div>
-                    <div className="flex flex-col xs:flex-row">
-                      <span className="font-semibold text-gray-800 text-sm sm:text-base w-full xs:w-16 mb-1 xs:mb-0">
-                        Model:
-                      </span>
-                      <span className="text-gray-700 text-sm sm:text-base break-words">{vehicle.type}</span>
-                    </div>
-                    <div className="flex flex-col xs:flex-row">
-                      <span className="font-semibold text-gray-800 text-sm sm:text-base w-full xs:w-16 mb-1 xs:mb-0">
-                        Color:
-                      </span>
-                      <span className="text-gray-700 text-sm sm:text-base">{vehicle.color}</span>
-                    </div>
-                    <div className="flex flex-col xs:flex-row">
-                      <span className="font-semibold text-gray-800 text-sm sm:text-base w-full xs:w-16 mb-1 xs:mb-0">
-                        Number:
-                      </span>
-                      <span className="text-gray-700 text-sm sm:text-base font-mono">
-                        {vehicle.plateNumber}
-                      </span>
-                    </div>
-                  </div>
                 </div>
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Profile Info Section - Responsive Table */}
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200">
+          <div className="p-4 sm:p-6 border-b border-gray-200">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+              Profile Info
+            </h2>
+          </div>
+
+          <div className="divide-y divide-gray-200">
+            <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">
+              <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
+                Name:
+              </div>
+              <div className="text-gray-700 text-sm sm:text-base break-words">
+                {driver.name}
+              </div>
+            </div>
+            <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-white">
+              <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
+                Email:
+              </div>
+              <div className="text-gray-700 text-sm sm:text-base break-words">
+                {driver.email}
+              </div>
+            </div>
+            <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">
+              <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
+                Phone:
+              </div>
+              <div className="text-gray-700 text-sm sm:text-base">
+                <a
+                  href={`tel:${driver.phone}`}
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  {driver.phone}
+                </a>
+              </div>
+            </div>
+            <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-white">
+              <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
+                Category:
+              </div>
+              <div className="text-gray-700 text-sm sm:text-base">
+                {isPremiumDriver() ? "Vip Prime" : "Regular"}
+              </div>
+            </div>
+            <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">
+              <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
+                State:
+              </div>
+              <div className="text-gray-700 text-sm sm:text-base">
+                {driver.state}
+              </div>
+            </div>
+            <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-white">
+              <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
+                City:
+              </div>
+              <div className="text-gray-700 text-sm sm:text-base">
+                {driver.city}
+              </div>
+            </div>
+            <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">
+              <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
+                Address:
+              </div>
+              <div className="text-gray-700 text-sm sm:text-base">
+                Address Information
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Similar Profiles Section */}
+        <div className="mt-6 sm:mt-8">
+          <SimilarProfiles currentDriverId={driver.id} city={driver.city} />
         </div>
       </div>
     </div>

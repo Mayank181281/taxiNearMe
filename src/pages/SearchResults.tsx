@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Search, ChevronDown } from "lucide-react";
 import PrimeMembersCarousel from "../components/PrimeMembersCarousel";
-import RegularDriversSection from "../components/RegularDriversSection";
+import UnifiedDriverSection from "../components/UnifiedDriverSection";
 
 const SearchResults: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -119,14 +119,14 @@ const SearchResults: React.FC = () => {
       {/* Moderate spacing for slight search form overlap */}
       <div className="pt-12 sm:pt-10"></div>
 
-      {/* Prime Members Carousel */}
+      {/* VIP Prime Members Carousel */}
       <PrimeMembersCarousel
         selectedState={selectedState}
         selectedCity={selectedCity}
       />
 
-      {/* Regular Drivers Section */}
-      <RegularDriversSection
+      {/* Unified Drivers Section - All drivers in priority order */}
+      <UnifiedDriverSection
         selectedState={selectedState}
         selectedCity={selectedCity}
       />

@@ -201,3 +201,9 @@ export const getCitiesByState = (stateName: string): string[] => {
 export const getAllCities = (): string[] => {
   return statesAndCities.flatMap((state) => state.cities);
 };
+
+export const categories = ["Taxi", "Tour and Travels"];
+
+export const getCategories = (): string[] => {
+  return categories;
+};
