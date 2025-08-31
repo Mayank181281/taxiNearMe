@@ -15,7 +15,7 @@ const Profile: React.FC = () => {
           {/* Your Adverts */}
           <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Your Adverts
+              My Adverts
             </h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center">

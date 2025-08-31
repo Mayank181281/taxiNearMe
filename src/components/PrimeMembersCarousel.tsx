@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Crown } from "lucide-react";
 
 interface PrimeDriver {
   id: string;
   name: string;
+  title: string;
   rating: number;
   vehicleType: string;
   vehicleModel: string;
@@ -14,6 +15,7 @@ interface PrimeDriver {
   phone: string;
   profileImage: string;
   isPrime: boolean;
+  isVIP?: boolean;
 }
 
 interface PrimeMembersCarouselProps {
@@ -35,6 +37,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "1",
         name: "Rajesh Kumar",
+        title: "this is title ad",
         rating: 4.9,
         vehicleType: "Luxury Sedan",
         vehicleModel: "BMW 3 Series",
@@ -49,6 +52,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "13",
         name: "Vishal Gupta",
+        title: "this is title ad",
         rating: 4.7,
         vehicleType: "Premium SUV",
         vehicleModel: "Mercedes GLC",
@@ -63,6 +67,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "14",
         name: "Ananya Saxena",
+        title: "this is title ad",
         rating: 4.8,
         vehicleType: "Electric Sedan",
         vehicleModel: "Tesla Model S",
@@ -77,6 +82,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "15",
         name: "Rohit Malhotra",
+        title: "this is title ad",
         rating: 4.6,
         vehicleType: "Luxury Sedan",
         vehicleModel: "Audi A6",
@@ -91,6 +97,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "16",
         name: "Deepika Sharma",
+        title: "this is title ad",
         rating: 4.8,
         vehicleType: "Premium SUV",
         vehicleModel: "Range Rover Evoque",
@@ -105,6 +112,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "17",
         name: "Karan Singh",
+        title: "this is title ad",
         rating: 4.7,
         vehicleType: "Electric Luxury",
         vehicleModel: "Tesla Model X",
@@ -119,6 +127,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "18",
         name: "Priyanka Jain",
+        title: "this is title ad",
         rating: 4.9,
         vehicleType: "Luxury Sedan",
         vehicleModel: "Jaguar XF",
@@ -133,6 +142,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "19",
         name: "Amit Gupta",
+        title: "this is title ad",
         rating: 4.5,
         vehicleType: "Premium SUV",
         vehicleModel: "BMW X5",
@@ -147,6 +157,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "20",
         name: "Sonia Kapoor",
+        title: "this is title ad",
         rating: 4.8,
         vehicleType: "Electric SUV",
         vehicleModel: "Audi e-tron",
@@ -161,6 +172,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "2",
         name: "Priya Sharma",
+        title: "this is title ad",
         rating: 4.8,
         vehicleType: "Electric SUV",
         vehicleModel: "Tesla Model Y",
@@ -175,6 +187,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "3",
         name: "Mohammed Ali",
+        title: "this is title ad",
         rating: 4.7,
         vehicleType: "Premium SUV",
         vehicleModel: "Toyota Fortuner",
@@ -189,6 +202,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "4",
         name: "Anita Patel",
+        title: "this is title ad",
         rating: 4.6,
         vehicleType: "Luxury Sedan",
         vehicleModel: "Mercedes E-Class",
@@ -203,6 +217,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "5",
         name: "Vikram Singh",
+        title: "this is title ad",
         rating: 4.8,
         vehicleType: "Electric Sedan",
         vehicleModel: "Tesla Model 3",
@@ -217,6 +232,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "6",
         name: "Arjun Mehta",
+        title: "this is title ad",
         rating: 4.5,
         vehicleType: "Luxury SUV",
         vehicleModel: "Audi Q5",
@@ -231,6 +247,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "7",
         name: "Kavita Joshi",
+        title: "this is title ad",
         rating: 4.7,
         vehicleType: "Luxury Sedan",
         vehicleModel: "Audi A4",
@@ -245,6 +262,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "8",
         name: "Rahul Gupta",
+        title: "this is title ad",
         rating: 4.9,
         vehicleType: "Premium SUV",
         vehicleModel: "BMW X3",
@@ -259,6 +277,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "9",
         name: "Sanjay Malhotra",
+        title: "this is title ad",
         rating: 4.6,
         vehicleType: "Electric SUV",
         vehicleModel: "Tata Nexon EV Max",
@@ -273,6 +292,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "10",
         name: "Neha Agarwal",
+        title: "this is title ad",
         rating: 4.8,
         vehicleType: "Luxury Sedan",
         vehicleModel: "Mercedes C-Class",
@@ -287,6 +307,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "11",
         name: "Amit Verma",
+        title: "this is title ad",
         rating: 4.5,
         vehicleType: "Premium SUV",
         vehicleModel: "Toyota Innova Crysta",
@@ -301,6 +322,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
       {
         id: "12",
         name: "Ravi Shankar",
+        title: "this is title ad",
         rating: 4.7,
         vehicleType: "Electric Sedan",
         vehicleModel: "MG ZS EV",
@@ -358,25 +380,6 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
     return () => clearInterval(interval);
   }, [isAutoScrolling, filteredDrivers.length]);
 
-  const goToPrevious = () => {
-    setCurrentIndex((prevIndex) => {
-      if (prevIndex === 0) {
-        return filteredDrivers.length - 1;
-      }
-      return prevIndex - 1;
-    });
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prevIndex) => {
-      const nextIndex = prevIndex + 1;
-      if (nextIndex >= filteredDrivers.length) {
-        return 0;
-      }
-      return nextIndex;
-    });
-  };
-
   // Don't render the component if no drivers match the filter
   if (filteredDrivers.length === 0) {
     return null;
@@ -384,30 +387,6 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
 
   return (
     <div className="mb-8 max-w-6xl mx-auto px-4">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center">
-          <span className="text-blue-600 mr-2 text-lg">📋</span>
-          <h2 className="text-base font-semibold text-gray-800">
-            Prime Members:
-          </h2>
-        </div>
-        <div className="flex space-x-2">
-          <button
-            onClick={goToPrevious}
-            className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-          >
-            <ChevronLeft className="text-gray-600" size={20} />
-          </button>
-          <button
-            onClick={goToNext}
-            className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-          >
-            <ChevronRight className="text-gray-600" size={20} />
-          </button>
-        </div>
-      </div>
-
       {/* Continuous Carousel Container */}
       <div className="bg-blue-50 rounded-lg p-4">
         <div
@@ -418,7 +397,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
           <div
             className="flex transition-transform duration-500 ease-in-out space-x-3"
             style={{
-              transform: `translateX(-${currentIndex * (96 + 12)}px)`, // 96px card width + 12px gap
+              transform: `translateX(-${currentIndex * (144 + 12)}px)`, // 144px card width + 12px gap
             }}
           >
             {/* Triple the drivers for smooth infinite scroll */}
@@ -440,33 +419,39 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
                   <Link
                     key={`${driver.id}-${globalIndex}`}
                     to={`/driver/${driver.id}`}
-                    className="w-24 flex-shrink-0"
+                    className="w-36 flex-shrink-0"
                   >
                     <div
-                      className={`${bgColor} rounded-lg relative text-center text-white hover:opacity-90 transition-all duration-200 shadow-md hover:shadow-lg overflow-hidden h-24`}
+                      className={`${bgColor} rounded-lg relative text-center text-white hover:opacity-90 transition-all duration-200 shadow-md hover:shadow-lg overflow-hidden h-40`}
                     >
-                      {/* Prime Badge */}
-                      <div className="absolute top-1 right-1 z-10">
-                        <span className="bg-yellow-400 text-black text-[10px] px-1.5 py-0.5 rounded font-bold shadow-sm">
-                          Prime
-                        </span>
+                      {/* Custom Premium Badge for Carousel */}
+                      <div className="absolute top-1 left-1 z-10 transform scale-[0.8] origin-top-left">
+                        <div className="flex items-center gap-1 text-yellow-900 font-black tracking-wider transition-all duration-300 bg-gradient-to-r from-yellow-300 via-yellow-400 to-amber-400 border-2 border-yellow-500 shadow-lg hover:shadow-xl hover:shadow-yellow-400/50 px-2 py-0.5 rounded-full">
+                          <Crown
+                            className="h-3 w-3 text-yellow-800 filter drop-shadow-sm"
+                            strokeWidth={3}
+                          />
+                          <span className="text-[8px] uppercase font-black">
+                            VIP PRIME
+                          </span>
+                        </div>
                       </div>
 
-                      {/* Profile Image - Full frame coverage */}
-                      <div className="relative h-16">
+                      {/* Profile Image - Rectangular coverage */}
+                      <div className="relative h-32">
                         <img
                           src={driver.profileImage}
-                          alt={driver.name}
-                          className="w-full h-full object-cover"
+                          alt={driver.title}
+                          className="w-full h-full object-cover object-center"
                         />
                         {/* Gradient overlay for text readability */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                       </div>
 
-                      {/* Name at bottom */}
+                      {/* Title at bottom */}
                       <div className="absolute bottom-1 left-0 right-0 px-1">
                         <h3 className="text-xs font-semibold leading-tight text-white drop-shadow-sm">
-                          {driver.name}
+                          {driver.title}
                         </h3>
                       </div>
                     </div>

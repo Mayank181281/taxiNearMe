@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Car, User, Mail, Lock, Phone, Eye, EyeOff } from "lucide-react";
-import { useAuth } from "../../contexts/auth";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   validateEmail,
   validatePhone,
@@ -15,7 +15,6 @@ const DriverRegister: React.FC = () => {
     phone: "",
     password: "",
     confirmPassword: "",
-    gender: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -130,10 +129,6 @@ const DriverRegister: React.FC = () => {
 
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
-    }
-
-    if (!formData.gender) {
-      newErrors.gender = "Gender is required";
     }
 
     if (!termsAccepted) {
@@ -351,32 +346,6 @@ const DriverRegister: React.FC = () => {
                 </div>
                 {errors.phone && (
                   <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="gender"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Gender *
-                </label>
-                <select
-                  id="gender"
-                  name="gender"
-                  value={formData.gender}
-                  onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border ${
-                    errors.gender ? "border-red-300" : "border-gray-300"
-                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-                >
-                  <option value="">Select Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select>
-                {errors.gender && (
-                  <p className="mt-1 text-sm text-red-600">{errors.gender}</p>
                 )}
               </div>
 

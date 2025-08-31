@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Phone, Car, MessageCircle, Crown, Star, Shield } from "lucide-react";
 
 interface Driver {
   id: string;
   name: string;
+  title: string;
   rating: number;
   vehicleType: string;
   vehicleModel: string;
@@ -26,6 +28,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
   selectedState,
   selectedCity,
 }) => {
+  const navigate = useNavigate();
   const [filteredDrivers, setFilteredDrivers] = useState<Driver[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const driversPerPage = 10;
@@ -37,6 +40,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       {
         id: "1",
         name: "Rajesh Kumar",
+        title: "this is title ad",
         rating: 4.9,
         vehicleType: "Luxury Sedan",
         vehicleModel: "BMW 3 Series",
@@ -53,6 +57,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       {
         id: "2",
         name: "Priya Sharma",
+        title: "this is title ad",
         rating: 4.8,
         vehicleType: "Electric SUV",
         vehicleModel: "Tesla Model Y",
@@ -69,6 +74,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       {
         id: "3",
         name: "Mohammed Ali",
+        title: "this is title ad",
         rating: 4.7,
         vehicleType: "Premium SUV",
         vehicleModel: "Toyota Fortuner",
@@ -87,6 +93,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       {
         id: "201",
         name: "Mahesh Varma",
+        title: "this is title ad",
         rating: 4.7,
         vehicleType: "Premium Sedan",
         vehicleModel: "Toyota Camry",
@@ -103,6 +110,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       {
         id: "202",
         name: "Sunita Devi",
+        title: "this is title ad",
         rating: 4.6,
         vehicleType: "Premium SUV",
         vehicleModel: "Honda CR-V",
@@ -121,6 +129,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       {
         id: "101",
         name: "Suresh Gupta",
+        title: "this is title ad",
         rating: 4.5,
         vehicleType: "Sedan",
         vehicleModel: "Honda City",
@@ -137,6 +146,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       {
         id: "102",
         name: "Amit Verma",
+        title: "this is title ad",
         rating: 4.3,
         vehicleType: "Hatchback",
         vehicleModel: "Maruti Swift",
@@ -153,6 +163,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       {
         id: "103",
         name: "Deepak Singh",
+        title: "this is title ad",
         rating: 4.4,
         vehicleType: "SUV",
         vehicleModel: "Mahindra XUV500",
@@ -169,6 +180,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       {
         id: "104",
         name: "Ravi Patel",
+        title: "this is title ad",
         rating: 4.2,
         vehicleType: "Sedan",
         vehicleModel: "Toyota Corolla",
@@ -185,6 +197,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       {
         id: "105",
         name: "Vikash Kumar",
+        title: "this is title ad",
         rating: 4.1,
         vehicleType: "Hatchback",
         vehicleModel: "Hyundai i20",
@@ -202,6 +215,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       {
         id: "4",
         name: "Kavita Reddy",
+        title: "this is title ad",
         rating: 4.9,
         vehicleType: "Luxury SUV",
         vehicleModel: "Audi Q5",
@@ -218,6 +232,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       {
         id: "5",
         name: "Arshan Sheikh",
+        title: "this is title ad",
         rating: 4.8,
         vehicleType: "Executive Sedan",
         vehicleModel: "Mercedes C-Class",
@@ -235,6 +250,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       {
         id: "203",
         name: "Neha Tripathi",
+        title: "this is title ad",
         rating: 4.6,
         vehicleType: "Premium Hatchback",
         vehicleModel: "Volkswagen Polo GT",
@@ -251,6 +267,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       {
         id: "204",
         name: "Rajat Khanna",
+        title: "this is title ad",
         rating: 4.5,
         vehicleType: "Premium Sedan",
         vehicleModel: "Honda Accord",
@@ -336,8 +353,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
     if (driver.isPrime) {
       return {
         containerClass: "relative",
-        frameClass:
-          "bg-white rounded-3xl border-4 border-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-[1.02]",
+        frameClass: "bg-white rounded-3xl border-2 border-gray-200 shadow-2xl",
         backgroundClass: "p-8",
         badgeClass: "",
         badgeText: "VIP Prime",
@@ -347,8 +363,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
     if (driver.isVIP) {
       return {
         containerClass: "relative",
-        frameClass:
-          "bg-white rounded-3xl border-4 border-gradient-to-r from-purple-400 via-purple-500 to-purple-600 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.01]",
+        frameClass: "bg-white rounded-3xl border-2 border-gray-200 shadow-xl",
         backgroundClass: "p-8",
         badgeClass: "",
         badgeText: "VIP",
@@ -357,11 +372,10 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
     }
     return {
       containerClass: "relative",
-      frameClass:
-        "bg-white rounded-xl border-2 border-gray-200 shadow-md hover:shadow-lg transition-shadow",
-      backgroundClass: "p-6",
+      frameClass: "bg-white rounded-3xl border-2 border-gray-300 shadow-lg",
+      backgroundClass: "p-8",
       badgeClass: "",
-      badgeText: "Standard",
+      badgeText: "FREE",
       hasFloatingBadge: true,
     };
   };
@@ -369,33 +383,18 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
   const getPremiumBadge = (driver: Driver) => {
     if (driver.isPrime) {
       return (
-        <div className="absolute -top-3 -right-3 z-20">
-          <div className="relative">
-            {/* Outer glow effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 rounded-2xl blur-sm opacity-75 animate-pulse"></div>
-
-            {/* Main badge */}
-            <div className="relative bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 px-6 py-3 rounded-2xl shadow-2xl border-2 border-white transform rotate-3 hover:rotate-0 transition-transform duration-300">
-              {/* Inner shine effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent rounded-2xl"></div>
-
-              {/* Badge content */}
-              <div className="relative flex items-center gap-2">
-                <Crown className="h-5 w-5 text-amber-800 drop-shadow-sm" />
-                <span className="text-amber-900 font-bold text-sm tracking-wide drop-shadow-sm">
-                  VIP PRIME
-                </span>
-                <div className="flex">
-                  <Star className="h-3 w-3 text-amber-800 fill-current" />
-                  <Star className="h-3 w-3 text-amber-800 fill-current" />
-                  <Star className="h-3 w-3 text-amber-800 fill-current" />
-                </div>
-              </div>
-
-              {/* Decorative elements */}
-              <div className="absolute -top-1 -left-1 w-2 h-2 bg-white rounded-full opacity-60"></div>
-              <div className="absolute -bottom-1 -right-1 w-1 h-1 bg-amber-200 rounded-full opacity-80"></div>
-            </div>
+        <div className="absolute -top-0 left-1/2 -translate-x-1/2 lg:left-auto lg:translate-x-0 lg:right-4 z-30">
+          <div className="relative inline-flex items-center gap-2 px-4 py-2">
+            <Crown
+              className="h-5 w-5 text-yellow-800"
+              style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))" }}
+            />
+            <span
+              className="text-yellow-900 font-serif font-bold text-sm uppercase tracking-wider"
+              style={{ textShadow: "0 1px 2px rgba(255,255,255,0.5)" }}
+            >
+              VIP Prime
+            </span>
           </div>
         </div>
       );
@@ -403,46 +402,36 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
 
     if (driver.isVIP) {
       return (
-        <div className="absolute -top-3 -right-3 z-20">
-          <div className="relative">
-            {/* Outer glow effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 rounded-xl blur-sm opacity-60"></div>
-
-            {/* Main badge */}
-            <div className="relative bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 px-5 py-2.5 rounded-xl shadow-xl border-2 border-white transform -rotate-2 hover:rotate-0 transition-transform duration-300">
-              {/* Inner shine effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent rounded-xl"></div>
-
-              {/* Badge content */}
-              <div className="relative flex items-center gap-2">
-                <Shield className="h-4 w-4 text-purple-200 drop-shadow-sm" />
-                <span className="text-white font-bold text-sm tracking-wide drop-shadow-sm">
-                  VIP
-                </span>
-                <div className="flex">
-                  <Star className="h-3 w-3 text-purple-200 fill-current" />
-                  <Star className="h-3 w-3 text-purple-200 fill-current" />
-                </div>
-              </div>
-
-              {/* Decorative elements */}
-              <div className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-white rounded-full opacity-70"></div>
-              <div className="absolute -bottom-1 -left-1 w-1 h-1 bg-purple-300 rounded-full opacity-60"></div>
-            </div>
+        <div className="absolute -top-0 left-1/2 -translate-x-1/2 lg:left-auto lg:translate-x-0 lg:right-10 z-30">
+          <div className="relative inline-flex items-center gap-2 px-4 py-2">
+            <Shield
+              className="h-5 w-5 text-indigo-800"
+              style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))" }}
+            />
+            <span
+              className="text-indigo-900 font-serif font-bold text-sm uppercase tracking-wider"
+              style={{ textShadow: "0 1px 2px rgba(255,255,255,0.5)" }}
+            >
+              VIP
+            </span>
           </div>
         </div>
       );
     }
 
     return (
-      <div className="absolute -top-2 -right-2 z-20">
-        <div className="bg-gradient-to-r from-gray-500 to-gray-600 px-4 py-2 rounded-lg shadow-md border border-gray-300">
-          <div className="flex items-center gap-1">
-            <Star className="h-3 w-3 text-gray-200 fill-current" />
-            <span className="text-white font-medium text-xs tracking-wide">
-              STANDARD
-            </span>
-          </div>
+      <div className="absolute -top-0 left-1/2 -translate-x-1/2 lg:left-auto lg:translate-x-0 lg:right-6 z-30">
+        <div className="relative inline-flex items-center gap-2 px-4 py-2">
+          <Star
+            className="h-5 w-5 text-gray-800"
+            style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))" }}
+          />
+          <span
+            className="text-gray-900 font-serif font-bold text-sm uppercase tracking-wider"
+            style={{ textShadow: "0 1px 2px rgba(255,255,255,0.5)" }}
+          >
+            FREE
+          </span>
         </div>
       </div>
     );
@@ -451,26 +440,6 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
   return (
     <section className="py-8 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">
-            Available Drivers - Sorted by Priority
-          </h2>
-          <p className="text-lg text-gray-600">
-            VIP Prime → VIP → Standard drivers available for booking. Premium
-            service guaranteed across India
-          </p>
-          {/* Pagination Info */}
-          <div className="mt-4 text-sm text-gray-500">
-            Showing {startIndex + 1}-{Math.min(endIndex, totalDrivers)} of{" "}
-            {totalDrivers} drivers
-            {totalPages > 1 && (
-              <span className="ml-2">
-                (Page {currentPage} of {totalPages})
-              </span>
-            )}
-          </div>
-        </div>
-
         {/* Unified Drivers List with Premium Badges */}
         <div className="space-y-6">
           {currentDrivers.map((driver) => {
@@ -489,17 +458,16 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                       ? {
                           background:
                             "linear-gradient(145deg, #ffffff 0%, #fefce8 100%)",
-                          borderImage:
-                            "linear-gradient(145deg, #f59e0b, #eab308, #f59e0b) 1",
                         }
                       : driver.isVIP
                       ? {
                           background:
                             "linear-gradient(145deg, #ffffff 0%, #faf5ff 100%)",
-                          borderImage:
-                            "linear-gradient(145deg, #8b5cf6, #a855f7, #8b5cf6) 1",
                         }
-                      : {}
+                      : {
+                          background:
+                            "linear-gradient(145deg, #ffffff 0%, #f0f9ff 100%)",
+                        }
                   }
                 >
                   <div className={styling.backgroundClass}>
@@ -514,6 +482,10 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                           {driver.isVIP && !driver.isPrime && (
                             <div className="absolute -inset-2 bg-gradient-to-r from-purple-400 via-purple-500 to-purple-600 rounded-xl blur-sm opacity-25"></div>
                           )}
+                          {/* Added glow for FREE drivers */}
+                          {!driver.isPrime && !driver.isVIP && (
+                            <div className="absolute -inset-2 bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500 rounded-xl blur-sm opacity-20"></div>
+                          )}
                           <img
                             src={driver.profileImage}
                             alt={driver.name}
@@ -522,14 +494,14 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                                 ? "ring-4 ring-amber-300"
                                 : driver.isVIP
                                 ? "ring-4 ring-purple-300"
-                                : "ring-2 ring-gray-200"
+                                : "ring-4 ring-sky-200" // Updated ring for FREE drivers
                             }`}
                           />
                         </div>
 
                         {/* Driver Details */}
                         <div className="flex-1 space-y-4 text-center sm:text-left">
-                          {/* Name with Premium Styling */}
+                          {/* Title with Premium Styling */}
                           <h3
                             className={`text-2xl font-bold leading-tight ${
                               driver.isPrime
@@ -539,7 +511,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                                 : "text-gray-900"
                             }`}
                           >
-                            {driver.name}
+                            {driver.title}
                             {driver.isPrime && (
                               <Crown className="inline ml-2 h-6 w-6 text-amber-600" />
                             )}
@@ -593,41 +565,10 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                           >
                             📍 {driver.location}
                           </p>
-
-                          {/* Rating with Premium Stars */}
-                          <div className="flex items-center justify-center sm:justify-start gap-2">
-                            <div className="flex">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`h-5 w-5 ${
-                                    i < Math.floor(driver.rating)
-                                      ? driver.isPrime
-                                        ? "text-amber-500 fill-current"
-                                        : driver.isVIP
-                                        ? "text-purple-500 fill-current"
-                                        : "text-yellow-500 fill-current"
-                                      : "text-gray-300"
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                            <span
-                              className={`font-semibold ${
-                                driver.isPrime
-                                  ? "text-amber-700"
-                                  : driver.isVIP
-                                  ? "text-purple-700"
-                                  : "text-gray-700"
-                              }`}
-                            >
-                              {driver.rating}
-                            </span>
-                          </div>
                         </div>
                       </div>
 
-                      {/* Action Buttons with Premium Styling */}
+                      {/* Action Buttons without hover effects */}
                       <div className="flex flex-col gap-3 min-w-[160px]">
                         <a
                           href={`https://wa.me/${driver.phone.replace(
@@ -640,16 +581,16 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                               ? "VIP Prime luxury"
                               : driver.isVIP
                               ? "VIP premium"
-                              : "standard"
+                              : "FREE"
                           } taxi%20service.`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 transition-all duration-300 relative z-10 transform hover:scale-105 ${
+                          className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 relative z-10 ${
                             driver.isPrime
-                              ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl"
+                              ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg"
                               : driver.isVIP
-                              ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-md hover:shadow-lg"
-                              : "bg-green-500 hover:bg-green-600 text-white shadow-md hover:shadow-lg"
+                              ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md"
+                              : "bg-green-500 text-white shadow-md"
                           }`}
                           onClick={(e) => e.stopPropagation()}
                         >
@@ -659,12 +600,12 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
 
                         <a
                           href={`tel:${driver.phone}`}
-                          className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 transition-all duration-300 relative z-10 transform hover:scale-105 ${
+                          className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 relative z-10 ${
                             driver.isPrime
-                              ? "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl"
+                              ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg"
                               : driver.isVIP
-                              ? "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md hover:shadow-lg"
-                              : "bg-blue-500 hover:bg-blue-600 text-white shadow-md hover:shadow-lg"
+                              ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
+                              : "bg-blue-500 text-white shadow-md"
                           }`}
                           onClick={(e) => e.stopPropagation()}
                         >
@@ -673,13 +614,17 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                         </a>
 
                         <div
-                          className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 transition-all duration-300 cursor-pointer transform hover:scale-105 ${
+                          className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 cursor-pointer ${
                             driver.isPrime
-                              ? "bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white shadow-lg hover:shadow-xl"
+                              ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg"
                               : driver.isVIP
-                              ? "bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white shadow-md hover:shadow-lg"
-                              : "bg-teal-500 hover:bg-teal-600 text-white shadow-md hover:shadow-lg"
+                              ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-md"
+                              : "bg-teal-500 text-white shadow-md"
                           }`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/driver/${driver.id}`);
+                          }}
                         >
                           <span>👤</span>
                           View AD
@@ -691,6 +636,83 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
               </div>
             );
           })}
+        </div>
+
+        {/* Pagination Info and Controls at Bottom */}
+        <div className="text-center mt-8">
+          <div className="text-sm text-gray-500 mb-4">
+            Showing {startIndex + 1}-{Math.min(endIndex, totalDrivers)} of{" "}
+            {totalDrivers} drivers
+            {totalPages > 1 && (
+              <span className="ml-2">
+                (Page {currentPage} of {totalPages})
+              </span>
+            )}
+          </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center space-x-2">
+              {/* Previous Button */}
+              <button
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+
+              {/* Page Numbers */}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-3 py-2 rounded-lg ${
+                      currentPage === page
+                        ? "bg-blue-500 text-white"
+                        : "border border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+
+              {/* Next Button */}
+              <button
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>

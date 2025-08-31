@@ -53,7 +53,7 @@ const Home: React.FC = () => {
         }}
       >
         {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+        <div className="absolute inset-0 bg-opacity-0"></div>
 
         {/* Content */}
         <div className="relative max-w-4xl mx-auto px-4 text-center text-white">
@@ -138,7 +138,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Service Cards Section */}
-      <section className="pt-20 sm:pt-16 md:pt-12 pb-8 bg-white">
+      <section className="pt-28 sm:pt-24 md:pt-20 pb-8 bg-white">
         <div className="max-w-2xl mx-auto px-4">
           <div className="flex justify-center items-center gap-6 md:gap-8">
             {/* Taxi Card */}
@@ -219,7 +219,7 @@ const Home: React.FC = () => {
           </div>
 
           {/* City Buttons Grid */}
-          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-10 sm:gap-12">
+          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-10 gap-y-20 sm:gap-x-12 sm:gap-y-24">
             {filteredCities.length > 0 ? (
               filteredCities.map((city, index) => (
                 <div
@@ -239,24 +239,24 @@ const Home: React.FC = () => {
                   {hoveredCity === city && (
                     <>
                       {/* Top Option */}
-                      <div className="absolute bottom-full left-0 right-0 mb-1 z-10">
+                      <div className="absolute bottom-full left-0 right-0 z-10">
                         <button
                           onClick={() => handleCityClick(city)}
-                          className="w-full px-4 py-2.5 bg-white text-gray-700 hover:bg-blue-50 transition-colors rounded-lg shadow-lg border border-gray-200 text-sm"
+                          className="w-full px-4 py-2.5 bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors rounded-full shadow-lg border border-blue-200 text-sm"
                         >
                           <span className="font-medium">Taxi</span>
-                          <span className="text-gray-500 ml-1">- {city}</span>
+                          <span className="text-blue-600 ml-1">- {city}</span>
                         </button>
                       </div>
 
                       {/* Bottom Option */}
-                      <div className="absolute top-full left-0 right-0 mt-1 z-10">
+                      <div className="absolute top-full left-0 right-0 z-10">
                         <button
                           onClick={() => handleCityClick(city)}
-                          className="w-full px-4 py-2.5 bg-white text-gray-700 hover:bg-blue-50 transition-colors rounded-lg shadow-lg border border-gray-200 text-sm"
+                          className="w-full px-4 py-2.5 bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors rounded-full shadow-lg border border-blue-200 text-sm"
                         >
                           <span className="font-medium">Tour and Travels</span>
-                          <span className="text-gray-500 ml-1">- {city}</span>
+                          <span className="text-blue-600 ml-1">- {city}</span>
                         </button>
                       </div>
                     </>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAds, Advertisement } from "../contexts/AdsContext";
+import DriverTierTag from "../components/DriverTierTags";
 
 const YourAdverts: React.FC = () => {
   const navigate = useNavigate();
@@ -8,6 +9,39 @@ const YourAdverts: React.FC = () => {
   const [showPlansModal, setShowPlansModal] = useState(false);
   const [billingPeriod, setBillingPeriod] = useState<"month" | "day">("month");
   const [viewingAd, setViewingAd] = useState<Advertisement | null>(null);
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "vip-prime":
+        return <DriverTierTag tier="vip-prime" size="sm" />;
+      case "vip":
+        return <DriverTierTag tier="vip" size="sm" />;
+      case "published":
+        return (
+          <span className="bg-green-500 text-white px-3 py-1 rounded text-sm font-medium">
+            Published
+          </span>
+        );
+      case "waiting-approval":
+        return (
+          <span className="bg-yellow-500 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm font-medium">
+            <span className="hidden sm:inline">Pending</span>
+            <span className="sm:hidden">Pending</span>
+          </span>
+        );
+      case "inactive":
+        return (
+          <button
+            onClick={() => setShowPlansModal(true)}
+            className="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm font-medium transition-colors cursor-pointer"
+          >
+            Publish
+          </button>
+        );
+      default:
+        return null;
+    }
+  };
 
   const PlansModal = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -336,47 +370,6 @@ const YourAdverts: React.FC = () => {
     return statusOrder[a.status] - statusOrder[b.status];
   });
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "vip-prime":
-        return (
-          <span className="bg-orange-500 text-white px-3 py-1 rounded text-sm font-medium">
-            VIP Prime
-          </span>
-        );
-      case "vip":
-        return (
-          <span className="bg-blue-500 text-white px-3 py-1 rounded text-sm font-medium">
-            VIP
-          </span>
-        );
-      case "published":
-        return (
-          <span className="bg-green-500 text-white px-3 py-1 rounded text-sm font-medium">
-            Published
-          </span>
-        );
-      case "waiting-approval":
-        return (
-          <span className="bg-yellow-500 text-white px-2 sm:px-3 py-1 rounded text-xs sm:text-sm font-medium">
-            <span className="hidden sm:inline">Pending</span>
-            <span className="sm:hidden">Pending</span>
-          </span>
-        );
-      case "inactive":
-        return (
-          <button
-            onClick={() => setShowPlansModal(true)}
-            className="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm font-medium transition-colors cursor-pointer"
-          >
-            Publish
-          </button>
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* WhatsApp Contact Message */}
@@ -521,30 +514,28 @@ const YourAdverts: React.FC = () => {
                         <div className="flex-shrink-0 ml-4 flex items-center space-x-2">
                           {getStatusBadge(advert.status)}
 
-                          {/* Edit button - only for inactive ads */}
-                          {advert.status === "inactive" && (
-                            <button
-                              onClick={() =>
-                                navigate(`/profile/post-ads?edit=${advert.id}`)
-                              }
-                              className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
-                              title="Edit Advertisement"
+                          {/* Edit button - available for all ads */}
+                          <button
+                            onClick={() =>
+                              navigate(`/profile/post-ads?edit=${advert.id}`)
+                            }
+                            className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Edit Advertisement"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
                             >
-                              <svg
-                                className="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                />
-                              </svg>
-                            </button>
-                          )}
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                              />
+                            </svg>
+                          </button>
 
                           {/* View button - for published and waiting approval ads */}
                           {(advert.status === "published" ||

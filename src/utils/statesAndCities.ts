@@ -24,7 +24,7 @@ export const statesAndCities: StateData[] = [
       "Nanded",
       "Kolhapur",
       "Ulhasnagar",
-      "Sangli-Miraj & Kupwad",
+      "Sangli-Miraj",
       "Malegaon",
       "Jalgaon",
       "Akola",

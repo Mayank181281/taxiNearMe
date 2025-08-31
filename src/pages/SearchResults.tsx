@@ -51,17 +51,17 @@ const SearchResults: React.FC = () => {
         }}
       >
         {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+        <div className="absolute inset-0 bg-black bg-opacity-0"></div>
 
         {/* Content */}
         <div className="relative max-w-4xl mx-auto px-4 text-center text-white">
           <p className="text-lg mb-4 font-medium opacity-90">
             Finding Best Taxis Near you.
           </p>
-          <h1 className="text-5xl md:text-6xl font-bold mb-4">
+          <h2 className="text-5xl md:text-6xl font-bold mb-4">
             "Your Journey, Our Priority"
-          </h1>
-          <p className="text-xl mb-8 max-w-2xl mx-auto font-light opacity-90">
+          </h2>
+          <p className="text-xl mb-16 max-w-2xl mx-auto font-light opacity-90">
             Easy bookings, trusted drivers, and rides that fit your schedule.
           </p>
         </div>

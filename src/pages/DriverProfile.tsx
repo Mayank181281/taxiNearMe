@@ -1,6 +1,7 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import SimilarProfiles from "../components/SimilarProfiles";
+import DriverTierTag, { DriverTier } from "../components/DriverTierTags";
 
 interface Vehicle {
   id: string;
@@ -15,10 +16,8 @@ interface Vehicle {
 
 interface DriverDetail {
   id: string;
-  name: string;
-  email: string;
+  title: string;
   phone: string;
-  profileImage?: string;
   city: string;
   state: string;
   address: string;
@@ -29,9 +28,8 @@ interface DriverDetail {
     status: "online" | "offline" | "busy";
     days: string[];
   };
-  // Remove system fields: rating, totalRatings, isVerified, isPremium, joinDate
-  // These will be determined by business logic or role
-  role?: string; // Keep role for premium determination
+
+  role?: string;
 }
 
 const DriverProfile: React.FC = () => {
@@ -46,11 +44,8 @@ const DriverProfile: React.FC = () => {
   const driverProfiles: { [key: string]: DriverDetail } = {
     "1": {
       id: "1",
-      name: "Rajesh Kumar Sharma",
-      email: "rajesh.kumar@taxibook.com",
+      title: "this is test title",
       phone: "+91 9876543210",
-      profileImage:
-        "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop",
       city: "Delhi",
       state: "Delhi",
       address: "Delhi, Delhi",
@@ -112,11 +107,8 @@ const DriverProfile: React.FC = () => {
     },
     "2": {
       id: "2",
-      name: "Priya Singh",
-      email: "priya.singh@taxibook.com",
+      title: "this is test title",
       phone: "+91 9876543211",
-      profileImage:
-        "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop",
       city: "Mumbai",
       state: "Maharashtra",
       address: "Mumbai, Maharashtra",
@@ -166,11 +158,8 @@ const DriverProfile: React.FC = () => {
     },
     "3": {
       id: "3",
-      name: "Amit Patel",
-      email: "amit.patel@taxibook.com",
+      title: "this is test title",
       phone: "+91 9876543212",
-      profileImage:
-        "https://images.pexels.com/photos/1587009/pexels-photo-1587009.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop",
       city: "Ahmedabad",
       state: "Gujarat",
       address: "Ahmedabad, Gujarat",
@@ -205,11 +194,8 @@ const DriverProfile: React.FC = () => {
     },
     "4": {
       id: "4",
-      name: "Suresh Kumar",
-      email: "suresh.kumar@taxibook.com",
+      title: "this is test title",
       phone: "+91 9876543213",
-      profileImage:
-        "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop",
       city: "Jaipur",
       state: "Rajasthan",
       address: "Jaipur, Rajasthan",
@@ -247,11 +233,8 @@ const DriverProfile: React.FC = () => {
     },
     "5": {
       id: "5",
-      name: "Kavita Sharma",
-      email: "kavita.sharma@taxibook.com",
+      title: "this is test title",
       phone: "+91 9876543214",
-      profileImage:
-        "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop",
       city: "Pune",
       state: "Maharashtra",
       address: "Pune, Maharashtra",
@@ -293,8 +276,12 @@ const DriverProfile: React.FC = () => {
   // Get driver data or default to first driver
   const driver = driverProfiles[driverId || "1"] || driverProfiles["1"];
 
-  // Helper functions to simulate system-generated data
-  const isPremiumDriver = () => driver.role === "prime-driver";
+  // Helper function to determine driver tier
+  const getDriverTier = (): DriverTier => {
+    if (driver.role === "prime-driver") return "vip-prime";
+    if (driver.role === "vip-driver") return "vip";
+    return "free";
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -310,35 +297,28 @@ const DriverProfile: React.FC = () => {
         {/* Driver Profile Card - Responsive Layout */}
         <div className="bg-blue-50 rounded-lg shadow-lg border border-gray-200 p-4 sm:p-6 lg:p-8 mb-4 sm:mb-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
-            {/* Driver Photo */}
-            <div className="flex-shrink-0 self-center lg:self-start">
-              <img
-                src={driver.profileImage}
-                alt={driver.name}
-                className="w-24 h-32 xs:w-32 xs:h-40 sm:w-36 sm:h-44 lg:w-40 lg:h-48 rounded-lg object-cover shadow-md"
-              />
-            </div>
-
             {/* Driver Info - Responsive layout */}
             <div className="flex-1 space-y-3 sm:space-y-4 text-center lg:text-left">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center lg:justify-start gap-2 sm:gap-4">
-                <h1 className="text-xl xs:text-2xl sm:text-3xl lg:text-2xl font-bold text-gray-900">
-                  {driver.name}
+              <div className="flex flex-col items-center lg:items-start gap-2 sm:gap-3">
+                <h1 className="text-xl xs:text-2xl sm:text-3xl lg:text-2xl font-bold text-gray-900 text-center lg:text-left">
+                  {driver.title}
                 </h1>
-                {isPremiumDriver() && (
-                  <span className="bg-yellow-400 text-yellow-900 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold self-center">
-                    Prime
-                  </span>
-                )}
+                <div className="flex justify-center lg:justify-start">
+                  <DriverTierTag
+                    tier={getDriverTier()}
+                    size="sm"
+                    className="shrink-0"
+                  />
+                </div>
               </div>
 
               <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
-                {driver.name} is one of our most reliable drivers with extensive
-                experience in the city and outstanding travel service. Known for
-                polite behavior, punctuality, and safe driving, ensuring every
-                ride is smooth and stress-free. Whether it's a quick trip to the
-                airport or a late-night pickup, {driver.name} is always ready to
-                serve with a smile.
+                {driver.title} is one of our most reliable drivers with
+                extensive experience in the city and outstanding travel service.
+                Known for polite behavior, punctuality, and safe driving,
+                ensuring every ride is smooth and stress-free. Whether it's a
+                quick trip to the airport or a late-night pickup, {driver.title}{" "}
+                is always ready to serve with a smile.
               </p>
 
               <p className="text-xs sm:text-sm text-gray-600 font-medium">
@@ -353,7 +333,7 @@ const DriverProfile: React.FC = () => {
                   /[^0-9]/g,
                   ""
                 )}?text=Hi%20${encodeURIComponent(
-                  driver.name
+                  driver.title
                 )},%20I%20would%20like%20to%20book%20your%20taxi%20service.`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -380,11 +360,11 @@ const DriverProfile: React.FC = () => {
           </div>
 
           <div className="p-4 sm:p-6">
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {driver.vehicles.map((vehicle) => (
                 <div
                   key={vehicle.id}
-                  className="aspect-square bg-gray-200 rounded-lg overflow-hidden"
+                  className="aspect-[4/3] sm:aspect-square bg-gray-200 rounded-lg overflow-hidden"
                 >
                   <img
                     src={vehicle.image}
@@ -408,21 +388,13 @@ const DriverProfile: React.FC = () => {
           <div className="divide-y divide-gray-200">
             <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">
               <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
-                Name:
+                Title:
               </div>
               <div className="text-gray-700 text-sm sm:text-base break-words">
-                {driver.name}
+                {driver.title}
               </div>
             </div>
             <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-white">
-              <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
-                Email:
-              </div>
-              <div className="text-gray-700 text-sm sm:text-base break-words">
-                {driver.email}
-              </div>
-            </div>
-            <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">
               <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
                 Phone:
               </div>
@@ -439,8 +411,8 @@ const DriverProfile: React.FC = () => {
               <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
                 Category:
               </div>
-              <div className="text-gray-700 text-sm sm:text-base">
-                {isPremiumDriver() ? "Vip Prime" : "Regular"}
+              <div className="text-gray-700 text-sm sm:text-base flex items-center">
+                <DriverTierTag tier={getDriverTier()} size="sm" />
               </div>
             </div>
             <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">

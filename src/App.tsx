@@ -29,6 +29,10 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/search" element={<SearchResults />} />
                 <Route path="/driver/:driverId" element={<DriverProfile />} />
+                <Route
+                  path="/driver-profile/:driverId"
+                  element={<DriverProfile />}
+                />
 
                 {/* Profile Routes - Direct routes without wrapper */}
                 <Route path="/profile" element={<Profile />} />

@@ -178,20 +178,13 @@ const SimilarProfiles: React.FC<SimilarProfilesProps> = ({
             key={driver.id}
             className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden flex"
           >
-            {/* Driver Photo with Badge - Left Side */}
+            {/* Driver Photo - Left Side */}
             <div className="relative w-32 flex-shrink-0">
               <img
                 src={driver.profileImage}
                 alt={driver.name}
                 className="w-full h-full object-cover"
               />
-
-              {/* VIP Prime Badge */}
-              <div className="absolute top-2 left-2">
-                <span className="bg-yellow-400 text-yellow-900 px-2 py-1 rounded text-xs font-semibold">
-                  VIP Prime
-                </span>
-              </div>
 
               {/* Name Badge at Bottom */}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent">

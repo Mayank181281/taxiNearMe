@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, User, LogOut, Crown, Car } from "lucide-react";
-import { useAuth } from "../contexts/auth";
+import { useAuth } from "../contexts/AuthContext";
 import PrimePackagesModal from "./PrimePackagesModal";
 
 const Header: React.FC = () => {
