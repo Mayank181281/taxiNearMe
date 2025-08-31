@@ -24,7 +24,7 @@ const OrderHistory: React.FC = () => {
                   </h3>
                 </div>
                 <div className="space-y-1 text-sm text-gray-600">
-                  <div>transaction id : #1548521544</div>
+                  <div>UPI id : #1548521544</div>
                   <div>Plan : VIP Prime (1 month)</div>
                   <div>date & time : 25.08.2025 , 12:00 pm</div>
                 </div>
@@ -48,7 +48,7 @@ const OrderHistory: React.FC = () => {
                   </h3>
                 </div>
                 <div className="space-y-1 text-sm text-gray-600">
-                  <div>transaction id : #1548521544</div>
+                  <div>UPI id : #1548521544</div>
                   <div>Plan : VIP (24 hours)</div>
                   <div>date & time : 25.08.2025 , 12:00 pm</div>
                 </div>

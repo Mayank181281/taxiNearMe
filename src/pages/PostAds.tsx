@@ -89,7 +89,7 @@ const PostAds: React.FC = () => {
 
     // Check if adding new files would exceed the limit
     const currentImagesCount = formData.images.length;
-    const availableSlots = 2 - currentImagesCount;
+    const availableSlots = 5 - currentImagesCount;
     const filesToAdd = files.slice(0, availableSlots);
 
     if (filesToAdd.length > 0) {
@@ -116,7 +116,7 @@ const PostAds: React.FC = () => {
     // Show alert if user tried to upload more than allowed
     if (files.length > availableSlots) {
       alert(
-        `Maximum 2 photos allowed. Only ${filesToAdd.length} photos were added.`
+        `Maximum 5 photos allowed. Only ${filesToAdd.length} photos were added.`
       );
     }
   };
@@ -343,7 +343,7 @@ const PostAds: React.FC = () => {
         {/* Photo Upload */}
         <div>
           <label className="block text-blue-600 font-medium mb-2">
-            Choose photo to upload (Maximum 2 photos allowed)
+            Choose photo to upload (Maximum 5 photos allowed)
           </label>
           <div className="space-y-4">
             {/* Upload Button */}
@@ -354,19 +354,19 @@ const PostAds: React.FC = () => {
                 accept="image/*"
                 multiple
                 onChange={handleImageUpload}
-                disabled={formData.images.length >= 2}
+                disabled={formData.images.length >= 5}
                 className="sr-only"
               />
               <label
                 htmlFor="photo-upload"
                 className={`inline-flex items-center px-4 py-2 border border-gray-300 rounded-md cursor-pointer transition-colors focus-within:ring-2 focus-within:ring-blue-500 ${
-                  formData.images.length >= 2
+                  formData.images.length >= 5
                     ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                     : "bg-white text-gray-600 hover:bg-gray-50"
                 }`}
               >
                 <span>
-                  {formData.images.length >= 2
+                  {formData.images.length >= 5
                     ? "Maximum photos reached"
                     : "Upload Or Drag"}
                 </span>
@@ -385,7 +385,7 @@ const PostAds: React.FC = () => {
                 </svg>
               </label>
               <div className="text-xs text-gray-500 mt-1">
-                {formData.images.length}/2 photos selected
+                {formData.images.length}/5 photos selected
               </div>
             </div>
 

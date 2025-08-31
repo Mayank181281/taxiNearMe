@@ -45,7 +45,7 @@ const YourAdverts: React.FC = () => {
 
   const PlansModal = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-lg p-8 max-w-6xl w-full max-h-[90vh] overflow-y-auto">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold mb-4">Our Suitable Packages</h2>
 
@@ -75,7 +75,51 @@ const YourAdverts: React.FC = () => {
         </div>
 
         {/* Plans */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Free Plan */}
+          <div className="border border-gray-200 rounded-lg p-6 bg-gray-50">
+            <div className="text-center mb-4">
+              <div className="bg-gray-500 text-white px-3 py-1 rounded text-sm inline-block mb-2">
+                Free
+              </div>
+              <div className="text-3xl font-bold text-gray-600 mb-1">$0</div>
+              <div className="text-gray-600 text-sm">/ Forever</div>
+            </div>
+
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center text-sm">
+                <div className="w-2 h-2 bg-gray-500 rounded-full mr-3"></div>
+                <span>
+                  <strong>Placement:</strong> Basic Listings
+                </span>
+              </div>
+              <div className="flex items-center text-sm">
+                <div className="w-2 h-2 bg-gray-500 rounded-full mr-3"></div>
+                <span>
+                  <strong>Highlight:</strong> Standard Ad Card Display
+                </span>
+              </div>
+              <div className="flex items-center text-sm">
+                <div className="w-2 h-2 bg-gray-500 rounded-full mr-3"></div>
+                <span>
+                  <strong>Exposure:</strong> Standard Visibility
+                </span>
+              </div>
+              <div className="flex items-center text-sm">
+                <div className="w-2 h-2 bg-gray-500 rounded-full mr-3"></div>
+                <span>
+                  <strong>Duration:</strong> No Time Limit
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowPlansModal(false)}
+              className="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              Current Plan
+            </button>
+          </div>
           {/* VIP Plan */}
           <div className="border border-blue-200 rounded-lg p-6 bg-blue-50">
             <div className="text-center mb-4">
@@ -202,14 +246,8 @@ const YourAdverts: React.FC = () => {
           </div>
         </div>
 
-        {/* Skip and Close buttons */}
-        <div className="flex justify-center space-x-4">
-          <button
-            onClick={() => setShowPlansModal(false)}
-            className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors"
-          >
-            Skip
-          </button>
+        {/* Close button */}
+        <div className="flex justify-center">
           <button
             onClick={() => setShowPlansModal(false)}
             className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors"
@@ -437,11 +475,6 @@ const YourAdverts: React.FC = () => {
                         alt="Profile"
                         className="w-16 h-16 rounded-lg object-cover bg-gradient-to-br from-cyan-400 to-cyan-600"
                       />
-                      <div className="text-center mt-1">
-                        <span className="text-xs text-white bg-gray-800 px-2 py-1 rounded">
-                          Ganesh Modi
-                        </span>
-                      </div>
                     </div>
 
                     {/* Content */}

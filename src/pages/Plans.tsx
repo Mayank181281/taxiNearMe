@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 const Plans: React.FC = () => {
-  const navigate = useNavigate();
   const [billingPeriod, setBillingPeriod] = useState<"month" | "day">("month");
 
   return (
@@ -94,19 +92,6 @@ const Plans: React.FC = () => {
               </div>
             )}
           </div>
-
-          <button
-            onClick={() => {
-              const planType = "vip";
-              const price = billingPeriod === "month" ? "40" : "3";
-              navigate(
-                `/profile/payment?plan=${planType}&period=${billingPeriod}&price=${price}`
-              );
-            }}
-            className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium text-lg"
-          >
-            Select VIP Plan
-          </button>
         </div>
 
         {/* VIP Prime Plan */}
@@ -178,19 +163,6 @@ const Plans: React.FC = () => {
               </div>
             )}
           </div>
-
-          <button
-            onClick={() => {
-              const planType = "vip-prime";
-              const price = billingPeriod === "month" ? "80" : "6";
-              navigate(
-                `/profile/payment?plan=${planType}&period=${billingPeriod}&price=${price}`
-              );
-            }}
-            className="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition-colors font-medium text-lg"
-          >
-            Select VIP Prime Plan
-          </button>
         </div>
       </div>
 

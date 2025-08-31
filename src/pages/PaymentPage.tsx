@@ -4,61 +4,29 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 const PaymentPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [dragOver, setDragOver] = useState(false);
+  const [paymentMode, setPaymentMode] = useState<string>("");
+  const [upiTransaction, setUpiTransaction] = useState<string>("");
 
   // Get plan details from URL parameters
   const planType = searchParams.get("plan") || "vip";
   const billingPeriod = searchParams.get("period") || "month";
   const price = searchParams.get("price") || "40";
 
-  const handleFileUpload = (file: File) => {
-    if (file && file.type.startsWith("image/")) {
-      setUploadedFile(file);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragOver(false);
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) {
-      handleFileUpload(files[0]);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragOver(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragOver(false);
-  };
-
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      handleFileUpload(files[0]);
-    }
-  };
-
   const handleVerify = () => {
-    if (uploadedFile) {
-      // Here you would typically upload the file to your server
-      // For now, we'll just navigate back to the adverts page
+    if (paymentMode.trim() && upiTransaction.trim()) {
+      // Here you would typically send the payment details to your server
       alert(
-        "Payment screenshot uploaded successfully! Your ad will be reviewed and activated soon."
+        "Payment details submitted successfully! Your ad will be reviewed and activated soon."
       );
       navigate("/profile/your-adverts");
     } else {
-      alert("Please upload a payment screenshot first.");
+      alert("Please fill in both payment mode and UPI transaction details.");
     }
   };
 
   const handleClear = () => {
-    setUploadedFile(null);
+    setPaymentMode("");
+    setUpiTransaction("");
   };
 
   const getPlanDisplayName = () => {
@@ -126,73 +94,48 @@ const PaymentPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Upload Section */}
+      {/* Payment Details Section */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Upload your payment screenshot.
-        </h3>
+        <div className="text-center mb-6">
+          <p className="text-lg font-medium text-gray-900 mb-2">
+            Kindly send screenshot on Whatsapp to this number
+          </p>
+          <a
+            href="tel:12345678909"
+            className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
+          >
+            12345678909
+          </a>
+        </div>
 
-        {/* File Upload Area */}
-        <div
-          className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-            dragOver
-              ? "border-blue-500 bg-blue-50"
-              : uploadedFile
-              ? "border-green-500 bg-green-50"
-              : "border-gray-300 bg-gray-50 hover:bg-gray-100"
-          }`}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-        >
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileInputChange}
-            className="hidden"
-            id="file-upload"
-          />
+        <div className="space-y-6">
+          {/* Payment Mode */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-2">
+              Payment Mode
+            </label>
+            <input
+              type="text"
+              value={paymentMode}
+              onChange={(e) => setPaymentMode(e.target.value)}
+              placeholder="Enter payment mode (e.g., UPI, Credit Card, Net Banking)"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
 
-          {uploadedFile ? (
-            <div className="space-y-4">
-              <div className="flex justify-center">
-                <img
-                  src={URL.createObjectURL(uploadedFile)}
-                  alt="Payment screenshot"
-                  className="max-w-64 max-h-64 object-contain rounded-lg border"
-                />
-              </div>
-              <p className="text-green-600 font-medium">{uploadedFile.name}</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex justify-center">
-                <svg
-                  className="w-12 h-12 text-blue-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                  />
-                </svg>
-              </div>
-              <div>
-                <label htmlFor="file-upload" className="cursor-pointer">
-                  <span className="text-blue-600 font-medium hover:text-blue-700">
-                    Upload Or Drag
-                  </span>
-                </label>
-                <p className="text-gray-500 text-sm mt-2">
-                  PNG, JPG, JPEG up to 10MB
-                </p>
-              </div>
-            </div>
-          )}
+          {/* UPI Transaction */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-2">
+              UPI Transaction ID
+            </label>
+            <input
+              type="text"
+              value={upiTransaction}
+              onChange={(e) => setUpiTransaction(e.target.value)}
+              placeholder="Enter UPI transaction ID"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
         </div>
       </div>
 
