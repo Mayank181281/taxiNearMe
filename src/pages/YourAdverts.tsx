@@ -510,14 +510,6 @@ const YourAdverts: React.FC = () => {
                             }
                           >
                             {advert.title}
-                            {(advert.status === "published" ||
-                              advert.status === "vip" ||
-                              advert.status === "vip-prime" ||
-                              advert.status === "waiting-approval") && (
-                              <span className="ml-2 text-xs text-gray-500">
-                                (click to view)
-                              </span>
-                            )}
                           </h3>
                           <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                             {advert.description}
