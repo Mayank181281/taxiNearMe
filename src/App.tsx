@@ -16,6 +16,7 @@ import DriverLogin from "./pages/auth/DriverLogin";
 import DriverRegister from "./pages/auth/DriverRegister";
 import SearchResults from "./pages/SearchResults";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Admin from "./admin/Admin";
 
 function App() {
   return (
@@ -23,44 +24,72 @@ function App() {
       <AdsProvider>
         <Router>
           <div className="min-h-screen bg-gray-50 flex flex-col">
-            <Header />
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/search" element={<SearchResults />} />
-                <Route path="/driver/:driverId" element={<DriverProfile />} />
-                <Route
-                  path="/driver-profile/:driverId"
-                  element={<DriverProfile />}
-                />
+            <Routes>
+              {/* Admin Route - No Header/Footer */}
+              <Route path="/admin/*" element={<Admin />} />
 
-                {/* Profile Routes - Direct routes without wrapper */}
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/profile/your-adverts" element={<YourAdverts />} />
-                <Route
-                  path="/profile/order-history"
-                  element={<OrderHistory />}
-                />
-                <Route path="/profile/plans" element={<Plans />} />
-                <Route path="/profile/edit-profile" element={<EditProfile />} />
-                <Route path="/profile/post-ads" element={<PostAds />} />
-                <Route path="/profile/payment" element={<PaymentPage />} />
+              {/* Main Application Routes */}
+              <Route
+                path="/*"
+                element={
+                  <>
+                    <Header />
+                    <main className="flex-1">
+                      <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/search" element={<SearchResults />} />
+                        <Route
+                          path="/driver/:driverId"
+                          element={<DriverProfile />}
+                        />
+                        <Route
+                          path="/driver-profile/:driverId"
+                          element={<DriverProfile />}
+                        />
 
-                {/* Driver Routes */}
-                <Route path="/driver/login" element={<DriverLogin />} />
-                <Route path="/driver/register" element={<DriverRegister />} />
-                {/* Redirect dashboard to profile */}
-                <Route
-                  path="/driver/dashboard"
-                  element={
-                    <ProtectedRoute requiredRole="driver">
-                      <Profile />
-                    </ProtectedRoute>
-                  }
-                />
-              </Routes>
-            </main>
-            <Footer />
+                        {/* Profile Routes - Direct routes without wrapper */}
+                        <Route path="/profile" element={<Profile />} />
+                        <Route
+                          path="/profile/your-adverts"
+                          element={<YourAdverts />}
+                        />
+                        <Route
+                          path="/profile/order-history"
+                          element={<OrderHistory />}
+                        />
+                        <Route path="/profile/plans" element={<Plans />} />
+                        <Route
+                          path="/profile/edit-profile"
+                          element={<EditProfile />}
+                        />
+                        <Route path="/profile/post-ads" element={<PostAds />} />
+                        <Route
+                          path="/profile/payment"
+                          element={<PaymentPage />}
+                        />
+
+                        {/* Driver Routes */}
+                        <Route path="/driver/login" element={<DriverLogin />} />
+                        <Route
+                          path="/driver/register"
+                          element={<DriverRegister />}
+                        />
+                        {/* Redirect dashboard to profile */}
+                        <Route
+                          path="/driver/dashboard"
+                          element={
+                            <ProtectedRoute requiredRole="driver">
+                              <Profile />
+                            </ProtectedRoute>
+                          }
+                        />
+                      </Routes>
+                    </main>
+                    <Footer />
+                  </>
+                }
+              />
+            </Routes>
           </div>
         </Router>
       </AdsProvider>
