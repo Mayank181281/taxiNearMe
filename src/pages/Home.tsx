@@ -192,7 +192,7 @@ const Home: React.FC = () => {
       <section className="py-16 pt-20 bg-blue-50">
         <div className="max-w-7xl mx-auto px-4">
           {/* Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 sm:mb-12 gap-6 md:gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-16 sm:mb-16 gap-10 md:gap-4">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
               Browse by city
             </h2>
@@ -219,7 +219,7 @@ const Home: React.FC = () => {
           </div>
 
           {/* City Buttons Grid */}
-          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-10 gap-y-20 sm:gap-x-12 sm:gap-y-24">
+          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-10 gap-y-24 sm:gap-x-12 sm:gap-y-28">
             {filteredCities.length > 0 ? (
               filteredCities.map((city, index) => (
                 <div
