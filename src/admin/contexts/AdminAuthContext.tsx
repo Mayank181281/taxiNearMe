@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect } from "react";
 
 interface AdminAuthContextType {
   isAuthenticated: boolean;
@@ -7,17 +7,9 @@ interface AdminAuthContextType {
   loading: boolean;
 }
 
-const AdminAuthContext = createContext<AdminAuthContextType | undefined>(
+export const AdminAuthContext = createContext<AdminAuthContextType | undefined>(
   undefined
 );
-
-export const useAdminAuth = () => {
-  const context = useContext(AdminAuthContext);
-  if (context === undefined) {
-    throw new Error("useAdminAuth must be used within an AdminAuthProvider");
-  }
-  return context;
-};
 
 interface AdminAuthProviderProps {
   children: React.ReactNode;

@@ -1,5 +1,6 @@
 import React from "react";
-import { AdminAuthProvider, useAdminAuth } from "./contexts/AdminAuthContext";
+import { AdminAuthProvider } from "./contexts/AdminAuthContext";
+import { useAdminAuth } from "./contexts/useAdminAuth";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 

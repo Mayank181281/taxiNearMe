@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useAdminAuth } from "../contexts/AdminAuthContext";
+import { useAdminAuth } from "../contexts/useAdminAuth";
 
 const AdminLogin: React.FC = () => {
   const [credentials, setCredentials] = useState({

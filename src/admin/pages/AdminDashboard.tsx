@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useAdminAuth } from "../contexts/AdminAuthContext";
+import { useAdminAuth } from "../contexts/useAdminAuth";
 import Dashboard from "./Dashboard";
 import AdManagement from "./AdManagement";
 import UserManagement from "./UserManagement";
