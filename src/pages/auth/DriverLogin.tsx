@@ -48,12 +48,12 @@ const DriverLogin: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const success = await login(formData.email, formData.password, "driver");
+      const success = await login(formData.email, formData.password);
 
       if (success) {
         navigate("/profile");
       } else {
-        setErrors({ general: "Invalid email or password" });
+        setErrors({ general: "Invalid email or password. If you just registered, please verify your email first." });
       }
     } catch (error: unknown) {
       if (error instanceof Error) {

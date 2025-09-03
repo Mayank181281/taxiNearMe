@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Car, User, Mail, Lock, Phone, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import {
@@ -20,13 +20,9 @@ const DriverRegister: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [emailOtpSent, setEmailOtpSent] = useState(false);
-  const [emailOtpVerified, setEmailOtpVerified] = useState(false);
-  const [emailOtp, setEmailOtp] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [isOtpLoading, setIsOtpLoading] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const { register } = useAuth();
-  const navigate = useNavigate();
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -36,67 +32,6 @@ const DriverRegister: React.FC = () => {
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-  };
-
-  const handleSendOTP = async () => {
-    if (!formData.email) {
-      setErrors((prev) => ({
-        ...prev,
-        email: "Email is required to send OTP",
-      }));
-      return;
-    }
-    if (!validateEmail(formData.email)) {
-      setErrors((prev) => ({
-        ...prev,
-        email: "Please enter a valid email address",
-      }));
-      return;
-    }
-
-    setIsOtpLoading(true);
-    try {
-      // Simulate OTP sending - replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setEmailOtpSent(true);
-      setErrors((prev) => ({ ...prev, email: "" }));
-      console.log("OTP sent to:", formData.email);
-    } catch {
-      setErrors((prev) => ({
-        ...prev,
-        general: "Failed to send OTP. Please try again.",
-      }));
-    }
-    setIsOtpLoading(false);
-  };
-
-  const handleVerifyOTP = async () => {
-    if (!emailOtp.trim()) {
-      setErrors((prev) => ({ ...prev, otp: "Please enter the OTP" }));
-      return;
-    }
-
-    setIsOtpLoading(true);
-    try {
-      // Simulate OTP verification - replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      if (emailOtp === "123456") {
-        // Mock verification
-        setEmailOtpVerified(true);
-        setErrors((prev) => ({ ...prev, otp: "" }));
-      } else {
-        setErrors((prev) => ({
-          ...prev,
-          otp: "Invalid OTP. Please try again.",
-        }));
-      }
-    } catch {
-      setErrors((prev) => ({
-        ...prev,
-        otp: "OTP verification failed. Please try again.",
-      }));
-    }
-    setIsOtpLoading(false);
   };
 
   const validateForm = (): boolean => {
@@ -112,8 +47,6 @@ const DriverRegister: React.FC = () => {
       newErrors.email = "Email is required";
     } else if (!validateEmail(formData.email)) {
       newErrors.email = "Please enter a valid email address";
-    } else if (!emailOtpVerified) {
-      newErrors.email = "Please verify your email with OTP";
     }
 
     if (!formData.phone) {
@@ -149,16 +82,14 @@ const DriverRegister: React.FC = () => {
     try {
       const driverData = {
         ...formData,
-        role: "driver" as const,
-        isApproved: false,
-        availabilityStatus: "offline",
-        profileCompleted: false, // Flag to track if profile details are completed
       };
 
       const success = await register(driverData);
 
       if (success) {
-        navigate("/driver/login");
+        setRegistrationSuccess(true);
+        setErrors({});
+        // Show success message instead of navigating immediately
       } else {
         setErrors({ general: "Registration failed. Please try again." });
       }
@@ -238,88 +169,14 @@ const DriverRegister: React.FC = () => {
                     type="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    disabled={emailOtpVerified}
                     className={`w-full pl-10 pr-4 py-3 border ${
-                      errors.email
-                        ? "border-red-300"
-                        : emailOtpVerified
-                        ? "border-green-300 bg-green-50"
-                        : "border-gray-300"
-                    } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      emailOtpVerified ? "text-green-700" : ""
-                    }`}
+                      errors.email ? "border-red-300" : "border-gray-300"
+                    } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                     placeholder="Enter your email"
                   />
-                  {emailOtpVerified && (
-                    <div className="absolute right-3 top-3 text-green-500">
-                      <svg
-                        className="h-5 w-5"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  )}
                 </div>
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                )}
-
-                {/* OTP Section */}
-                {!emailOtpVerified && (
-                  <div className="mt-3 space-y-3">
-                    <button
-                      type="button"
-                      onClick={handleSendOTP}
-                      disabled={
-                        !formData.email ||
-                        !validateEmail(formData.email) ||
-                        isOtpLoading ||
-                        emailOtpSent
-                      }
-                      className="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
-                    >
-                      {isOtpLoading
-                        ? "Sending OTP..."
-                        : emailOtpSent
-                        ? "OTP Sent ✓"
-                        : "Send Email OTP"}
-                    </button>
-
-                    {emailOtpSent && (
-                      <div className="space-y-2">
-                        <input
-                          type="text"
-                          placeholder="Enter 6-digit OTP"
-                          value={emailOtp}
-                          onChange={(e) => setEmailOtp(e.target.value)}
-                          maxLength={6}
-                          className={`w-full px-4 py-2 border ${
-                            errors.otp ? "border-red-300" : "border-gray-300"
-                          } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg tracking-widest`}
-                        />
-                        {errors.otp && (
-                          <p className="text-sm text-red-600">{errors.otp}</p>
-                        )}
-                        <button
-                          type="button"
-                          onClick={handleVerifyOTP}
-                          disabled={!emailOtp.trim() || isOtpLoading}
-                          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
-                        >
-                          {isOtpLoading ? "Verifying..." : "Verify OTP"}
-                        </button>
-                        <p className="text-xs text-gray-500 text-center">
-                          Use OTP: <strong>123456</strong> (for demo)
-                        </p>
-                      </div>
-                    )}
-                  </div>
                 )}
               </div>
 
@@ -459,11 +316,50 @@ const DriverRegister: React.FC = () => {
 
             <button
               type="submit"
-              disabled={isLoading || !emailOtpVerified || !termsAccepted}
+              disabled={isLoading || !termsAccepted}
               className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isLoading ? "Registering..." : "Create Account"}
+              {isLoading ? "Sending Verification Link..." : "Send Verification Link"}
             </button>
+
+            {registrationSuccess && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg
+                      className="h-5 w-5 text-green-400"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-green-800">
+                      Registration Successful!
+                    </h3>
+                    <div className="mt-2 text-sm text-green-700">
+                      <p>
+                        A verification link has been sent to <strong>{formData.email}</strong>.
+                        Please check your email and click the verification link before logging in.
+                      </p>
+                    </div>
+                    <div className="mt-4">
+                      <Link
+                        to="/driver/login"
+                        className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                      >
+                        Go to Login
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="text-center">
               <p className="text-sm text-gray-600">

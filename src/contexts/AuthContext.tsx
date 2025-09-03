@@ -5,56 +5,23 @@ import React, {
   createContext,
   useContext,
 } from "react";
+import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../config/firebase";
+import { registerUser, loginUser, logoutUser } from "../services/authService";
 
 interface User {
   id: string;
   name: string;
   email: string;
-  role: "driver" | "prime-driver";
-  isPremium?: boolean;
-  city?: string;
-  state?: string;
-  subscriptionEnd?: string;
-  // Personal Information
-  phone?: string;
-  gender?: string;
-  dateOfBirth?: string;
-  address?: string;
-  emergencyContact?: string;
-  // Identification
-  aadhaar?: string;
-  driverLicense?: string;
-  licenseExpiry?: string;
-  experience?: string;
-  // Vehicle Information
-  vehicles?: Array<{
-    id: string;
-    type: string;
-    model: string;
-    number: string;
-    year: string;
-  }>;
-  // Legacy vehicle fields (for backward compatibility)
-  vehicleNumber?: string;
-  vehicleType?: string;
-  vehicleModel?: string;
-  vehicleYear?: string;
-  // Banking Information
-  bankName?: string;
-  bankAccount?: string;
-  ifscCode?: string;
-  // Profile Status
-  profileCompleted?: boolean;
+  phone: string;
 }
 
 interface RegisterData {
   name: string;
   email: string;
   password: string;
-  role: "driver";
-  phone?: string;
-  gender?: string;
-  [key: string]: unknown;
+  phone: string;
 }
 
 interface StoredUser extends User {
@@ -64,7 +31,7 @@ interface StoredUser extends User {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string, role: "driver") => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   register: (userData: RegisterData) => Promise<boolean>;
   updateUser: (userData: Partial<User>) => void;
@@ -85,22 +52,8 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       name: "John Driver",
       email: "driver@demo.com",
       password: "password123",
-      role: "driver",
-      isPremium: true,
-      city: "Delhi",
       phone: "+91 9876543210",
-      gender: "male",
-      aadhaar: "123456789012",
-      vehicleNumber: "DL01AB1234",
-      vehicleType: "Sedan",
-      vehicleModel: "Honda City",
-      vehicleYear: "2020",
-      driverLicense: "DL123456789",
       registrationDate: new Date().toISOString(),
-      subscriptionEnd: new Date(
-        Date.now() + 30 * 24 * 60 * 60 * 1000
-      ).toISOString(),
-      profileCompleted: false,
     };
 
     // Initialize drivers in localStorage if not exists
@@ -119,75 +72,93 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     // Initialize mock data on first load
     initializeMockData();
 
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
+    // Firebase Auth State Listener
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
+      if (firebaseUser && firebaseUser.emailVerified) {
+        // User is signed in and email is verified
+        try {
+          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            const user: User = {
+              id: firebaseUser.uid,
+              name: userData.name,
+              email: userData.email,
+              phone: userData.phone,
+            };
+            setUser(user);
+            localStorage.setItem("user", JSON.stringify(user));
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      } else {
+        // User is signed out or email not verified
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          // Check if we have a stored demo user (for backward compatibility)
+          const parsedUser = JSON.parse(storedUser);
+          if (parsedUser.email === "driver@demo.com") {
+            setUser(parsedUser);
+          } else {
+            setUser(null);
+            localStorage.removeItem("user");
+          }
+        } else {
+          setUser(null);
+        }
+      }
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const login = async (
     email: string,
-    password: string,
-    role: "driver"
+    password: string
   ): Promise<boolean> => {
     setIsLoading(true);
 
     try {
-      const users: StoredUser[] = JSON.parse(
-        localStorage.getItem("drivers") || "[]"
-      );
-      const foundUser = users.find(
-        (u: StoredUser) => u.email === email && u.password === password
-      );
-
-      if (foundUser) {
-        const userData: User = {
-          id: foundUser.id,
-          name: foundUser.name,
-          email: foundUser.email,
-          role: foundUser.role || role,
-          isPremium: foundUser.isPremium,
-          city: foundUser.city,
-          subscriptionEnd: foundUser.subscriptionEnd,
-          // Personal Information
-          phone: foundUser.phone,
-          gender: foundUser.gender,
-          dateOfBirth: foundUser.dateOfBirth,
-          address: foundUser.address,
-          emergencyContact: foundUser.emergencyContact,
-          // Identification
-          aadhaar: foundUser.aadhaar,
-          driverLicense: foundUser.driverLicense,
-          licenseExpiry: foundUser.licenseExpiry,
-          experience: foundUser.experience,
-          // Vehicle Information
-          vehicleNumber: foundUser.vehicleNumber,
-          vehicleType: foundUser.vehicleType,
-          vehicleModel: foundUser.vehicleModel,
-          vehicleYear: foundUser.vehicleYear,
-          // Banking Information
-          bankName: foundUser.bankName,
-          bankAccount: foundUser.bankAccount,
-          ifscCode: foundUser.ifscCode,
-          // Profile Status
-          profileCompleted: foundUser.profileCompleted,
-        };
-        setUser(userData);
-        localStorage.setItem("user", JSON.stringify(userData));
+      const result = await loginUser(email, password);
+      
+      if (result.success && result.user) {
+        // Get additional user data from Firestore
+        const userDoc = await getDoc(doc(db, 'users', result.user.uid));
+        
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const user: User = {
+            id: result.user.uid,
+            name: userData.name,
+            email: userData.email,
+            phone: userData.phone,
+          };
+          
+          setUser(user);
+          localStorage.setItem("user", JSON.stringify(user));
+        }
+        
         setIsLoading(false);
         return true;
+      } else if (result.error) {
+        // Throw error to be caught by login components
+        setIsLoading(false);
+        throw new Error(result.error);
       }
+      
       setIsLoading(false);
       return false;
     } catch (error) {
       console.error("Login error:", error);
       setIsLoading(false);
-      return false;
+      throw error; // Re-throw to be handled by login components
     }
   };
 
   const logout = () => {
+    logoutUser();
     setUser(null);
     localStorage.removeItem("user");
   };
@@ -196,21 +167,23 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     setIsLoading(true);
 
     try {
-      const existingUsers: StoredUser[] = JSON.parse(
-        localStorage.getItem("drivers") || "[]"
-      );
+      // Transform RegisterData to match UserData requirements
+      const userDataForFirebase = {
+        name: userData.name,
+        email: userData.email,
+        phone: userData.phone,
+        password: userData.password,
+      };
 
-      const newUser: StoredUser = {
-        ...userData,
-        id: Date.now().toString(),
-        registrationDate: new Date().toISOString(),
-      } as StoredUser;
-
-      existingUsers.push(newUser);
-      localStorage.setItem("drivers", JSON.stringify(existingUsers));
-
+      const result = await registerUser(userDataForFirebase);
+      
+      if (result.success) {
+        setIsLoading(false);
+        return true;
+      }
+      
       setIsLoading(false);
-      return true;
+      return false;
     } catch (error) {
       console.error("Registration error:", error);
       setIsLoading(false);
