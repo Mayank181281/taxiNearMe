@@ -2,13 +2,10 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, User, LogOut, Crown, Car } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
-import PrimePackagesModal from "./PrimePackagesModal";
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [isPrimePackagesModalOpen, setIsPrimePackagesModalOpen] =
-    useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -85,18 +82,6 @@ const Header: React.FC = () => {
                         <User className="h-4 w-4 inline mr-2" />
                         View Profile
                       </button>
-                      {!user.isPremium && (
-                        <button
-                          onClick={() => {
-                            setIsUserMenuOpen(false);
-                            setIsPrimePackagesModalOpen(true);
-                          }}
-                          className="block w-full text-left px-4 py-2 text-sm text-orange-700 hover:bg-orange-50"
-                        >
-                          <Crown className="h-4 w-4 inline mr-2" />
-                          Upgrade to Prime
-                        </button>
-                      )}
                       <button
                         onClick={handleLogout}
                         className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -148,17 +133,6 @@ const Header: React.FC = () => {
                     >
                       View Profile
                     </button>
-                    {!user.isPremium && (
-                      <button
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          setIsPrimePackagesModalOpen(true);
-                        }}
-                        className="block w-full text-left px-3 py-2 text-orange-700 hover:text-orange-600"
-                      >
-                        Upgrade to Prime
-                      </button>
-                    )}
                     <button
                       onClick={handleLogout}
                       className="block w-full text-left px-3 py-2 text-gray-700 hover:text-blue-600"
@@ -172,12 +146,6 @@ const Header: React.FC = () => {
           )}
         </div>
       </header>
-
-      {/* Modals */}
-      <PrimePackagesModal
-        isOpen={isPrimePackagesModalOpen}
-        onClose={() => setIsPrimePackagesModalOpen(false)}
-      />
     </>
   );
 };

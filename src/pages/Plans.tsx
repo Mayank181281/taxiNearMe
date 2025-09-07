@@ -41,7 +41,53 @@ const Plans: React.FC = () => {
       </div>
 
       {/* Plans Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        {/* Free Plan */}
+        <div className="border border-gray-200 rounded-2xl p-8 bg-gray-50 hover:shadow-lg transition-shadow">
+          <div className="text-center mb-6">
+            <div className="bg-gray-500 text-white px-4 py-2 rounded-lg text-sm font-medium inline-block mb-4">
+              Free
+            </div>
+            <div className="text-4xl font-bold text-gray-600 mb-2">$0</div>
+            <div className="text-gray-600">/ Forever</div>
+          </div>
+
+          <div className="space-y-4 mb-8">
+            <div className="flex items-start">
+              <div className="w-3 h-3 bg-gray-500 rounded-full mr-4 mt-1 flex-shrink-0"></div>
+              <div>
+                <span className="font-semibold text-gray-900">Placement:</span>
+                <p className="text-gray-700">Basic Listings</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="w-3 h-3 bg-gray-500 rounded-full mr-4 mt-1 flex-shrink-0"></div>
+              <div>
+                <span className="font-semibold text-gray-900">Highlight:</span>
+                <p className="text-gray-700">Standard Ad Card Display</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="w-3 h-3 bg-gray-500 rounded-full mr-4 mt-1 flex-shrink-0"></div>
+              <div>
+                <span className="font-semibold text-gray-900">Exposure:</span>
+                <p className="text-gray-700">Standard Visibility</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="w-3 h-3 bg-gray-500 rounded-full mr-4 mt-1 flex-shrink-0"></div>
+              <div>
+                <span className="font-semibold text-gray-900">Duration:</span>
+                <p className="text-gray-700">No Time Limit</p>
+              </div>
+            </div>
+          </div>
+
+          <button className="w-full bg-gray-500 text-white py-3 rounded-lg font-medium hover:bg-gray-600 transition-colors">
+            Current Plan
+          </button>
+        </div>
+
         {/* VIP Plan */}
         <div className="border border-blue-200 rounded-2xl p-8 bg-blue-50 hover:shadow-lg transition-shadow">
           <div className="text-center mb-6">
@@ -92,6 +138,10 @@ const Plans: React.FC = () => {
               </div>
             )}
           </div>
+
+          <button className="w-full bg-blue-500 text-white py-3 rounded-lg font-medium hover:bg-blue-600 transition-colors">
+            Select Plan
+          </button>
         </div>
 
         {/* VIP Prime Plan */}
@@ -163,6 +213,10 @@ const Plans: React.FC = () => {
               </div>
             )}
           </div>
+
+          <button className="w-full bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition-colors">
+            Select Plan
+          </button>
         </div>
       </div>
 

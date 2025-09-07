@@ -4,13 +4,9 @@ import { useAuth } from "../contexts/AuthContext";
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  requiredRole?: "driver" | "customer";
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
-  children,
-  requiredRole,
-}) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
@@ -22,10 +18,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (!user) {
-    return <Navigate to="/" replace />;
-  }
-
-  if (requiredRole && user.role !== requiredRole) {
     return <Navigate to="/" replace />;
   }
 

@@ -48,12 +48,12 @@ const DriverLogin: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const success = await login(formData.email, formData.password);
+      const result = await login(formData.email, formData.password);
 
-      if (success) {
+      if (result.success) {
         navigate("/profile");
       } else {
-        setErrors({ general: "Invalid email or password. If you just registered, please verify your email first." });
+        setErrors({ general: result.error || "Invalid email or password" });
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -148,6 +148,16 @@ const DriverLogin: React.FC = () => {
               {errors.password && (
                 <p className="mt-1 text-sm text-red-600">{errors.password}</p>
               )}
+
+              {/* Forgot Password Link */}
+              <div className="flex justify-end mt-2">
+                <Link
+                  to="/driver/forgot-password"
+                  className="text-sm text-blue-600 hover:text-blue-500 font-medium"
+                >
+                  Forgot your password?
+                </Link>
+              </div>
             </div>
           </div>
 

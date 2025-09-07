@@ -1,6 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
+import { initializeAdminData } from "../../services/seedData";
 
 const Dashboard: React.FC = () => {
+  const [isInitializing, setIsInitializing] = useState(false);
+
+  const handleInitializeData = async () => {
+    if (
+      window.confirm("This will create sample users for testing. Continue?")
+    ) {
+      setIsInitializing(true);
+      try {
+        await initializeAdminData();
+        alert("Sample data created successfully!");
+      } catch (error) {
+        console.error("Error initializing data:", error);
+        alert("Error creating sample data. Please check console for details.");
+      } finally {
+        setIsInitializing(false);
+      }
+    }
+  };
+
   // Dummy data for the chart (user signups over the last week)
   const weeklySignups = [
     { day: "Mon", count: 12 },
@@ -292,6 +312,30 @@ const Dashboard: React.FC = () => {
               <p className="text-xs text-gray-500">Click to manage</p>
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Data Initialization Section */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          Development Tools
+        </h3>
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="text-sm font-medium text-gray-900">
+              Initialize Sample Data
+            </h4>
+            <p className="text-sm text-gray-500">
+              Create sample users for testing the admin panel
+            </p>
+          </div>
+          <button
+            onClick={handleInitializeData}
+            disabled={isInitializing}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {isInitializing ? "Initializing..." : "Create Sample Data"}
+          </button>
         </div>
       </div>
     </div>

@@ -5,109 +5,140 @@ export interface StateData {
 
 export const statesAndCities: StateData[] = [
   {
-    name: "Maharashtra",
+    name: "Andhra Pradesh",
     cities: [
-      "Mumbai",
-      "Pune",
-      "Nagpur",
-      "Thane",
-      "Pimpri-Chinchwad",
-      "Nashik",
-      "Kalyan-Dombivali",
-      "Vasai-Virar",
-      "Aurangabad",
-      "Navi Mumbai",
-      "Solapur",
-      "Mira-Bhayandar",
-      "Bhiwandi",
-      "Amravati",
-      "Nanded",
-      "Kolhapur",
-      "Ulhasnagar",
-      "Sangli-Miraj",
-      "Malegaon",
-      "Jalgaon",
-      "Akola",
+      "Guntur",
+      "Nellore",
+      "Tirupati",
+      "Vijayawada",
+      "Visakhapatnam",
+      "Warangal",
     ],
+  },
+  {
+    name: "Assam",
+    cities: ["Dibrugarh", "Guwahati", "Jorhat", "Nagaon", "Silchar"],
+  },
+  {
+    name: "Bihar",
+    cities: [
+      "Bhagalpur",
+      "Darbhanga",
+      "Gaya",
+      "Muzaffarpur",
+      "Patna",
+      "Purnia",
+    ],
+  },
+  {
+    name: "Chandigarh",
+    cities: ["Chandigarh"],
+  },
+  {
+    name: "Chhattisgarh",
+    cities: ["Bhilai Nagar", "Bilaspur", "Durg", "Korba", "Raipur"],
   },
   {
     name: "Delhi",
     cities: ["Delhi", "New Delhi"],
   },
   {
+    name: "Gujarat",
+    cities: ["Ahmedabad", "Bhavnagar", "Jamnagar", "Rajkot", "Vadodara"],
+  },
+  {
+    name: "Haryana",
+    cities: [
+      "Ambala",
+      "Faridabad",
+      "Gurgaon",
+      "Hisar",
+      "Panipat",
+      "Rohtak",
+      "Yamunanagar",
+    ],
+  },
+  {
+    name: "Himachal Pradesh",
+    cities: ["Dharamshala", "Mandi", "Shimla", "Solan"],
+  },
+  {
+    name: "Jammu and Kashmir",
+    cities: ["Anantnag", "Baramulla", "Jammu", "Srinagar"],
+  },
+  {
+    name: "Jharkhand",
+    cities: ["Bokaro", "Deoghar", "Dhanbad", "Jamshedpur", "Ranchi"],
+  },
+  {
     name: "Karnataka",
     cities: [
       "Bangalore",
-      "Hubli-Dharwad",
-      "Mysore",
-      "Gulbarga",
-      "Mangalore",
       "Belgaum",
       "Bellary",
+      "Gulbarga",
+      "Hubli-Dharwad",
+      "Mangalore",
+      "Mysore",
     ],
+  },
+  {
+    name: "Kerala",
+    cities: ["Kochi", "Kollam", "Kozhikode", "Thiruvananthapuram", "Thrissur"],
+  },
+  {
+    name: "Madhya Pradesh",
+    cities: ["Bhopal", "Dewas", "Gwalior", "Indore", "Jabalpur", "Ujjain"],
+  },
+  {
+    name: "Maharashtra",
+    cities: [
+      "Akola",
+      "Amravati",
+      "Aurangabad",
+      "Bhiwandi",
+      "Jalgaon",
+      "Kalyan-Dombivali",
+      "Kolhapur",
+      "Malegaon",
+      "Mira-Bhayandar",
+      "Mumbai",
+      "Nagpur",
+      "Nanded",
+      "Nashik",
+      "Navi Mumbai",
+      "Pimpri-Chinchwad",
+      "Pune",
+      "Sangli-Miraj",
+      "Solapur",
+      "Thane",
+      "Ulhasnagar",
+      "Vasai-Virar",
+    ],
+  },
+  {
+    name: "Odisha",
+    cities: ["Bhubaneswar", "Brahmapur", "Cuttack", "Rourkela", "Sambalpur"],
+  },
+  {
+    name: "Punjab",
+    cities: ["Amritsar", "Bathinda", "Jalandhar", "Ludhiana", "Patiala"],
+  },
+  {
+    name: "Rajasthan",
+    cities: ["Ajmer", "Bikaner", "Jaipur", "Jodhpur", "Kota", "Udaipur"],
   },
   {
     name: "Tamil Nadu",
     cities: [
+      "Ambattur",
       "Chennai",
       "Coimbatore",
-      "Madurai",
-      "Tiruchirappalli",
-      "Salem",
-      "Tirunelveli",
       "Erode",
-      "Ambattur",
-    ],
-  },
-  {
-    name: "West Bengal",
-    cities: [
-      "Kolkata",
-      "Howrah",
-      "Durgapur",
-      "Asansol",
-      "Siliguri",
-      "Maheshtala",
-    ],
-  },
-  {
-    name: "Gujarat",
-    cities: ["Ahmedabad", "Vadodara", "Rajkot", "Bhavnagar", "Jamnagar"],
-  },
-  {
-    name: "Rajasthan",
-    cities: ["Jaipur", "Jodhpur", "Bikaner", "Ajmer", "Udaipur", "Kota"],
-  },
-  {
-    name: "Uttar Pradesh",
-    cities: [
-      "Lucknow",
-      "Kanpur",
-      "Ghaziabad",
-      "Agra",
-      "Meerut",
-      "Varanasi",
-      "Allahabad",
-      "Bareilly",
-      "Moradabad",
-      "Saharanpur",
-      "Firozabad",
-      "Jhansi",
-      "Loni",
-      "Aligarh",
-      "Noida",
-      "Faridabad",
-    ],
-  },
-  {
-    name: "Andhra Pradesh",
-    cities: [
-      "Visakhapatnam",
-      "Vijayawada",
-      "Guntur",
-      "Nellore",
-      "Warangal",
-      "Tirupati",
+      "Madurai",
+      "Salem",
+      "Tiruchirappalli",
+      "Tirunelveli",
     ],
   },
   {
@@ -115,91 +146,60 @@ export const statesAndCities: StateData[] = [
     cities: ["Hyderabad", "Secunderabad", "Warangal"],
   },
   {
-    name: "Kerala",
-    cities: ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur", "Kollam"],
-  },
-  {
-    name: "Madhya Pradesh",
-    cities: ["Indore", "Bhopal", "Jabalpur", "Gwalior", "Ujjain", "Dewas"],
-  },
-  {
-    name: "Punjab",
-    cities: ["Ludhiana", "Amritsar", "Jalandhar", "Patiala", "Bathinda"],
-  },
-  {
-    name: "Haryana",
+    name: "Uttar Pradesh",
     cities: [
+      "Agra",
+      "Aligarh",
+      "Allahabad",
+      "Bareilly",
       "Faridabad",
-      "Gurgaon",
-      "Panipat",
-      "Ambala",
-      "Yamunanagar",
-      "Rohtak",
-      "Hisar",
+      "Firozabad",
+      "Ghaziabad",
+      "Jhansi",
+      "Kanpur",
+      "Loni",
+      "Lucknow",
+      "Meerut",
+      "Moradabad",
+      "Noida",
+      "Saharanpur",
+      "Varanasi",
     ],
-  },
-  {
-    name: "Bihar",
-    cities: [
-      "Patna",
-      "Gaya",
-      "Bhagalpur",
-      "Muzaffarpur",
-      "Purnia",
-      "Darbhanga",
-    ],
-  },
-  {
-    name: "Odisha",
-    cities: ["Bhubaneswar", "Cuttack", "Rourkela", "Brahmapur", "Sambalpur"],
-  },
-  {
-    name: "Jharkhand",
-    cities: ["Ranchi", "Jamshedpur", "Dhanbad", "Bokaro", "Deoghar"],
-  },
-  {
-    name: "Assam",
-    cities: ["Guwahati", "Silchar", "Dibrugarh", "Jorhat", "Nagaon"],
-  },
-  {
-    name: "Chhattisgarh",
-    cities: ["Raipur", "Bhilai Nagar", "Bilaspur", "Korba", "Durg"],
   },
   {
     name: "Uttarakhand",
     cities: [
       "Dehradun",
+      "Haldwani-cum-Kathgodam",
       "Haridwar",
       "Roorkee",
-      "Haldwani-cum-Kathgodam",
       "Rudrapur",
     ],
   },
   {
-    name: "Jammu and Kashmir",
-    cities: ["Srinagar", "Jammu", "Baramulla", "Anantnag"],
-  },
-  {
-    name: "Himachal Pradesh",
-    cities: ["Shimla", "Dharamshala", "Solan", "Mandi"],
-  },
-  {
-    name: "Chandigarh",
-    cities: ["Chandigarh"],
+    name: "West Bengal",
+    cities: [
+      "Asansol",
+      "Durgapur",
+      "Howrah",
+      "Kolkata",
+      "Maheshtala",
+      "Siliguri",
+    ],
   },
 ];
 
 export const getAllStates = (): string[] => {
-  return statesAndCities.map((state) => state.name);
+  return statesAndCities.map((state) => state.name).sort();
 };
 
 export const getCitiesByState = (stateName: string): string[] => {
   const state = statesAndCities.find((state) => state.name === stateName);
-  return state ? state.cities : [];
+  return state ? state.cities.sort() : [];
 };
 
 export const getAllCities = (): string[] => {
-  return statesAndCities.flatMap((state) => state.cities);
+  return statesAndCities.flatMap((state) => state.cities).sort();
 };
 
 export const categories = ["Taxi", "Tour and Travels"];

@@ -1,18 +1,32 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Phone, MessageCircle } from "lucide-react";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  Timestamp,
+} from "firebase/firestore";
+import { db } from "../config/firebase";
 
-interface SimilarDriver {
+interface Advertisement {
   id: string;
-  name: string;
-  rating: number;
-  vehicleType: string;
-  vehicleModel: string;
-  location: string;
-  phone: string;
-  profileImage: string;
-  isPrime?: boolean;
-  isVIP?: boolean;
+  title: string;
+  description: string;
+  phoneNumber: string;
+  city: string;
+  state: string;
+  category: string;
+  photoUrls: string[];
+  tag: "free" | "vip" | "vip-prime";
+  approved: boolean;
+  status: "published";
+  userId: string;
+  createdAt: Timestamp;
+  publishedAt?: Timestamp;
+  planDuration: number;
+  planUnit: "Day";
+  expiryDate?: Timestamp;
 }
 
 interface SimilarProfilesProps {
@@ -24,146 +38,98 @@ const SimilarProfiles: React.FC<SimilarProfilesProps> = ({
   currentDriverId,
   city,
 }) => {
-  // Mock data - in real app, this would come from an API
-  const allDrivers: SimilarDriver[] = [
-    // VIP PRIME DRIVERS
-    {
-      id: "1",
-      name: "Rajesh Kumar",
-      rating: 4.9,
-      vehicleType: "Luxury Sedan",
-      vehicleModel: "BMW 3 Series",
-      location: "Connaught Place, Delhi",
-      phone: "+91 9876543210",
-      profileImage:
-        "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      isPrime: true,
-      isVIP: false,
-    },
-    {
-      id: "2",
-      name: "Priya Sharma",
-      rating: 4.8,
-      vehicleType: "Electric SUV",
-      vehicleModel: "Tesla Model Y",
-      location: "Karol Bagh, Delhi",
-      phone: "+91 9876543211",
-      profileImage:
-        "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      isPrime: true,
-      isVIP: false,
-    },
-    {
-      id: "3",
-      name: "Mohammed Ali",
-      rating: 4.7,
-      vehicleType: "Premium SUV",
-      vehicleModel: "Toyota Fortuner",
-      location: "Lajpat Nagar, Delhi",
-      phone: "+91 9876543212",
-      profileImage:
-        "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      isPrime: true,
-      isVIP: false,
-    },
-    {
-      id: "4",
-      name: "Kavita Singh",
-      rating: 4.9,
-      vehicleType: "Luxury Sedan",
-      vehicleModel: "Mercedes C-Class",
-      location: "Janpath, Delhi",
-      phone: "+91 9876543213",
-      profileImage:
-        "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      isPrime: true,
-      isVIP: false,
-    },
-    {
-      id: "5",
-      name: "Ravi Kumar",
-      rating: 4.8,
-      vehicleType: "Premium SUV",
-      vehicleModel: "Hyundai Creta",
-      location: "Dwarka, Delhi",
-      phone: "+91 9876543214",
-      profileImage:
-        "https://images.pexels.com/photos/1587009/pexels-photo-1587009.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      isPrime: true,
-      isVIP: false,
-    },
+  const [similarAds, setSimilarAds] = useState<Advertisement[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    // VIP DRIVERS
-    {
-      id: "201",
-      name: "Mahesh Varma",
-      rating: 4.7,
-      vehicleType: "Premium Sedan",
-      vehicleModel: "Toyota Camry",
-      location: "CP, Delhi",
-      phone: "+91 9876543301",
-      profileImage:
-        "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      isPrime: false,
-      isVIP: true,
-    },
-    {
-      id: "202",
-      name: "Sunita Devi",
-      rating: 4.6,
-      vehicleType: "Premium SUV",
-      vehicleModel: "Honda CR-V",
-      location: "Paharganj, Delhi",
-      phone: "+91 9876543302",
-      profileImage:
-        "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      isPrime: false,
-      isVIP: true,
-    },
+  useEffect(() => {
+    const fetchSimilarAds = async () => {
+      try {
+        setLoading(true);
 
-    // REGULAR DRIVERS
-    {
-      id: "101",
-      name: "Suresh Gupta",
-      rating: 4.4,
-      vehicleType: "Sedan",
-      vehicleModel: "Maruti Dzire",
-      location: "Rohini, Delhi",
-      phone: "+91 9876543401",
-      profileImage:
-        "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      isPrime: false,
-      isVIP: false,
-    },
-    {
-      id: "102",
-      name: "Anjali Kumari",
-      rating: 4.3,
-      vehicleType: "Hatchback",
-      vehicleModel: "Hyundai i20",
-      location: "Saket, Delhi",
-      phone: "+91 9876543402",
-      profileImage:
-        "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      isPrime: false,
-      isVIP: false,
-    },
-  ];
+        // Query ads from the same city, excluding current ad
+        const cityQuery = query(
+          collection(db, "adData"),
+          where("city", "==", city),
+          where("approved", "==", true)
+          // Include both "published" and "approved" status ads
+        );
 
-  // Filter drivers by city and exclude current driver - only show Prime drivers
-  const similarDrivers = allDrivers
-    .filter(
-      (driver) =>
-        driver.id !== currentDriverId &&
-        driver.location.includes(city) &&
-        driver.isPrime === true
-    )
-    .slice(0, 2); // Only show 2 prime drivers
+        const querySnapshot = await getDocs(cityQuery);
+        const ads: Advertisement[] = [];
 
-  if (similarDrivers.length === 0) {
-    return null;
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          // Exclude the current ad
+          if (doc.id !== currentDriverId) {
+            ads.push({
+              id: doc.id,
+              ...data,
+            } as Advertisement);
+          }
+        });
+
+        // Sort by priority: VIP Prime (1), VIP (2), Free (3)
+        ads.sort((a, b) => {
+          const getPriority = (tag: string) => {
+            if (tag === "vip-prime") return 1;
+            if (tag === "vip") return 2;
+            return 3; // free
+          };
+          return getPriority(a.tag) - getPriority(b.tag);
+        });
+
+        // Limit to 2 ads
+        setSimilarAds(ads.slice(0, 2));
+      } catch (error) {
+        console.error("Error fetching similar ads:", error);
+        setSimilarAds([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (city) {
+      fetchSimilarAds();
+    } else {
+      setLoading(false);
+    }
+  }, [city, currentDriverId]);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div>
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Similar Listing
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[1, 2].map((i) => (
+            <div
+              key={i}
+              className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden flex animate-pulse"
+            >
+              <div className="w-32 h-32 bg-gray-200 flex-shrink-0"></div>
+              <div className="p-3 flex-1">
+                <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded mb-3"></div>
+                <div className="flex space-x-1">
+                  <div className="h-6 bg-gray-200 rounded flex-1"></div>
+                  <div className="h-6 bg-gray-200 rounded flex-1"></div>
+                  <div className="h-6 bg-gray-200 rounded flex-1"></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
+  if (similarAds.length === 0) {
+    return null;
+  }
   return (
     <div>
       {/* Header */}
@@ -171,68 +137,106 @@ const SimilarProfiles: React.FC<SimilarProfilesProps> = ({
         <h2 className="text-lg font-semibold text-gray-900">Similar Listing</h2>
       </div>
 
-      {/* Driver Cards - 2 Cards Side by Side */}
+      {/* Ad Cards - 2 Cards Side by Side */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {similarDrivers.map((driver) => (
+        {similarAds.map((ad) => (
           <div
-            key={driver.id}
+            key={ad.id}
             className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden flex"
           >
-            {/* Driver Photo - Left Side */}
+            {/* Ad Photo - Left Side */}
             <div className="relative w-32 flex-shrink-0">
-              <img
-                src={driver.profileImage}
-                alt={driver.name}
-                className="w-full h-full object-cover"
-              />
+              {ad.photoUrls && ad.photoUrls.length > 0 ? (
+                <img
+                  src={ad.photoUrls[0]}
+                  alt={ad.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <svg
+                    className="h-8 w-8 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+              )}
 
-              {/* Name Badge at Bottom */}
+              {/* Title Badge at Bottom */}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent">
                 <div className="p-2">
                   <h3 className="text-white font-semibold text-xs truncate">
-                    {driver.name}
+                    {ad.title.length > 20
+                      ? ad.title.substring(0, 20) + "..."
+                      : ad.title}
                   </h3>
                 </div>
               </div>
             </div>
 
-            {/* Driver Description - Right Side */}
+            {/* Ad Description - Right Side */}
             <div className="p-3 flex-1 flex flex-col justify-between">
               <div className="mb-3">
                 <p className="text-xs text-gray-700 leading-relaxed">
-                  {driver.name} is One Of Our Most Reliable Drivers With Over
-                  Seven Years Of Experience In City.{driver.name} is One Of Our
-                  Most Reliable Drivers With Over.
+                  {ad.description.length > 80
+                    ? ad.description.substring(0, 80) + "..."
+                    : ad.description}
                 </p>
               </div>
 
               {/* Action Buttons */}
               <div className="flex items-center space-x-1">
                 <a
-                  href={`https://wa.me/${driver.phone.replace(
+                  href={`https://wa.me/${ad.phoneNumber.replace(
                     /[^0-9]/g,
                     ""
                   )}?text=Hi%20${encodeURIComponent(
-                    driver.name
+                    ad.title
                   )},%20I%20would%20like%20to%20book%20your%20taxi%20service.`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-green-500 text-white p-1.5 rounded-md hover:bg-green-600 transition-colors flex-1 flex items-center justify-center"
                   title="WhatsApp"
                 >
-                  <MessageCircle className="h-3 w-3" />
+                  <svg
+                    className="h-3 w-3"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.516" />
+                  </svg>
                 </a>
 
                 <a
-                  href={`tel:${driver.phone}`}
+                  href={`tel:${ad.phoneNumber}`}
                   className="bg-blue-500 text-white p-1.5 rounded-md hover:bg-blue-600 transition-colors flex-1 flex items-center justify-center"
                   title="Call"
                 >
-                  <Phone className="h-3 w-3" />
+                  <svg
+                    className="h-3 w-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    />
+                  </svg>
                 </a>
 
                 <Link
-                  to={`/driver/${driver.id}`}
+                  to={`/driver/${ad.id}`}
                   className="bg-teal-500 text-white p-1.5 rounded-md hover:bg-teal-600 transition-colors flex-1 flex items-center justify-center"
                   title="View Profile"
                 >

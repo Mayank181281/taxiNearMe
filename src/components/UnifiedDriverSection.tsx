@@ -1,22 +1,33 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Phone, Car, MessageCircle, Crown, Star, Shield } from "lucide-react";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  Timestamp,
+} from "firebase/firestore";
+import { db } from "../config/firebase";
 
-interface Driver {
+interface Advertisement {
   id: string;
-  name: string;
   title: string;
-  rating: number;
-  vehicleType: string;
-  vehicleModel: string;
-  location: string;
-  state: string;
+  description: string;
+  phoneNumber: string;
   city: string;
-  phone: string;
-  profileImage: string;
-  isPrime?: boolean;
-  isVIP?: boolean;
-  priority: number; // 1 = VIP Prime, 2 = VIP, 3 = Regular
+  state: string;
+  category: string;
+  photoUrls: string[];
+  tag: "free" | "vip" | "vip-prime";
+  approved: boolean;
+  status: "published";
+  userId: string;
+  createdAt: Timestamp;
+  publishedAt?: Timestamp;
+  planDuration: number;
+  planUnit: "Day";
+  expiryDate?: Timestamp;
 }
 
 interface UnifiedDriverSectionProps {
@@ -29,300 +40,87 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
   selectedCity,
 }) => {
   const navigate = useNavigate();
-  const [filteredDrivers, setFilteredDrivers] = useState<Driver[]>([]);
+  const [filteredAds, setFilteredAds] = useState<Advertisement[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const driversPerPage = 10;
 
-  // All drivers data with priority system
-  const allDrivers: Driver[] = useMemo(
-    () => [
-      // VIP PRIME DRIVERS (Priority 1)
-      {
-        id: "1",
-        name: "Rajesh Kumar",
-        title: "this is title ad",
-        rating: 4.9,
-        vehicleType: "Luxury Sedan",
-        vehicleModel: "BMW 3 Series",
-        location: "Connaught Place, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543210",
-        profileImage:
-          "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: true,
-        isVIP: false,
-        priority: 1,
-      },
-      {
-        id: "2",
-        name: "Priya Sharma",
-        title: "this is title ad",
-        rating: 4.8,
-        vehicleType: "Electric SUV",
-        vehicleModel: "Tesla Model Y",
-        location: "Bandra West, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543211",
-        profileImage:
-          "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: true,
-        isVIP: false,
-        priority: 1,
-      },
-      {
-        id: "3",
-        name: "Mohammed Ali",
-        title: "this is title ad",
-        rating: 4.7,
-        vehicleType: "Premium SUV",
-        vehicleModel: "Toyota Fortuner",
-        location: "Koramangala, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543212",
-        profileImage:
-          "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: true,
-        isVIP: false,
-        priority: 1,
-      },
-
-      // VIP DRIVERS (Priority 2)
-      {
-        id: "201",
-        name: "Mahesh Varma",
-        title: "this is title ad",
-        rating: 4.7,
-        vehicleType: "Premium Sedan",
-        vehicleModel: "Toyota Camry",
-        location: "CP, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543301",
-        profileImage:
-          "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: true,
-        priority: 2,
-      },
-      {
-        id: "202",
-        name: "Sunita Devi",
-        title: "this is title ad",
-        rating: 4.6,
-        vehicleType: "Premium SUV",
-        vehicleModel: "Honda CR-V",
-        location: "Bandra, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543302",
-        profileImage:
-          "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: true,
-        priority: 2,
-      },
-
-      // REGULAR DRIVERS (Priority 3)
-      {
-        id: "101",
-        name: "Suresh Gupta",
-        title: "this is title ad",
-        rating: 4.5,
-        vehicleType: "Sedan",
-        vehicleModel: "Honda City",
-        location: "Lajpat Nagar, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543220",
-        profileImage:
-          "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: false,
-        priority: 3,
-      },
-      {
-        id: "102",
-        name: "Amit Verma",
-        title: "this is title ad",
-        rating: 4.3,
-        vehicleType: "Hatchback",
-        vehicleModel: "Maruti Swift",
-        location: "Andheri East, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543221",
-        profileImage:
-          "https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: false,
-        priority: 3,
-      },
-      {
-        id: "103",
-        name: "Deepak Singh",
-        title: "this is title ad",
-        rating: 4.4,
-        vehicleType: "SUV",
-        vehicleModel: "Mahindra XUV500",
-        location: "Whitefield, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543222",
-        profileImage:
-          "https://images.pexels.com/photos/1212984/pexels-photo-1212984.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: false,
-        priority: 3,
-      },
-      {
-        id: "104",
-        name: "Ravi Patel",
-        title: "this is title ad",
-        rating: 4.2,
-        vehicleType: "Sedan",
-        vehicleModel: "Toyota Corolla",
-        location: "Sector 62, Noida",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543223",
-        profileImage:
-          "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: false,
-        priority: 3,
-      },
-      {
-        id: "105",
-        name: "Vikash Kumar",
-        title: "this is title ad",
-        rating: 4.1,
-        vehicleType: "Hatchback",
-        vehicleModel: "Hyundai i20",
-        location: "Salt Lake, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543224",
-        profileImage:
-          "https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: false,
-        priority: 3,
-      },
-      // Additional VIP Prime drivers
-      {
-        id: "4",
-        name: "Kavita Reddy",
-        title: "this is title ad",
-        rating: 4.9,
-        vehicleType: "Luxury SUV",
-        vehicleModel: "Audi Q5",
-        location: "Banjara Hills, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543232",
-        profileImage:
-          "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: true,
-        isVIP: false,
-        priority: 1,
-      },
-      {
-        id: "5",
-        name: "Arshan Sheikh",
-        title: "this is title ad",
-        rating: 4.8,
-        vehicleType: "Executive Sedan",
-        vehicleModel: "Mercedes C-Class",
-        location: "Juhu, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543233",
-        profileImage:
-          "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: true,
-        isVIP: false,
-        priority: 1,
-      },
-      // Additional VIP drivers
-      {
-        id: "203",
-        name: "Neha Tripathi",
-        title: "this is title ad",
-        rating: 4.6,
-        vehicleType: "Premium Hatchback",
-        vehicleModel: "Volkswagen Polo GT",
-        location: "Gomti Nagar, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543234",
-        profileImage:
-          "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: true,
-        priority: 2,
-      },
-      {
-        id: "204",
-        name: "Rajat Khanna",
-        title: "this is title ad",
-        rating: 4.5,
-        vehicleType: "Premium Sedan",
-        vehicleModel: "Honda Accord",
-        location: "Sector 18, Delhi",
-        state: "Delhi",
-        city: "Delhi",
-        phone: "+91 9876543235",
-        profileImage:
-          "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-        isPrime: false,
-        isVIP: true,
-        priority: 2,
-      },
-    ],
-    []
-  );
-
-  // Filter and sort drivers based on priority and location
+  // Fetch advertisements from Firebase adData collection
   useEffect(() => {
-    let filtered = [...allDrivers];
+    const fetchAds = async () => {
+      try {
+        setLoading(true);
 
-    // Filter by location
-    if (selectedCity && selectedCity !== "all") {
-      filtered = filtered.filter((driver) => driver.city === selectedCity);
-    } else if (selectedState && selectedState !== "all") {
-      filtered = filtered.filter((driver) => driver.state === selectedState);
-    }
+        // Filter by city if specified
+        let querySnapshot;
+        if (selectedCity && selectedCity !== "all") {
+          const cityQuery = query(
+            collection(db, "adData"),
+            where("city", "==", selectedCity)
+          );
+          querySnapshot = await getDocs(cityQuery);
+        } else {
+          querySnapshot = await getDocs(collection(db, "adData"));
+        }
 
-    // Sort by priority (1 = VIP Prime first, 2 = VIP second, 3 = Regular last)
-    filtered.sort((a, b) => a.priority - b.priority);
+        const ads: Advertisement[] = [];
 
-    setFilteredDrivers(filtered);
-    setCurrentPage(1); // Reset to first page when filters change
-  }, [selectedState, selectedCity, allDrivers]);
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          // Show both old "published" ads and new "approved" ads
+          if (
+            (data.status === "approved" || data.status === "published") &&
+            data.approved
+          ) {
+            ads.push({
+              id: doc.id,
+              ...data,
+            } as Advertisement);
+          }
+        });
+
+        // Sort by priority: VIP Prime (1), VIP (2), Free (3)
+        ads.sort((a, b) => {
+          const getPriority = (tag: string) => {
+            if (tag === "vip-prime") return 1;
+            if (tag === "vip") return 2;
+            return 3; // free
+          };
+          return getPriority(a.tag) - getPriority(b.tag);
+        });
+
+        setFilteredAds(ads);
+        setCurrentPage(1);
+      } catch (error) {
+        console.error("Error fetching advertisements:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAds();
+  }, [selectedState, selectedCity]);
 
   // Pagination calculations
-  const totalDrivers = filteredDrivers.length;
-  const totalPages = Math.ceil(totalDrivers / driversPerPage);
+  const totalAds = filteredAds.length;
+  const totalPages = Math.ceil(totalAds / driversPerPage);
   const startIndex = (currentPage - 1) * driversPerPage;
   const endIndex = startIndex + driversPerPage;
-  const currentDrivers = filteredDrivers.slice(startIndex, endIndex);
+  const currentAds = filteredAds.slice(startIndex, endIndex);
 
-  // Show message if no drivers match the filter
-  if (filteredDrivers.length === 0 && (selectedState || selectedCity)) {
+  // Show message if no ads match the filter
+  if (filteredAds.length === 0 && (selectedState || selectedCity)) {
     return (
       <section className="py-8 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center py-12">
             <Car className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-600 mb-2">
-              No drivers found
+              No ads found
             </h3>
             <p className="text-gray-500">
-              No drivers available in {selectedCity || selectedState}. Try
-              selecting a different location.
+              No ads available in {selectedCity || selectedState}. Try selecting
+              a different location.
             </p>
           </div>
         </div>
@@ -330,8 +128,22 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
     );
   }
 
-  // Show message if no drivers for current page (shouldn't happen normally)
-  if (filteredDrivers.length > 0 && currentDrivers.length === 0) {
+  // Show loading state
+  if (loading) {
+    return (
+      <section className="py-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-500">Loading advertisements...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Show message if no ads for current page (shouldn't happen normally)
+  if (filteredAds.length > 0 && currentAds.length === 0) {
     return (
       <section className="py-8 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -349,8 +161,8 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
     );
   }
 
-  const getCardStyling = (driver: Driver) => {
-    if (driver.isPrime) {
+  const getCardStyling = (ad: Advertisement) => {
+    if (ad.tag === "vip-prime") {
       return {
         containerClass: "relative",
         frameClass: "bg-white rounded-3xl border-2 border-gray-200 shadow-2xl",
@@ -360,7 +172,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
         hasFloatingBadge: true,
       };
     }
-    if (driver.isVIP) {
+    if (ad.tag === "vip") {
       return {
         containerClass: "relative",
         frameClass: "bg-white rounded-3xl border-2 border-gray-200 shadow-xl",
@@ -380,8 +192,8 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
     };
   };
 
-  const getPremiumBadge = (driver: Driver) => {
-    if (driver.isPrime) {
+  const getPremiumBadge = (ad: Advertisement) => {
+    if (ad.tag === "vip-prime") {
       return (
         <div className="absolute -top-0 left-1/2 -translate-x-1/2 lg:left-auto lg:translate-x-0 lg:right-4 z-30">
           <div className="relative inline-flex items-center gap-2 px-4 py-2">
@@ -400,7 +212,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       );
     }
 
-    if (driver.isVIP) {
+    if (ad.tag === "vip") {
       return (
         <div className="absolute -top-0 left-1/2 -translate-x-1/2 lg:left-auto lg:translate-x-0 lg:right-10 z-30">
           <div className="relative inline-flex items-center gap-2 px-4 py-2">
@@ -440,26 +252,26 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
   return (
     <section className="py-8 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Unified Drivers List with Premium Badges */}
+        {/* Unified Ads List with Premium Badges */}
         <div className="space-y-6">
-          {currentDrivers.map((driver) => {
-            const styling = getCardStyling(driver);
+          {currentAds.map((ad) => {
+            const styling = getCardStyling(ad);
 
             return (
-              <div key={driver.id} className={styling.containerClass}>
+              <div key={ad.id} className={styling.containerClass}>
                 {/* Premium Badge */}
-                {getPremiumBadge(driver)}
+                {getPremiumBadge(ad)}
 
                 {/* Main Card with Frame Border */}
                 <div
                   className={`block cursor-pointer ${styling.frameClass}`}
                   style={
-                    driver.isPrime
+                    ad.tag === "vip-prime"
                       ? {
                           background:
                             "linear-gradient(145deg, #ffffff 0%, #fefce8 100%)",
                         }
-                      : driver.isVIP
+                      : ad.tag === "vip"
                       ? {
                           background:
                             "linear-gradient(145deg, #ffffff 0%, #faf5ff 100%)",
@@ -472,50 +284,65 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                 >
                   <div className={styling.backgroundClass}>
                     <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
-                      {/* Driver Info Section */}
+                      {/* Ad Info Section */}
                       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 lg:gap-8 flex-1">
-                        {/* Driver Profile Image with Premium Ring */}
+                        {/* Ad Image with Premium Ring */}
                         <div className="flex-shrink-0 relative">
-                          {driver.isPrime && (
+                          {ad.tag === "vip-prime" && (
                             <div className="absolute -inset-2 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 rounded-xl blur-sm opacity-30 animate-pulse"></div>
                           )}
-                          {driver.isVIP && !driver.isPrime && (
+                          {ad.tag === "vip" && (
                             <div className="absolute -inset-2 bg-gradient-to-r from-purple-400 via-purple-500 to-purple-600 rounded-xl blur-sm opacity-25"></div>
                           )}
-                          {/* Added glow for FREE drivers */}
-                          {!driver.isPrime && !driver.isVIP && (
+                          {/* Added glow for FREE ads */}
+                          {ad.tag === "free" && (
                             <div className="absolute -inset-2 bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500 rounded-xl blur-sm opacity-20"></div>
                           )}
-                          <img
-                            src={driver.profileImage}
-                            alt={driver.name}
-                            className={`relative w-32 h-32 rounded-xl object-cover shadow-lg ${
-                              driver.isPrime
-                                ? "ring-4 ring-amber-300"
-                                : driver.isVIP
-                                ? "ring-4 ring-purple-300"
-                                : "ring-4 ring-sky-200" // Updated ring for FREE drivers
-                            }`}
-                          />
+
+                          {ad.photoUrls && ad.photoUrls.length > 0 ? (
+                            <img
+                              src={ad.photoUrls[0]}
+                              alt={ad.title}
+                              className={`relative w-32 h-32 rounded-xl object-cover shadow-lg ${
+                                ad.tag === "vip-prime"
+                                  ? "ring-4 ring-amber-300"
+                                  : ad.tag === "vip"
+                                  ? "ring-4 ring-purple-300"
+                                  : "ring-4 ring-sky-200" // Updated ring for FREE ads
+                              }`}
+                            />
+                          ) : (
+                            <div
+                              className={`relative w-32 h-32 bg-gray-200 rounded-xl flex items-center justify-center shadow-lg ${
+                                ad.tag === "vip-prime"
+                                  ? "ring-4 ring-amber-300"
+                                  : ad.tag === "vip"
+                                  ? "ring-4 ring-purple-300"
+                                  : "ring-4 ring-sky-200"
+                              }`}
+                            >
+                              <Car className="w-8 h-8 text-gray-400" />
+                            </div>
+                          )}
                         </div>
 
-                        {/* Driver Details */}
+                        {/* Ad Details */}
                         <div className="flex-1 space-y-4 text-center sm:text-left">
                           {/* Title with Premium Styling */}
                           <h3
                             className={`text-2xl font-bold leading-tight ${
-                              driver.isPrime
+                              ad.tag === "vip-prime"
                                 ? "text-amber-900 drop-shadow-sm"
-                                : driver.isVIP
+                                : ad.tag === "vip"
                                 ? "text-purple-900"
                                 : "text-gray-900"
                             }`}
                           >
-                            {driver.title}
-                            {driver.isPrime && (
+                            {ad.title}
+                            {ad.tag === "vip-prime" && (
                               <Crown className="inline ml-2 h-6 w-6 text-amber-600" />
                             )}
-                            {driver.isVIP && !driver.isPrime && (
+                            {ad.tag === "vip" && (
                               <Shield className="inline ml-2 h-5 w-5 text-purple-600" />
                             )}
                           </h3>
@@ -523,47 +350,27 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                           {/* Premium Description */}
                           <p
                             className={`text-base leading-relaxed ${
-                              driver.isPrime
+                              ad.tag === "vip-prime"
                                 ? "text-amber-800"
-                                : driver.isVIP
+                                : ad.tag === "vip"
                                 ? "text-purple-800"
                                 : "text-gray-700"
                             }`}
                           >
-                            {driver.name} Is One Of Our Most Reliable Drivers
-                            With Over{" "}
-                            {driver.isPrime
-                              ? "Ten"
-                              : driver.isVIP
-                              ? "Seven"
-                              : "Five"}{" "}
-                            Years Of Experience In City And Outstation Travel.
-                            Known For{" "}
-                            {driver.isPrime
-                              ? "His Exceptional Luxury Service"
-                              : driver.isVIP
-                              ? "His Professional Premium Service"
-                              : "His Reliable Service"}
-                            , Punctuality, And Safe Driving,{" "}
-                            {driver.isPrime
-                              ? "He Ensures Every Ride Is Luxurious And Stress-Free"
-                              : driver.isVIP
-                              ? "He Ensures Every Ride Is Comfortable And Stress-Free"
-                              : "He Ensures Every Ride Is Smooth And Stress-Free"}
-                            .
+                            {ad.description}
                           </p>
 
                           {/* Location with Premium Accent */}
                           <p
                             className={`text-base font-medium ${
-                              driver.isPrime
+                              ad.tag === "vip-prime"
                                 ? "text-amber-700"
-                                : driver.isVIP
+                                : ad.tag === "vip"
                                 ? "text-purple-700"
                                 : "text-gray-600"
                             }`}
                           >
-                            📍 {driver.location}
+                            📍 {ad.city}, {ad.state}
                           </p>
                         </div>
                       </div>
@@ -571,24 +378,22 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                       {/* Action Buttons without hover effects */}
                       <div className="flex flex-col gap-3 min-w-[160px]">
                         <a
-                          href={`https://wa.me/${driver.phone.replace(
+                          href={`https://wa.me/${ad.phoneNumber.replace(
                             /[^0-9]/g,
                             ""
-                          )}?text=Hi%20${encodeURIComponent(
-                            driver.name
-                          )},%20I%20would%20like%20to%20book%20your%20${
-                            driver.isPrime
+                          )}?text=Hi,%20I%20would%20like%20to%20book%20your%20${
+                            ad.tag === "vip-prime"
                               ? "VIP Prime luxury"
-                              : driver.isVIP
+                              : ad.tag === "vip"
                               ? "VIP premium"
                               : "FREE"
                           } taxi%20service.`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 relative z-10 ${
-                            driver.isPrime
+                            ad.tag === "vip-prime"
                               ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg"
-                              : driver.isVIP
+                              : ad.tag === "vip"
                               ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md"
                               : "bg-green-500 text-white shadow-md"
                           }`}
@@ -599,11 +404,11 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                         </a>
 
                         <a
-                          href={`tel:${driver.phone}`}
+                          href={`tel:${ad.phoneNumber}`}
                           className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 relative z-10 ${
-                            driver.isPrime
+                            ad.tag === "vip-prime"
                               ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg"
-                              : driver.isVIP
+                              : ad.tag === "vip"
                               ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
                               : "bg-blue-500 text-white shadow-md"
                           }`}
@@ -615,15 +420,15 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
 
                         <div
                           className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 cursor-pointer ${
-                            driver.isPrime
+                            ad.tag === "vip-prime"
                               ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg"
-                              : driver.isVIP
+                              : ad.tag === "vip"
                               ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-md"
                               : "bg-teal-500 text-white shadow-md"
                           }`}
                           onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/driver/${driver.id}`);
+                            navigate(`/driver/${ad.id}`);
                           }}
                         >
                           <span>👤</span>
@@ -641,8 +446,8 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
         {/* Pagination Info and Controls at Bottom */}
         <div className="text-center mt-8">
           <div className="text-sm text-gray-500 mb-4">
-            Showing {startIndex + 1}-{Math.min(endIndex, totalDrivers)} of{" "}
-            {totalDrivers} drivers
+            Showing {startIndex + 1}-{Math.min(endIndex, totalAds)} of{" "}
+            {totalAds} ads
             {totalPages > 1 && (
               <span className="ml-2">
                 (Page {currentPage} of {totalPages})
