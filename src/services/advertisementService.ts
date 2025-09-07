@@ -355,11 +355,16 @@ export const getUserAdvertisements = async (
       status: "draft" as const,
     })) as Advertisement[];
 
-    const published = publishedSnapshot.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-      createdAt: doc.data().createdAt.toDate(),
-    })) as Advertisement[];
+    const published = publishedSnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        ...data,
+        id: doc.id,
+        createdAt: data.createdAt.toDate(),
+        // Convert expiryDate Timestamp to Date if it exists
+        expiryDate: data.expiryDate ? data.expiryDate.toDate() : undefined,
+      };
+    }) as Advertisement[];
 
     return { drafts, published };
   } catch (error) {

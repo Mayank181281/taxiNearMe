@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/useAuth";
 import {
   getUserAdvertisements,
   Advertisement,
@@ -598,6 +598,17 @@ const YourAdverts: React.FC = () => {
                                       : ad.tag === "vip"
                                       ? "VIP"
                                       : "FREE"}
+                                    {ad.tag &&
+                                      ad.tag !== "free" &&
+                                      ad.planDuration && (
+                                        <span className="font-normal">
+                                          {" "}
+                                          • {ad.planDuration}{" "}
+                                          {ad.planDuration === 1
+                                            ? "Day"
+                                            : "Days"}
+                                        </span>
+                                      )}
                                   </span>
                                   <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
                                     {ad.category}
@@ -724,6 +735,17 @@ const YourAdverts: React.FC = () => {
                                       : ad.tag === "vip"
                                       ? "VIP"
                                       : "FREE"}
+                                    {ad.tag &&
+                                      ad.tag !== "free" &&
+                                      ad.planDuration && (
+                                        <span className="font-normal">
+                                          {" "}
+                                          • {ad.planDuration}{" "}
+                                          {ad.planDuration === 1
+                                            ? "Day"
+                                            : "Days"}
+                                        </span>
+                                      )}
                                   </span>
                                   <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
                                     {ad.category}
@@ -987,6 +1009,84 @@ const YourAdverts: React.FC = () => {
                                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                                         LIVE
                                       </span>
+                                      {/* Plan Type and Duration */}
+                                      {ad.tag && ad.tag !== "free" && (
+                                        <span
+                                          className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 ${
+                                            ad.tag === "vip-prime"
+                                              ? "bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 border border-amber-200"
+                                              : "bg-gradient-to-r from-purple-100 to-violet-100 text-purple-800 border border-purple-200"
+                                          }`}
+                                        >
+                                          {ad.tag === "vip-prime" ? (
+                                            <svg
+                                              className="w-3 h-3"
+                                              fill="currentColor"
+                                              viewBox="0 0 20 20"
+                                            >
+                                              <path
+                                                fillRule="evenodd"
+                                                d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z"
+                                                clipRule="evenodd"
+                                              />
+                                            </svg>
+                                          ) : (
+                                            <svg
+                                              className="w-3 h-3"
+                                              fill="currentColor"
+                                              viewBox="0 0 20 20"
+                                            >
+                                              <path
+                                                fillRule="evenodd"
+                                                d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z"
+                                                clipRule="evenodd"
+                                              />
+                                            </svg>
+                                          )}
+                                          {ad.tag === "vip-prime"
+                                            ? "VIP PRIME"
+                                            : "VIP"}{" "}
+                                          • {ad.planDuration || 1}{" "}
+                                          {ad.planDuration === 1
+                                            ? "Day"
+                                            : "Days"}
+                                        </span>
+                                      )}
+                                      {/* Free Plan Tag */}
+                                      {(!ad.tag || ad.tag === "free") && (
+                                        <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-medium">
+                                          FREE PLAN
+                                        </span>
+                                      )}
+                                      {/* Expiry Information for VIP/VIP Prime ads */}
+                                      {ad.tag &&
+                                        ad.tag !== "free" &&
+                                        ad.expiryDate && (
+                                          <span className="bg-orange-50 text-orange-700 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                                            <svg
+                                              className="w-3 h-3"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              viewBox="0 0 24 24"
+                                            >
+                                              <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                              />
+                                            </svg>
+                                            Expires:{" "}
+                                            {ad.expiryDate.toLocaleDateString(
+                                              "en-US",
+                                              {
+                                                month: "short",
+                                                day: "numeric",
+                                                year: "numeric",
+                                              }
+                                            )}
+                                          </span>
+                                        )}
                                     </div>
                                   </div>
                                 </div>

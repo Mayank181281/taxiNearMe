@@ -5,7 +5,7 @@ import {
   EmailAuthProvider,
 } from "firebase/auth";
 import { db, auth } from "../config/firebase";
-import { User } from "../contexts/AuthContext";
+import { User } from "../contexts/authTypes";
 
 export interface ProfileUpdateData {
   firstName: string;

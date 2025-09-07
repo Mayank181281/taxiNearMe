@@ -9,7 +9,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../contexts/useAuth";
 import { getPaymentQRCode, QRCodeData } from "../services/paymentService";
 
 const PaymentPage: React.FC = () => {

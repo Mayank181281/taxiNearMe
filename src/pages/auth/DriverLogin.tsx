@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Car, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../contexts/useAuth";
 import { validateEmail } from "../../utils/validation";
 
 const DriverLogin: React.FC = () => {
