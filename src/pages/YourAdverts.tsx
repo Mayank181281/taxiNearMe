@@ -1,14 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/useAuth";
 import {
   getUserAdvertisements,
   Advertisement,
   publishDraftAdvertisement,
+  deleteAdvertisement,
 } from "../services/advertisementService";
+import { useAdDisplayExpiration } from "../hooks/useAutoExpiration";
 
 const YourAdverts: React.FC = () => {
-  const { user } = useAuth();
+  // Process expired ads before showing user's adverts
+  useAdDisplayExpiration();
+
+  const { user, firebaseUser } = useAuth();
+
   const navigate = useNavigate();
   const [ads, setAds] = useState<{
     drafts: Advertisement[];
@@ -23,31 +29,133 @@ const YourAdverts: React.FC = () => {
     null
   );
   const [billingPeriod, setBillingPeriod] = useState<"month" | "day">("day");
+  const [deletingAd, setDeletingAd] = useState<Advertisement | null>(null);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+
+  // Helper function to check if an ad can be upgraded
+  const canAdBeUpgraded = (ad: Advertisement): boolean => {
+    // An ad can be upgraded if:
+    // 1. It's currently a Free ad (tag === "free")
+    // 2. It's live (status === "published" OR status === "approved")
+    return (
+      ad.tag === "free" &&
+      (ad.status === "published" || ad.status === "approved")
+    );
+  };
+
+  // Function to fetch and refresh ads data
+  const fetchAds = useCallback(
+    async (force = false) => {
+      const userId = firebaseUser?.uid;
+      const userEmail = user?.email;
+
+      if (!userId) {
+        return;
+      }
+
+      if (!userEmail) {
+        return;
+      }
+
+      try {
+        if (force) setLoading(true);
+        console.log("� Current user ID:", userId);
+        console.log("🔍 Current user object:", user);
+        console.log("�🔄 Fetching user advertisements...");
+        console.log("🔍 About to call debugUserAds...");
+        console.log("User ID:", userId);
+        console.log("User Email:", userEmail);
+
+        const userAds = await getUserAdvertisements(userId);
+
+        setAds(userAds);
+      } catch (error) {
+        console.error("Error fetching advertisements:", error);
+      } finally {
+        if (force) setLoading(false);
+      }
+    },
+    [user, firebaseUser]
+  );
 
   // Fetch user's advertisements from Firebase
   useEffect(() => {
-    const fetchAds = async () => {
-      if (user?.id) {
-        try {
-          setLoading(true);
-          const userAds = await getUserAdvertisements(user.id);
-          setAds(userAds);
-        } catch (error) {
-          console.error("Error fetching advertisements:", error);
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        setLoading(false);
-      }
-    };
+    fetchAds(true);
+  }, [fetchAds]);
 
-    fetchAds();
-  }, [user]);
+  // Auto-refresh every 30 seconds to catch auto-processed ads
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchAds(false);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [fetchAds]);
 
   const handlePublishDraft = (draft: Advertisement) => {
     setPublishingDraft(draft);
     setShowPlansModal(true);
+  };
+
+  // Handle upgrade ad - create draft and navigate to plans selection
+  const handleUpgradeAd = (ad: Advertisement) => {
+    // Create a draft version with ad data for upgrade flow
+    const draftData = {
+      ...ad,
+      status: "draft" as const,
+      tag: "free" as const, // Start with free to allow plan selection
+      id: "", // Will be auto-generated
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    // Store the upgrade context
+    sessionStorage.setItem(
+      "upgradeContext",
+      JSON.stringify({
+        originalAdId: ad.id,
+        isUpgrade: true,
+        adData: draftData,
+      })
+    );
+
+    // Set the ad for publishing and show plans modal
+    setPublishingDraft(draftData);
+    setShowPlansModal(true);
+  };
+
+  const handleDeleteAd = (ad: Advertisement) => {
+    setDeletingAd(ad);
+    setShowDeleteConfirmation(true);
+  };
+
+  const confirmDeleteAd = async () => {
+    if (!deletingAd) return;
+
+    try {
+      setLoading(true);
+      await deleteAdvertisement(deletingAd.id!);
+
+      // Refresh the ads list to reflect the changes
+      await fetchAds(false);
+
+      // Close confirmation dialog
+      setShowDeleteConfirmation(false);
+      setDeletingAd(null);
+
+      // Show success message
+      alert("Your ad has been deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting ad:", error);
+      alert("There was an error deleting your ad. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cancelDeleteAd = () => {
+    setShowDeleteConfirmation(false);
+    setDeletingAd(null);
   };
 
   const handlePlanSelection = async (plan: {
@@ -57,17 +165,30 @@ const YourAdverts: React.FC = () => {
   }) => {
     if (!publishingDraft) return;
 
+    // Check if this is an upgrade flow
+    const upgradeContext = sessionStorage.getItem("upgradeContext");
+    const isUpgrade = upgradeContext
+      ? JSON.parse(upgradeContext).isUpgrade
+      : false;
+
     try {
       if (plan.tag === "free") {
         // For Free Plan, publish directly without payment
         setLoading(true);
-        await publishDraftAdvertisement(publishingDraft.id!, plan);
+
+        if (isUpgrade) {
+          // For upgrade to free, just update the existing ad to free
+          const { originalAdId } = JSON.parse(upgradeContext!);
+          // This would typically reactivate the ad or extend its duration
+          await publishDraftAdvertisement(originalAdId, plan);
+          sessionStorage.removeItem("upgradeContext");
+        } else {
+          // Normal draft publishing
+          await publishDraftAdvertisement(publishingDraft.id!, plan);
+        }
 
         // Refresh the ads list to reflect the changes
-        if (user?.id) {
-          const userAds = await getUserAdvertisements(user.id);
-          setAds(userAds);
-        }
+        await fetchAds(false);
 
         // Close modal and show success
         setShowPlansModal(false);
@@ -84,11 +205,20 @@ const YourAdverts: React.FC = () => {
           planPrice = billingPeriod === "month" ? "80" : "6";
         }
 
+        let adId = publishingDraft.id!;
+
+        // For upgrades, use the original ad ID
+        if (isUpgrade) {
+          const { originalAdId } = JSON.parse(upgradeContext!);
+          adId = originalAdId;
+        }
+
         const queryParams = new URLSearchParams({
           plan: plan.tag,
           period: billingPeriod,
           price: planPrice,
-          adId: publishingDraft.id!,
+          adId: adId,
+          ...(isUpgrade && { upgrade: "true" }), // Add upgrade flag for payment page
         });
 
         navigate(`/profile/payment?${queryParams.toString()}`);
@@ -261,9 +391,10 @@ const YourAdverts: React.FC = () => {
                     planUnit: "Day",
                   })
                 }
-                className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                disabled={loading}
+                className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Proceed to Payment
+                {loading ? "Processing..." : "Proceed to Payment"}
               </button>
             </div>
 
@@ -331,9 +462,10 @@ const YourAdverts: React.FC = () => {
                     planUnit: "Day",
                   })
                 }
-                className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition-colors text-sm"
+                disabled={loading}
+                className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Proceed to Payment
+                {loading ? "Processing..." : "Proceed to Payment"}
               </button>
             </div>
           </div>
@@ -344,10 +476,65 @@ const YourAdverts: React.FC = () => {
                 setShowPlansModal(false);
                 setPublishingDraft(null);
               }}
-              className="px-6 py-2 text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              disabled={loading}
+              className="px-6 py-2 text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const DeleteConfirmationModal = () => {
+    if (!showDeleteConfirmation || !deletingAd) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="text-center">
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+              <svg
+                className="h-6 w-6 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </div>
+
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Delete Advertisement
+            </h3>
+
+            <p className="text-sm text-gray-500 mb-6">
+              Are you sure you want to delete "{deletingAd.title}"? This action
+              cannot be undone and will permanently remove your advertisement.
+            </p>
+
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={cancelDeleteAd}
+                disabled={loading}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteAd}
+                disabled={loading}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? "Deleting..." : "Delete"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -370,6 +557,33 @@ const YourAdverts: React.FC = () => {
           </a>{" "}
           on WhatsApp
         </p>
+      </div>
+
+      {/* Refresh Button */}
+      <div className="mb-6 flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-900">
+          Your Advertisements
+        </h1>
+        <button
+          onClick={() => fetchAds(true)}
+          disabled={loading}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
+          {loading ? "Refreshing..." : "Refresh"}
+        </button>
       </div>
 
       <div className="space-y-6">
@@ -498,6 +712,12 @@ const YourAdverts: React.FC = () => {
                                 className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
                               >
                                 Publish
+                              </button>
+                              <button
+                                onClick={() => handleDeleteAd(ad)}
+                                className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                              >
+                                Delete
                               </button>
                             </div>
                           </div>
@@ -636,6 +856,12 @@ const YourAdverts: React.FC = () => {
                                     Awaiting Approval
                                   </span>
                                 </div>
+                                <button
+                                  onClick={() => handleDeleteAd(ad)}
+                                  className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors ml-2"
+                                >
+                                  Delete
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -761,6 +987,12 @@ const YourAdverts: React.FC = () => {
                                 >
                                   Edit & Resubmit
                                 </Link>
+                                <button
+                                  onClick={() => handleDeleteAd(ad)}
+                                  className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                                >
+                                  Delete
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -1099,6 +1331,41 @@ const YourAdverts: React.FC = () => {
                                   >
                                     Edit Ad
                                   </Link>
+
+                                  {/* Upgrade Button - Show for expired/free ads that can be upgraded */}
+                                  {canAdBeUpgraded(ad) && (
+                                    <button
+                                      onClick={() => handleUpgradeAd(ad)}
+                                      className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 transition-colors text-center font-medium flex items-center justify-center gap-2"
+                                      title={
+                                        ad.autoDowngraded
+                                          ? "Upgrade your expired ad back to premium"
+                                          : "Upgrade to premium plan"
+                                      }
+                                    >
+                                      <svg
+                                        className="w-4 h-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                                        />
+                                      </svg>
+                                      Upgrade
+                                    </button>
+                                  )}
+
+                                  <button
+                                    onClick={() => handleDeleteAd(ad)}
+                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-center font-medium"
+                                  >
+                                    Delete Ad
+                                  </button>
                                 </div>
                               </div>
                             </div>
@@ -1146,6 +1413,9 @@ const YourAdverts: React.FC = () => {
 
       {/* Plans Modal */}
       {showPlansModal && <PlansModal />}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal />
     </div>
   );
 };

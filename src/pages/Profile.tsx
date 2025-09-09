@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/useAuth";
-import { getUserAdsSummary } from "../services/advertisementService";
+import {
+  getUserAdsSummary,
+  getUserOrderHistory,
+} from "../services/advertisementService";
 
 interface Advertisement {
   id?: string;
@@ -34,7 +37,7 @@ interface OrderStats {
 }
 
 const Profile: React.FC = () => {
-  const { user } = useAuth();
+  const { firebaseUser } = useAuth();
   const [adsSummary, setAdsSummary] = useState<AdsSummary>({
     totalAds: 0,
     activeAds: 0,
@@ -44,7 +47,7 @@ const Profile: React.FC = () => {
     recentAds: [],
     canPostMore: true,
   });
-  const [orderStats] = useState<OrderStats>({
+  const [orderStats, setOrderStats] = useState<OrderStats>({
     totalOrders: 0,
     completed: 0,
     pending: 0,
@@ -53,28 +56,88 @@ const Profile: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
 
+  const fetchData = useCallback(async () => {
+    const userId = firebaseUser?.uid;
+
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Fetch ads summary
+      const summary = await getUserAdsSummary(userId);
+      setAdsSummary(summary);
+
+      // Fetch order history (all ads are treated as orders based on original posting)
+      const orderHistory = await getUserOrderHistory(userId);
+
+      // Calculate order statistics based on original ad type and current status
+      const totalOrders = orderHistory.length;
+
+      // For orders, we consider the original intent - free ads and premium purchases
+      const completed = orderHistory.filter(
+        (order) => order.status === "approved" || order.status === "published"
+      ).length;
+
+      const pending = orderHistory.filter(
+        (order) => order.status === "pending"
+      ).length;
+
+      const cancelled = orderHistory.filter(
+        (order) => order.status === "rejected"
+      ).length;
+
+      // Draft ads are not really "orders" yet, so we don't count them in orders
+      const drafts = orderHistory.filter(
+        (order) => order.status === "draft" || !order.status
+      ).length;
+
+      // Adjust totals to exclude drafts from order count (drafts aren't orders yet)
+      const actualOrders = totalOrders - drafts;
+
+      const lastOrder =
+        orderHistory.filter((order) => order.status && order.status !== "draft")
+          .length > 0
+          ? orderHistory.filter(
+              (order) => order.status && order.status !== "draft"
+            )[0]
+          : null;
+
+      const lastOrderDate = lastOrder
+        ? (
+            lastOrder.publishedAt || lastOrder.createdAt
+          )?.toLocaleDateString() || "N/A"
+        : "N/A";
+
+      setOrderStats({
+        totalOrders: actualOrders,
+        completed,
+        pending,
+        cancelled,
+        lastOrderDate,
+      });
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [firebaseUser?.uid]);
+
   useEffect(() => {
-    const fetchData = async () => {
-      if (!user?.id) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-
-        // Fetch ads summary
-        const summary = await getUserAdsSummary(user.id);
-        setAdsSummary(summary);
-      } catch (error) {
-        console.error("Error fetching profile data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
-  }, [user?.id]);
+  }, [fetchData]);
+
+  // Auto-refresh dashboard data every 60 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchData();
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [fetchData]);
 
   const getStatusBadge = (ad: Advertisement) => {
     if (ad.status === "draft" || !ad.status) {
@@ -147,8 +210,11 @@ const Profile: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {/* Your Adverts */}
           <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
               My Adverts
+              <span className="bg-blue-100 text-blue-800 text-sm font-bold px-3 py-1 rounded-full">
+                {adsSummary.totalAds} Total
+              </span>
             </h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center">

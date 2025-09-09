@@ -32,7 +32,7 @@ const PostAds: React.FC = () => {
   const [searchParams] = useSearchParams();
   const editId = searchParams.get("edit");
   const isEditing = Boolean(editId);
-  const { user } = useAuth();
+  const { user, firebaseUser } = useAuth();
 
   const [formData, setFormData] = useState<AdFormData>({
     email: "",
@@ -57,9 +57,9 @@ const PostAds: React.FC = () => {
   // Check ad limit for new ads (not for editing)
   useEffect(() => {
     const checkAdLimit = async () => {
-      if (!isEditing && user?.id) {
+      if (!isEditing && firebaseUser?.uid) {
         try {
-          const summary = await getUserAdsSummary(user.id);
+          const summary = await getUserAdsSummary(firebaseUser.uid);
           setAdCount(summary.totalAds);
           setAdLimitReached(!summary.canPostMore);
 
@@ -76,25 +76,26 @@ const PostAds: React.FC = () => {
     };
 
     checkAdLimit();
-  }, [user?.id, isEditing, navigate]);
+  }, [firebaseUser?.uid, isEditing, navigate]);
 
-  // Initialize form with user data
+  // Initialize form with user data (only for new ads, not when editing)
   useEffect(() => {
-    if (user) {
+    if (user && !isEditing) {
       setFormData((prev) => ({
         ...prev,
         email: user.email || "",
         phone: user.phone || "",
       }));
     }
-  }, [user]);
+  }, [user, isEditing]);
 
   // Load existing ad data when editing
   useEffect(() => {
     const loadAdData = async () => {
-      if (isEditing && editId && user?.id) {
+      if (isEditing && editId && firebaseUser?.uid) {
         try {
-          const userAds = await getUserAdvertisements(user.id);
+          const userAds = await getUserAdvertisements(firebaseUser.uid);
+
           // Search in both drafts and published ads
           const allAds = [...userAds.drafts, ...userAds.published];
           const existingAd = allAds.find((ad) => ad.id === editId);
@@ -131,7 +132,7 @@ const PostAds: React.FC = () => {
     };
 
     loadAdData();
-  }, [isEditing, editId, user]);
+  }, [isEditing, editId, firebaseUser?.uid]);
 
   const categories = getCategories();
 
@@ -201,7 +202,7 @@ const PostAds: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!user) {
+    if (!user || !firebaseUser) {
       alert("Please log in to post an advertisement.");
       return;
     }
@@ -218,7 +219,7 @@ const PostAds: React.FC = () => {
         city: formData.city,
         phoneNumber: formData.phone,
         whatsappNumber: formData.whatsapp,
-        userId: user.id,
+        userId: firebaseUser.uid,
       };
 
       if (isEditing && editId) {

@@ -18,8 +18,12 @@ import ResetPassword from "./pages/auth/ResetPassword";
 import SearchResults from "./pages/SearchResults";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Admin from "./admin/Admin";
+import { useAutoExpiration } from "./hooks/useAutoExpiration";
 
 function App() {
+  // Initialize automatic ad expiration system
+  useAutoExpiration(true);
+
   return (
     <AuthProvider>
       <Router>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import {
   doc,
   serverTimestamp,
@@ -11,23 +11,35 @@ import {
 import { db } from "../config/firebase";
 import { useAuth } from "../contexts/useAuth";
 import { getPaymentQRCode, QRCodeData } from "../services/paymentService";
+import { upgradeAdvertisement } from "../services/adUpgradeService";
 
 const PaymentPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const {firebaseUser } = useAuth();
+  const location = useLocation();
+  const { user } = useAuth();
   const [paymentMode, setPaymentMode] = useState<string>("");
   const [upiTransaction, setUpiTransaction] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [qrCodeData, setQrCodeData] = useState<QRCodeData | null>(null);
   const [loadingQRCode, setLoadingQRCode] = useState(true);
 
-  // Get plan details and ad ID from URL parameters
-  const planType = searchParams.get("plan") || "vip";
+  // Get upgrade state from navigation
+  const upgradeState = location.state as {
+    isUpgrade?: boolean;
+    upgradingAdId?: string;
+    planType?: string;
+    planDuration?: number;
+    cost?: number;
+  } | null;
+
+  // Get plan details and ad ID from URL parameters or upgrade state
+  const planType = upgradeState?.planType || searchParams.get("plan") || "vip";
   const billingPeriod = searchParams.get("period") || "day";
-  const price = searchParams.get("price") || "3";
-  const adId = searchParams.get("adId");
-  const isUpgrade = searchParams.get("upgrade") === "true";
+  const price =
+    upgradeState?.cost?.toString() || searchParams.get("price") || "3";
+  const adId = upgradeState?.upgradingAdId || searchParams.get("adId");
+  const isUpgradeFlow = upgradeState?.isUpgrade || false;
 
   // Load QR code data
   const loadQRCodeData = async () => {
@@ -48,6 +60,7 @@ const PaymentPage: React.FC = () => {
     console.log("PaymentPage - adId from params:", adId);
     console.log("PaymentPage - planType from params:", planType);
     console.log("PaymentPage - price from params:", price);
+    console.log("PaymentPage - isUpgradeFlow:", isUpgradeFlow);
 
     if (!adId) {
       console.log("PaymentPage - No adId found, redirecting...");
@@ -56,7 +69,7 @@ const PaymentPage: React.FC = () => {
 
     // Load QR code data
     loadQRCodeData();
-  }, [adId, navigate, searchParams, planType, price]);
+  }, [adId, navigate, searchParams, planType, price, isUpgradeFlow]);
 
   const handleVerify = async () => {
     if (!paymentMode.trim() || !upiTransaction.trim()) {
@@ -64,7 +77,7 @@ const PaymentPage: React.FC = () => {
       return;
     }
 
-    if (!adId || !firebaseUser?.uid) {
+    if (!adId || !user?.id) {
       alert("Missing advertisement or user information. Please try again.");
       return;
     }
@@ -73,11 +86,37 @@ const PaymentPage: React.FC = () => {
 
     console.log("Starting payment verification...");
     console.log("Ad ID:", adId);
-    console.log("User ID:", firebaseUser.uid);
+    console.log("User ID:", user?.id);
     console.log("Plan Type:", planType);
-    console.log("Is Upgrade:", isUpgrade);
+    console.log("Is Upgrade Flow:", isUpgradeFlow);
 
     try {
+      if (isUpgradeFlow) {
+        // Handle upgrade flow
+        const planDuration =
+          upgradeState?.planDuration || (billingPeriod === "day" ? 1 : 30);
+
+        await upgradeAdvertisement(
+          adId,
+          {
+            tag: planType as "vip" | "vip-prime",
+            planDuration,
+            planUnit: "Day",
+          },
+          {
+            transactionId: upiTransaction.trim(),
+            paymentMode: paymentMode.trim(),
+          }
+        );
+
+        alert(
+          "Payment verified successfully! Your advertisement has been upgraded and is now pending admin approval."
+        );
+        navigate("/profile/your-adverts");
+        return;
+      }
+
+      // Original draft publishing flow
       // Calculate expiry date based on plan
       const now = new Date();
       const expiryDate = new Date(now);
@@ -85,99 +124,62 @@ const PaymentPage: React.FC = () => {
         // Free plan - 30 days
         expiryDate.setDate(now.getDate() + 30);
       } else {
-        // VIP and VIP Prime - based on billing period
-        const duration = billingPeriod === "day" ? 1 : 30;
-        expiryDate.setDate(now.getDate() + duration);
+        // VIP and VIP Prime - 1 day
+        expiryDate.setDate(now.getDate() + 1);
       }
 
       console.log("Calculated expiry date:", expiryDate);
 
-      if (isUpgrade) {
-        // Handle upgrade flow - update existing published ad
-        console.log("Processing upgrade payment for existing ad");
-        const { updateDoc } = await import("firebase/firestore");
-        const existingAdRef = doc(db, "adData", adId);
+      // Step 1: Get the draft from advertisements collection
+      console.log("Getting draft from advertisements collection");
+      const draftRef = doc(db, "advertisements", adId);
+      const draftSnap = await getDoc(draftRef);
 
-        const updateData = {
-          tag:
-            planType === "vip-prime"
-              ? "vip-prime"
-              : planType === "vip"
-              ? "vip"
-              : "free",
-          status: planType === "free" ? "approved" : "pending",
-          approved: planType === "free" ? true : false,
-          planDuration:
-            billingPeriod === "day" ? 1 : billingPeriod === "month" ? 30 : 1,
-          planUnit: "Day",
-          expiryDate: expiryDate,
-          transactionId: upiTransaction.trim(),
-          paymentMode: paymentMode.trim(),
-          updatedAt: serverTimestamp(),
-          autoDowngraded: false, // Reset downgrade flag
-          originalTag: null, // Clear original tag
-        };
-
-        console.log("Updating existing ad with upgrade data");
-        await updateDoc(existingAdRef, updateData);
-        console.log("Ad upgraded successfully");
-
-        // Clear upgrade context
-        sessionStorage.removeItem("upgradeContext");
-      } else {
-        // Original draft publishing flow
-        // Step 1: Get the draft from advertisements collection
-        console.log("Getting draft from advertisements collection");
-        const draftRef = doc(db, "advertisements", adId);
-        const draftSnap = await getDoc(draftRef);
-
-        if (!draftSnap.exists()) {
-          console.error(
-            "Draft document does not exist in advertisements collection"
-          );
-          console.error("Document path:", draftRef.path);
-          alert(
-            "Advertisement draft not found. Please try again or contact support."
-          );
-          return;
-        }
-
-        console.log("Draft found, proceeding with publishing");
-        const draftData = draftSnap.data();
-
-        // Step 2: Create published ad in adData collection with payment info
-        const publishedAdData = {
-          ...draftData,
-          status: planType === "free" ? "approved" : "pending", // Free ads approved immediately, VIP/VIP Prime pending
-          approved: planType === "free" ? true : false, // Free ads approved, VIP/VIP Prime need admin approval
-          tag:
-            planType === "vip-prime"
-              ? "vip-prime"
-              : planType === "vip"
-              ? "vip"
-              : "free",
-          publishedAt: serverTimestamp(),
-          planDuration:
-            billingPeriod === "day" ? 1 : billingPeriod === "month" ? 30 : 1,
-          planUnit: "Day",
-          expiryDate: expiryDate,
-          transactionId: upiTransaction.trim(),
-          paymentMode: paymentMode.trim(),
-          updatedAt: serverTimestamp(),
-        };
-
-        console.log("Publishing ad to adData collection");
-        const publishedAdRef = await addDoc(
-          collection(db, "adData"),
-          publishedAdData
+      if (!draftSnap.exists()) {
+        console.error(
+          "Draft document does not exist in advertisements collection"
         );
-        console.log("Published ad created with ID:", publishedAdRef.id);
-
-        // Step 3: Delete the draft from advertisements collection
-        console.log("Deleting draft from advertisements collection");
-        await deleteDoc(draftRef);
-        console.log("Draft deleted successfully");
+        console.error("Document path:", draftRef.path);
+        alert(
+          "Advertisement draft not found. Please try again or contact support."
+        );
+        return;
       }
+
+      console.log("Draft found, proceeding with publishing");
+      const draftData = draftSnap.data();
+
+      // Step 2: Create published ad in adData collection with payment info
+      const publishedAdData = {
+        ...draftData,
+        status: planType === "free" ? "approved" : "pending", // Free ads approved immediately, VIP/VIP Prime pending
+        approved: planType === "free" ? true : false, // Free ads approved, VIP/VIP Prime need admin approval
+        tag:
+          planType === "vip-prime"
+            ? "vip-prime"
+            : planType === "vip"
+            ? "vip"
+            : "free",
+        publishedAt: serverTimestamp(),
+        planDuration: planType === "free" ? 30 : 1,
+        planUnit: "Day",
+        expiryDate: expiryDate,
+        transactionId: upiTransaction.trim(),
+        paymentMode: paymentMode.trim(),
+        updatedAt: serverTimestamp(),
+      };
+
+      console.log("Publishing ad to adData collection");
+      const publishedAdRef = await addDoc(
+        collection(db, "adData"),
+        publishedAdData
+      );
+      console.log("Published ad created with ID:", publishedAdRef.id);
+
+      // Step 3: Delete the draft from advertisements collection
+      console.log("Deleting draft from advertisements collection");
+      await deleteDoc(draftRef);
+      console.log("Draft deleted successfully");
 
       alert(
         planType === "free"
@@ -222,6 +224,9 @@ const PaymentPage: React.FC = () => {
   };
 
   const getPlanDisplayName = () => {
+    if (isUpgradeFlow) {
+      return planType === "vip-prime" ? "VIP Prime Upgrade" : "VIP Upgrade";
+    }
     return planType === "vip-prime" ? "VIP Prime" : "VIP";
   };
 
@@ -285,15 +290,18 @@ const PaymentPage: React.FC = () => {
         {/* Plan Summary */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            Selected Plan: {getPlanDisplayName()}
+            {isUpgradeFlow ? "Upgrading to:" : "Selected Plan:"}{" "}
+            {getPlanDisplayName()}
           </h2>
           <p className="text-2xl font-bold text-blue-600">
             ${price} / {billingPeriod === "month" ? "Month" : "Day"}
           </p>
-          <p className="text-sm text-orange-600 mt-2">
-            ⚡ After payment, your ad will require admin approval before going
-            live
-          </p>
+          {isUpgradeFlow && (
+            <p className="text-sm text-orange-600 mt-2">
+              ⚡ After payment, your ad will require admin approval before going
+              live
+            </p>
+          )}
         </div>
       </div>
 
@@ -432,7 +440,11 @@ const PaymentPage: React.FC = () => {
               disabled={isProcessing}
               className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isProcessing ? "Verifying..." : "Verify Payment"}
+              {isProcessing
+                ? "Verifying..."
+                : isUpgradeFlow
+                ? "Verify & Upgrade"
+                : "Verify Payment"}
             </button>
           </div>
         </form>
@@ -441,7 +453,8 @@ const PaymentPage: React.FC = () => {
       {/* Footer Note */}
       <div className="mt-8 text-center">
         <p className="text-xs text-gray-500">
-          Your payment will be verified manually. Once verified, you will be
+          Your payment will be verified manually. Once verified,{" "}
+          {isUpgradeFlow ? "your ad will be upgraded and" : ""} you will be
           notified via email.
         </p>
       </div>

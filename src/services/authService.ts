@@ -102,7 +102,7 @@ export const registerUser = async (
       updatedAt: new Date(),
     };
 
-    await setDoc(doc(db, "drivers", firebaseUser.uid), userProfile);
+    await setDoc(doc(db, "users", firebaseUser.uid), userProfile);
 
     // Sign out the user immediately after registration so they can't login without verification
     await signOut(auth);
@@ -153,7 +153,7 @@ export const loginUser = async (
     }
 
     // Get user profile from Firestore
-    const userDoc = await getDoc(doc(db, "drivers", firebaseUser.uid));
+    const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
 
     if (!userDoc.exists()) {
       await signOut(auth);
@@ -168,7 +168,7 @@ export const loginUser = async (
     // Update emailVerified status in profile if needed
     if (!userProfile.emailVerified) {
       await setDoc(
-        doc(db, "drivers", firebaseUser.uid),
+        doc(db, "users", firebaseUser.uid),
         {
           ...userProfile,
           emailVerified: true,
@@ -233,7 +233,7 @@ export const updateUserProfile = async (
 ): Promise<boolean> => {
   try {
     await setDoc(
-      doc(db, "drivers", userId),
+      doc(db, "users", userId),
       {
         ...updateData,
         updatedAt: new Date(),
@@ -254,7 +254,7 @@ export const getUserProfile = async (
   userId: string
 ): Promise<UserProfile | null> => {
   try {
-    const userDoc = await getDoc(doc(db, "drivers", userId));
+    const userDoc = await getDoc(doc(db, "users", userId));
     if (userDoc.exists()) {
       return userDoc.data() as UserProfile;
     }

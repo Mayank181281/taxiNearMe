@@ -6,17 +6,19 @@ import {
 } from "../services/advertisementService";
 
 const OrderHistory: React.FC = () => {
-  const { user } = useAuth();
+  const { firebaseUser } = useAuth();
   const [orders, setOrders] = useState<Advertisement[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch user's order history
   useEffect(() => {
     const fetchOrderHistory = async () => {
-      if (user?.id) {
+      const userId = firebaseUser?.uid;
+
+      if (userId) {
         try {
           setLoading(true);
-          const userOrders = await getUserOrderHistory(user.id);
+          const userOrders = await getUserOrderHistory(userId);
           setOrders(userOrders);
         } catch (error) {
           console.error("Error fetching order history:", error);
@@ -29,33 +31,61 @@ const OrderHistory: React.FC = () => {
     };
 
     fetchOrderHistory();
-  }, [user]);
+  }, [firebaseUser]);
 
   // Helper function to get plan display name
   const getPlanDisplayName = (order: Advertisement): string => {
-    const tag = order.tag || "free";
+    // Use originalTag if it exists (for auto-downgraded ads), otherwise use current tag
+    const displayTag = order.originalTag || order.tag || "free";
     const duration = order.planDuration || 30;
 
-    if (tag === "free") return "Free (30 days)";
-    if (tag === "vip")
+    if (displayTag === "free") return "Free (30 days)";
+    if (displayTag === "vip")
       return `VIP (${duration === 30 ? "1 month" : "24 hours"})`;
-    if (tag === "vip-prime")
+    if (displayTag === "vip-prime")
       return `VIP Prime (${duration === 30 ? "1 month" : "24 hours"})`;
     return "Unknown Plan";
   };
 
   // Helper function to get plan tag styling
-  const getPlanTagStyle = (tag: string) => {
-    switch (tag) {
+  const getPlanTagStyle = (order: Advertisement) => {
+    // Use originalTag if it exists (for auto-downgraded ads), otherwise use current tag
+    const displayTag = order.originalTag || order.tag || "free";
+    const isExpired = order.autoDowngraded;
+
+    let baseStyle = "";
+    switch (displayTag) {
       case "vip-prime":
-        return "bg-purple-600 text-white";
+        baseStyle = "bg-purple-600 text-white";
+        break;
       case "vip":
-        return "bg-blue-500 text-white";
+        baseStyle = "bg-blue-500 text-white";
+        break;
       case "free":
-        return "bg-gray-500 text-white";
+        baseStyle = "bg-gray-500 text-white";
+        break;
       default:
-        return "bg-gray-500 text-white";
+        baseStyle = "bg-gray-500 text-white";
     }
+
+    // Add opacity for expired premium ads
+    if (isExpired) {
+      baseStyle += " opacity-75";
+    }
+
+    return baseStyle;
+  };
+
+  // Helper function to get display tag text
+  const getDisplayTagText = (order: Advertisement): string => {
+    const displayTag = order.originalTag || order.tag || "free";
+    const tagText = displayTag.toUpperCase().replace("-", " ");
+
+    if (order.autoDowngraded) {
+      return `${tagText} (Expired)`;
+    }
+
+    return tagText;
   };
 
   // Helper function to format date
@@ -110,7 +140,7 @@ const OrderHistory: React.FC = () => {
                         </div>
                         <div className="space-y-1 text-sm text-gray-600">
                           <div>
-                            {order.tag === "free"
+                            {(order.originalTag || order.tag) === "free"
                               ? "Reference: Free Plan"
                               : `UPI id : #${order.transactionId || "N/A"}`}
                           </div>
@@ -118,15 +148,21 @@ const OrderHistory: React.FC = () => {
                           <div>
                             date & time : {formatDate(order.publishedAt)}
                           </div>
+                          {order.autoDowngraded && (
+                            <div className="text-orange-600 font-medium">
+                              ⚠️ This premium ad has expired and was downgraded
+                              to free
+                            </div>
+                          )}
                         </div>
                       </div>
                       <div className="ml-4">
                         <span
                           className={`px-3 py-1 rounded-full text-sm font-medium ${getPlanTagStyle(
-                            order.tag || "free"
+                            order
                           )}`}
                         >
-                          {order.tag?.toUpperCase().replace("-", " ") || "FREE"}
+                          {getDisplayTagText(order)}
                         </span>
                       </div>
                     </div>

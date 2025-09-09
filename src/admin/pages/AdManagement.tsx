@@ -3,6 +3,7 @@ import {
   getAllAdvertisementsForAdmin,
   approveAdvertisement,
   rejectAdvertisement,
+  deleteAdvertisementFromAdmin,
   AdminAdvertisement,
 } from "../../services/adminService";
 
@@ -13,6 +14,9 @@ const AdManagement: React.FC = () => {
     "all" | "pending" | "approved" | "rejected"
   >("pending");
   const [selectedAd, setSelectedAd] = useState<AdminAdvertisement | null>(null);
+  const [deletingAd, setDeletingAd] = useState<AdminAdvertisement | null>(null);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Fetch advertisements from Firebase
   useEffect(() => {
@@ -69,6 +73,44 @@ const AdManagement: React.FC = () => {
     }
   };
 
+  const handleDelete = (ad: AdminAdvertisement) => {
+    setDeletingAd(ad);
+    setShowDeleteConfirmation(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingAd) return;
+
+    try {
+      setLoading(true);
+      await deleteAdvertisementFromAdmin(deletingAd.id);
+
+      // Remove from local state
+      setAds(ads.filter((ad) => ad.id !== deletingAd.id));
+
+      // Close modal if the deleted ad was selected
+      if (selectedAd?.id === deletingAd.id) {
+        setSelectedAd(null);
+      }
+
+      // Close confirmation dialog
+      setShowDeleteConfirmation(false);
+      setDeletingAd(null);
+
+      alert("Advertisement deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting ad:", error);
+      alert("Failed to delete advertisement. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirmation(false);
+    setDeletingAd(null);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
@@ -95,8 +137,17 @@ const AdManagement: React.FC = () => {
     }
   };
 
-  const filteredAds =
-    filter === "all" ? ads : ads.filter((ad) => ad.status === filter);
+  const filteredAds = ads.filter((ad) => {
+    const matchesStatus = filter === "all" || ad.status === filter;
+    const searchLower = searchTerm.toLowerCase().trim();
+    const matchesSearch =
+      searchLower === "" ||
+      ad.customerEmail.toLowerCase().includes(searchLower) ||
+      (ad.transactionId &&
+        ad.transactionId.toLowerCase().includes(searchLower)) ||
+      ad.id.toLowerCase().includes(searchLower);
+    return matchesStatus && matchesSearch;
+  });
 
   return (
     <div className="space-y-6">
@@ -108,17 +159,61 @@ const AdManagement: React.FC = () => {
         </div>
       ) : (
         <>
-          {/* Header and Filters */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          {/* Header and Search */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h2 className="text-xl font-semibold text-gray-900 mb-2">
                 Advertisement Management
               </h2>
               <p className="text-gray-600">
-                Review and manage submitted advertisements
+                Review and manage submitted advertisements ({ads.length} total)
               </p>
             </div>
-            <div className="mt-4 sm:mt-0">
+            <div className="flex flex-col sm:flex-row gap-3">
+              {/* Search Bar */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search by email, UPI ID, or Ad ID..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-72"
+                />
+                <svg
+                  className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm("")}
+                    className="absolute right-3 top-2.5 h-5 w-5 text-gray-400 hover:text-gray-600"
+                  >
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-wrap gap-2">
               <div className="flex space-x-2">
                 {(["all", "pending", "approved", "rejected"] as const).map(
                   (status) => (
@@ -141,6 +236,16 @@ const AdManagement: React.FC = () => {
                 )}
               </div>
             </div>
+
+            {/* Search Results Info */}
+            {(searchTerm || filter !== "all") && (
+              <div className="text-sm text-gray-600">
+                Showing {filteredAds.length} of {ads.length} ads
+                {searchTerm && (
+                  <span className="ml-1">matching "{searchTerm}"</span>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Stats Cards */}
@@ -184,13 +289,19 @@ const AdManagement: React.FC = () => {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Customer & Title
+                      Customer Email & Title
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Ad ID
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Plan
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Location
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      UPI ID
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
@@ -212,11 +323,19 @@ const AdManagement: React.FC = () => {
                       <td className="px-6 py-4">
                         <div>
                           <div className="text-sm font-medium text-gray-900">
-                            {ad.customerName}
+                            {ad.customerEmail}
                           </div>
                           <div className="text-sm text-gray-600 max-w-xs truncate">
                             {ad.title}
                           </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 font-mono bg-gray-50 px-2 py-1 rounded text-xs">
+                          {ad.id.substring(0, 12)}...
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          Click for full ID
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -230,6 +349,29 @@ const AdManagement: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                         {ad.location}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {ad.transactionId ? (
+                          <div className="max-w-xs">
+                            <div
+                              className="font-mono text-xs bg-gray-100 px-2 py-1 rounded truncate"
+                              title={ad.transactionId}
+                            >
+                              {ad.transactionId}
+                            </div>
+                            {ad.paymentMode && (
+                              <div className="text-xs text-gray-500 mt-1">
+                                {ad.paymentMode}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-xs italic">
+                            {ad.tag === "free"
+                              ? "Free Plan"
+                              : "No Payment Info"}
+                          </span>
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
@@ -266,6 +408,12 @@ const AdManagement: React.FC = () => {
                             </button>
                           </>
                         )}
+                        <button
+                          onClick={() => handleDelete(ad)}
+                          className="text-red-600 hover:text-red-800 transition-colors font-medium"
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -289,11 +437,23 @@ const AdManagement: React.FC = () => {
                   />
                 </svg>
                 <h3 className="mt-2 text-sm font-medium text-gray-900">
-                  No advertisements found
+                  {searchTerm
+                    ? "No advertisements found"
+                    : "No advertisements match the current filters"}
                 </h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  No advertisements match the current filter.
+                  {searchTerm
+                    ? `No advertisements found matching "${searchTerm}". Try searching with a different email, UPI ID, or Ad ID.`
+                    : "No advertisements match the current filter criteria."}
                 </p>
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm("")}
+                    className="mt-3 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    Clear search
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -330,10 +490,19 @@ const AdManagement: React.FC = () => {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
-                        Customer Name
+                        Customer Email
                       </label>
                       <p className="mt-1 text-sm text-gray-900">
-                        {selectedAd.customerName}
+                        {selectedAd.customerEmail}
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Advertisement ID
+                      </label>
+                      <p className="mt-1 text-sm text-gray-900 bg-gray-50 p-2 rounded font-mono text-xs break-all">
+                        {selectedAd.id}
                       </p>
                     </div>
 
@@ -402,6 +571,38 @@ const AdManagement: React.FC = () => {
                         </p>
                       </div>
                     </div>
+
+                    {/* Payment Information */}
+                    {(selectedAd.paymentMode || selectedAd.transactionId) &&
+                      selectedAd.tag !== "free" && (
+                        <div className="mt-4 pt-4 border-t border-gray-200">
+                          <h4 className="text-sm font-medium text-gray-700 mb-3">
+                            Payment Information
+                          </h4>
+                          <div className="grid grid-cols-1 gap-3">
+                            {selectedAd.paymentMode && (
+                              <div>
+                                <label className="block text-xs font-medium text-gray-600">
+                                  Payment Mode
+                                </label>
+                                <p className="mt-1 text-sm text-gray-900 bg-gray-50 px-3 py-2 rounded">
+                                  {selectedAd.paymentMode}
+                                </p>
+                              </div>
+                            )}
+                            {selectedAd.transactionId && (
+                              <div>
+                                <label className="block text-xs font-medium text-gray-600">
+                                  UPI Transaction ID
+                                </label>
+                                <p className="mt-1 text-sm text-gray-900 bg-gray-50 px-3 py-2 rounded font-mono break-all">
+                                  {selectedAd.transactionId}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                   </div>
 
                   {selectedAd.status === "pending" && (
@@ -427,7 +628,13 @@ const AdManagement: React.FC = () => {
                     </div>
                   )}
 
-                  <div className="flex justify-end mt-4">
+                  <div className="flex justify-between mt-6 pt-6 border-t">
+                    <button
+                      onClick={() => handleDelete(selectedAd)}
+                      className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      Delete Advertisement
+                    </button>
                     <button
                       onClick={() => setSelectedAd(null)}
                       className="bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors"
@@ -440,6 +647,40 @@ const AdManagement: React.FC = () => {
             </div>
           )}
         </>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirmation && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3 text-center">
+              <h3 className="text-lg font-medium text-gray-900">
+                Confirm Delete
+              </h3>
+              <div className="mt-2 px-7 py-3">
+                <p className="text-sm text-gray-500">
+                  Are you sure you want to delete this advertisement? This
+                  action cannot be undone.
+                </p>
+              </div>
+              <div className="flex justify-center space-x-4 mt-4">
+                <button
+                  onClick={confirmDelete}
+                  disabled={loading}
+                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                >
+                  {loading ? "Deleting..." : "Delete"}
+                </button>
+                <button
+                  onClick={cancelDelete}
+                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

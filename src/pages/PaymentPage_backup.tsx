@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import {
   doc,
   serverTimestamp,
@@ -11,23 +11,34 @@ import {
 import { db } from "../config/firebase";
 import { useAuth } from "../contexts/useAuth";
 import { getPaymentQRCode, QRCodeData } from "../services/paymentService";
+import { upgradeAdvertisement } from "../services/adUpgradeService";
 
 const PaymentPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const {firebaseUser } = useAuth();
+  const location = useLocation();
+  const { user } = useAuth();
   const [paymentMode, setPaymentMode] = useState<string>("");
   const [upiTransaction, setUpiTransaction] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [qrCodeData, setQrCodeData] = useState<QRCodeData | null>(null);
   const [loadingQRCode, setLoadingQRCode] = useState(true);
 
-  // Get plan details and ad ID from URL parameters
-  const planType = searchParams.get("plan") || "vip";
+  // Get upgrade state from navigation
+  const upgradeState = location.state as {
+    isUpgrade?: boolean;
+    upgradingAdId?: string;
+    planType?: string;
+    planDuration?: number;
+    cost?: number;
+  } | null;
+
+  // Get plan details and ad ID from URL parameters or upgrade state
+  const planType = upgradeState?.planType || searchParams.get("plan") || "vip";
   const billingPeriod = searchParams.get("period") || "day";
-  const price = searchParams.get("price") || "3";
-  const adId = searchParams.get("adId");
-  const isUpgrade = searchParams.get("upgrade") === "true";
+  const price = upgradeState?.cost?.toString() || searchParams.get("price") || "3";
+  const adId = upgradeState?.upgradingAdId || searchParams.get("adId");
+  const isUpgradeFlow = upgradeState?.isUpgrade || false;
 
   // Load QR code data
   const loadQRCodeData = async () => {
@@ -64,7 +75,7 @@ const PaymentPage: React.FC = () => {
       return;
     }
 
-    if (!adId || !firebaseUser?.uid) {
+    if (!adId || !user?.id) {
       alert("Missing advertisement or user information. Please try again.");
       return;
     }
@@ -73,11 +84,36 @@ const PaymentPage: React.FC = () => {
 
     console.log("Starting payment verification...");
     console.log("Ad ID:", adId);
-    console.log("User ID:", firebaseUser.uid);
+    console.log("User ID:", user?.id);
     console.log("Plan Type:", planType);
-    console.log("Is Upgrade:", isUpgrade);
+    console.log("Is Upgrade Flow:", isUpgradeFlow);
 
     try {
+      if (isUpgradeFlow) {
+        // Handle upgrade flow
+        const planDuration = upgradeState?.planDuration || (billingPeriod === "day" ? 1 : 30);
+        
+        await upgradeAdvertisement(
+          adId,
+          {
+            tag: planType as "vip" | "vip-prime",
+            planDuration,
+            planUnit: "Day",
+          },
+          {
+            transactionId: upiTransaction.trim(),
+            paymentMode: paymentMode.trim(),
+          }
+        );
+
+        alert(
+          "Payment verified successfully! Your advertisement has been upgraded and is now pending admin approval."
+        );
+        navigate("/profile/your-adverts");
+        return;
+      }
+
+      // Original draft publishing flow
       // Calculate expiry date based on plan
       const now = new Date();
       const expiryDate = new Date(now);
@@ -85,99 +121,109 @@ const PaymentPage: React.FC = () => {
         // Free plan - 30 days
         expiryDate.setDate(now.getDate() + 30);
       } else {
-        // VIP and VIP Prime - based on billing period
-        const duration = billingPeriod === "day" ? 1 : 30;
-        expiryDate.setDate(now.getDate() + duration);
+        // VIP and VIP Prime - 1 day
+        expiryDate.setDate(now.getDate() + 1);
       }
 
       console.log("Calculated expiry date:", expiryDate);
 
-      if (isUpgrade) {
-        // Handle upgrade flow - update existing published ad
-        console.log("Processing upgrade payment for existing ad");
-        const { updateDoc } = await import("firebase/firestore");
-        const existingAdRef = doc(db, "adData", adId);
+      // Step 1: Get the draft from advertisements collection
+      console.log("Getting draft from advertisements collection");
+      const draftRef = doc(db, "advertisements", adId);
+      const draftSnap = await getDoc(draftRef);
 
-        const updateData = {
-          tag:
-            planType === "vip-prime"
-              ? "vip-prime"
-              : planType === "vip"
-              ? "vip"
-              : "free",
-          status: planType === "free" ? "approved" : "pending",
-          approved: planType === "free" ? true : false,
-          planDuration:
-            billingPeriod === "day" ? 1 : billingPeriod === "month" ? 30 : 1,
-          planUnit: "Day",
-          expiryDate: expiryDate,
-          transactionId: upiTransaction.trim(),
-          paymentMode: paymentMode.trim(),
-          updatedAt: serverTimestamp(),
-          autoDowngraded: false, // Reset downgrade flag
-          originalTag: null, // Clear original tag
-        };
-
-        console.log("Updating existing ad with upgrade data");
-        await updateDoc(existingAdRef, updateData);
-        console.log("Ad upgraded successfully");
-
-        // Clear upgrade context
-        sessionStorage.removeItem("upgradeContext");
-      } else {
-        // Original draft publishing flow
-        // Step 1: Get the draft from advertisements collection
-        console.log("Getting draft from advertisements collection");
-        const draftRef = doc(db, "advertisements", adId);
-        const draftSnap = await getDoc(draftRef);
-
-        if (!draftSnap.exists()) {
-          console.error(
-            "Draft document does not exist in advertisements collection"
-          );
-          console.error("Document path:", draftRef.path);
-          alert(
-            "Advertisement draft not found. Please try again or contact support."
-          );
-          return;
-        }
-
-        console.log("Draft found, proceeding with publishing");
-        const draftData = draftSnap.data();
-
-        // Step 2: Create published ad in adData collection with payment info
-        const publishedAdData = {
-          ...draftData,
-          status: planType === "free" ? "approved" : "pending", // Free ads approved immediately, VIP/VIP Prime pending
-          approved: planType === "free" ? true : false, // Free ads approved, VIP/VIP Prime need admin approval
-          tag:
-            planType === "vip-prime"
-              ? "vip-prime"
-              : planType === "vip"
-              ? "vip"
-              : "free",
-          publishedAt: serverTimestamp(),
-          planDuration:
-            billingPeriod === "day" ? 1 : billingPeriod === "month" ? 30 : 1,
-          planUnit: "Day",
-          expiryDate: expiryDate,
-          transactionId: upiTransaction.trim(),
-          paymentMode: paymentMode.trim(),
-          updatedAt: serverTimestamp(),
-        };
-
-        console.log("Publishing ad to adData collection");
-        const publishedAdRef = await addDoc(
-          collection(db, "adData"),
-          publishedAdData
+      if (!draftSnap.exists()) {
+        console.error(
+          "Draft document does not exist in advertisements collection"
         );
-        console.log("Published ad created with ID:", publishedAdRef.id);
-
-        // Step 3: Delete the draft from advertisements collection
-        console.log("Deleting draft from advertisements collection");
-        await deleteDoc(draftRef);
-        console.log("Draft deleted successfully");
+        console.error("Document path:", draftRef.path);
+        alert(
+          "Advertisement draft not found. Please try again or contact support."
+        );
+        return;
       }
+
+      console.log("Draft found, proceeding with publishing");
+      const draftData = draftSnap.data();
+
+      // Step 2: Create published ad in adData collection with payment info
+      const publishedAdData = {
+        ...draftData,
+        status: planType === "free" ? "approved" : "pending", // Free ads approved immediately, VIP/VIP Prime pending
+        approved: planType === "free" ? true : false, // Free ads approved, VIP/VIP Prime need admin approval
+        tag:
+          planType === "vip-prime"
+            ? "vip-prime"
+            : planType === "vip"
+            ? "vip"
+            : "free",
+        publishedAt: serverTimestamp(),
+        planDuration: planType === "free" ? 30 : 1,
+        planUnit: "Day",
+        expiryDate: expiryDate,
+        transactionId: upiTransaction.trim(),
+        paymentMode: paymentMode.trim(),
+        updatedAt: serverTimestamp(),
+      };
+
+      console.log("Publishing ad to adData collection");
+      const publishedAdRef = await addDoc(
+        collection(db, "adData"),
+        publishedAdData
+      );
+      console.log("Published ad created with ID:", publishedAdRef.id);
+
+      // Step 3: Delete the draft from advertisements collection
+      console.log("Deleting draft from advertisements collection");
+      await deleteDoc(draftRef);
+      console.log("Draft deleted successfully");
+
+      alert(
+        planType === "free"
+          ? "Payment verified successfully! Your advertisement is now live and visible to users."
+          : "Payment verified successfully! Your advertisement is now pending admin approval and will be live once approved."
+      );
+      navigate("/profile/your-adverts");
+    } catch (error) {
+      console.error("Detailed error:", error);
+        );
+        return;
+      }
+
+      console.log("Draft found, proceeding with publishing");
+      const draftData = draftSnap.data();
+
+      // Step 2: Create published ad in adData collection with payment info
+      const publishedAdData = {
+        ...draftData,
+        status: planType === "free" ? "approved" : "pending", // Free ads approved immediately, VIP/VIP Prime pending
+        approved: planType === "free" ? true : false, // Free ads approved, VIP/VIP Prime need admin approval
+        tag:
+          planType === "vip-prime"
+            ? "vip-prime"
+            : planType === "vip"
+            ? "vip"
+            : "free",
+        publishedAt: serverTimestamp(),
+        planDuration: planType === "free" ? 30 : 1,
+        planUnit: "Day",
+        expiryDate: expiryDate,
+        transactionId: upiTransaction.trim(),
+        paymentMode: paymentMode.trim(),
+        updatedAt: serverTimestamp(),
+      };
+
+      console.log("Publishing ad to adData collection");
+      const publishedAdRef = await addDoc(
+        collection(db, "adData"),
+        publishedAdData
+      );
+      console.log("Published ad created with ID:", publishedAdRef.id);
+
+      // Step 3: Delete the draft from advertisements collection
+      console.log("Deleting draft from advertisements collection");
+      await deleteDoc(draftRef);
+      console.log("Draft deleted successfully");
 
       alert(
         planType === "free"
@@ -290,10 +336,6 @@ const PaymentPage: React.FC = () => {
           <p className="text-2xl font-bold text-blue-600">
             ${price} / {billingPeriod === "month" ? "Month" : "Day"}
           </p>
-          <p className="text-sm text-orange-600 mt-2">
-            ⚡ After payment, your ad will require admin approval before going
-            live
-          </p>
         </div>
       </div>
 
@@ -338,112 +380,94 @@ const PaymentPage: React.FC = () => {
                 {formatLastUpdated(qrCodeData.lastUpdated)}
               </p>
             </div>
-
-            {/* Payment Instructions */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-4">
-              <h4 className="text-sm font-medium text-amber-800 mb-2">
-                Payment Instructions:
-              </h4>
-              <ul className="text-sm text-amber-700 space-y-1">
-                <li>1. Scan the QR code with any UPI app</li>
-                <li>2. Pay exactly ${price}</li>
-                <li>3. Complete the payment</li>
-                <li>4. Fill in the details below and submit</li>
-              </ul>
-            </div>
           </div>
         ) : (
           <div className="text-center py-16">
-            <p className="text-gray-500">
-              Unable to load QR code. Please try again later.
+            <div className="bg-gray-100 p-6 rounded-lg mb-4 mx-auto w-64 h-64 flex items-center justify-center">
+              <div className="text-center">
+                <svg
+                  className="h-16 w-16 text-gray-400 mx-auto mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <p className="text-gray-500">QR Code not available</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600">
+              Please contact admin to set up payment QR code
             </p>
           </div>
         )}
       </div>
 
-      {/* Payment Form */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-6">
-          Payment Verification
-        </h3>
+      {/* Payment Details Section */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+        <div className="text-center mb-6">
+          <p className="text-lg font-medium text-gray-900 mb-2">
+            Kindly send screenshot on Whatsapp to this number
+          </p>
+          <a
+            href="tel:12345678909"
+            className="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
+          >
+            12345678909
+          </a>
+        </div>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleVerify();
-          }}
-          className="space-y-6"
-        >
+        <div className="space-y-6">
+          {/* Payment Mode */}
           <div>
-            <label
-              htmlFor="paymentMode"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Payment Mode *
-            </label>
-            <select
-              id="paymentMode"
-              value={paymentMode}
-              onChange={(e) => setPaymentMode(e.target.value)}
-              required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Select Payment Mode</option>
-              <option value="UPI">UPI</option>
-              <option value="Net Banking">Net Banking</option>
-              <option value="Debit Card">Debit Card</option>
-              <option value="Credit Card">Credit Card</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div>
-            <label
-              htmlFor="upiTransaction"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              UPI Transaction ID / Reference Number *
+            <label className="block text-gray-700 font-medium mb-2">
+              Payment Mode
             </label>
             <input
               type="text"
-              id="upiTransaction"
+              value={paymentMode}
+              onChange={(e) => setPaymentMode(e.target.value)}
+              placeholder="Enter payment mode (e.g., UPI, Credit Card, Net Banking)"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* UPI Transaction */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-2">
+              UPI Transaction ID
+            </label>
+            <input
+              type="text"
               value={upiTransaction}
               onChange={(e) => setUpiTransaction(e.target.value)}
-              placeholder="Enter your transaction ID"
-              required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter UPI transaction ID"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              This can be found in your payment app after successful payment
-            </p>
           </div>
-
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={handleClear}
-              disabled={isProcessing}
-              className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Clear
-            </button>
-            <button
-              type="submit"
-              disabled={isProcessing}
-              className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isProcessing ? "Verifying..." : "Verify Payment"}
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
 
-      {/* Footer Note */}
-      <div className="mt-8 text-center">
-        <p className="text-xs text-gray-500">
-          Your payment will be verified manually. Once verified, you will be
-          notified via email.
-        </p>
+      {/* Action Buttons */}
+      <div className="flex justify-center space-x-4">
+        <button
+          onClick={handleClear}
+          className="bg-gray-200 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+        >
+          Clear
+        </button>
+        <button
+          onClick={handleVerify}
+          disabled={isProcessing}
+          className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isProcessing ? "Processing..." : "Verify"}
+        </button>
       </div>
     </div>
   );

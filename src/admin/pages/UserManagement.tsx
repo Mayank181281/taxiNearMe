@@ -1,22 +1,27 @@
 import React, { useState, useEffect } from "react";
+import { deleteUser } from "../../services/userManagementService";
 import {
-  getUsersWithAdCounts,
-  updateUserStatus,
-  deleteUser,
-  AdminUser,
-} from "../../services/userManagementService";
+  getEnhancedUsersData,
+  EnhancedUserData,
+} from "../../services/userAdService";
+import UserAdsView from "../components/UserAdsView";
+import QuickExpirationProcessor from "../components/QuickExpirationProcessor";
+import DatabaseDiagnostic from "../components/DatabaseDiagnostic";
 
 const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [users, setUsers] = useState<EnhancedUserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<
     "all" | "active" | "inactive" | "suspended"
   >("all");
-  const [accountTypeFilter, setAccountTypeFilter] = useState<
-    "all" | "Driver" | "Customer"
-  >("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
+  const [selectedUser, setSelectedUser] = useState<EnhancedUserData | null>(
+    null
+  );
+  const [showUserAds, setShowUserAds] = useState<{
+    userId: string;
+    userName: string;
+  } | null>(null);
 
   // Fetch users from Firebase
   useEffect(() => {
@@ -26,35 +31,12 @@ const UserManagement: React.FC = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const usersData = await getUsersWithAdCounts();
+      const usersData = await getEnhancedUsersData();
       setUsers(usersData);
     } catch (error) {
       console.error("Error fetching users:", error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleStatusUpdate = async (
-    userId: string,
-    newStatus: "active" | "inactive" | "suspended"
-  ) => {
-    try {
-      await updateUserStatus(userId, newStatus);
-      // Update local state
-      setUsers(
-        users.map((user) =>
-          user.id === userId ? { ...user, status: newStatus } : user
-        )
-      );
-      // Update selected user if it's the same one
-      if (selectedUser?.id === userId) {
-        setSelectedUser({ ...selectedUser, status: newStatus });
-      }
-      alert(`User status updated to ${newStatus}`);
-    } catch (error) {
-      console.error("Error updating user status:", error);
-      alert("Failed to update user status. Please try again.");
     }
   };
 
@@ -93,37 +75,24 @@ const UserManagement: React.FC = () => {
     }
   };
 
-  const getPlanColor = (plan: string) => {
-    switch (plan) {
-      case "VIP Prime":
-        return "bg-orange-100 text-orange-800";
-      case "VIP":
-        return "bg-blue-100 text-blue-800";
-      case "Free":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getAccountTypeColor = (type: string) => {
-    return type === "Driver"
-      ? "bg-purple-100 text-purple-800"
-      : "bg-cyan-100 text-cyan-800";
-  };
-
   const filteredUsers = users.filter((user) => {
     const matchesStatus = filter === "all" || user.status === filter;
-    const matchesAccountType =
-      accountTypeFilter === "all" || user.accountType === accountTypeFilter;
+    const searchLower = searchTerm.toLowerCase().trim();
     const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesStatus && matchesAccountType && matchesSearch;
+      searchLower === "" ||
+      user.name.toLowerCase().includes(searchLower) ||
+      user.email.toLowerCase().includes(searchLower);
+    return matchesStatus && matchesSearch;
   });
 
   return (
     <div className="space-y-6">
+      {/* Quick Fix for Expired Ads */}
+      <QuickExpirationProcessor />
+
+      {/* Database Diagnostic Tool */}
+      <DatabaseDiagnostic />
+
       {/* Loading State */}
       {loading ? (
         <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
@@ -139,56 +108,87 @@ const UserManagement: React.FC = () => {
                 User Management
               </h2>
               <p className="text-gray-600">
-                Manage and monitor registered users
+                Manage and monitor registered users ({users.length} total)
               </p>
             </div>
             <div className="mt-4 sm:mt-0">
               <div className="flex space-x-4">
-                <input
-                  type="text"
-                  placeholder="Search users..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search by name or email..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
+                  />
+                  <svg
+                    className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm("")}
+                      className="absolute right-3 top-2.5 h-5 w-5 text-gray-400 hover:text-gray-600"
+                    >
+                      <svg
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
           {/* Filters */}
-          <div className="flex flex-wrap gap-2">
-            <div className="flex space-x-2">
-              {(["all", "active", "inactive", "suspended"] as const).map(
-                (status) => (
-                  <button
-                    key={status}
-                    onClick={() => setFilter(status)}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium capitalize transition-colors ${
-                      filter === status
-                        ? "bg-blue-100 text-blue-700 border border-blue-200"
-                        : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
-                    }`}
-                  >
-                    {status}
-                  </button>
-                )
-              )}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-wrap gap-2">
+              <div className="flex space-x-2">
+                {(["all", "active", "inactive", "suspended"] as const).map(
+                  (status) => (
+                    <button
+                      key={status}
+                      onClick={() => setFilter(status)}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium capitalize transition-colors ${
+                        filter === status
+                          ? "bg-blue-100 text-blue-700 border border-blue-200"
+                          : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                      }`}
+                    >
+                      {status}
+                    </button>
+                  )
+                )}
+              </div>
             </div>
-            <div className="flex space-x-2">
-              {(["all", "Driver", "Customer"] as const).map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setAccountTypeFilter(type)}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    accountTypeFilter === type
-                      ? "bg-purple-100 text-purple-700 border border-purple-200"
-                      : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
-                  }`}
-                >
-                  {type}
-                </button>
-              ))}
-            </div>
+
+            {/* Search Results Info */}
+            {(searchTerm || filter !== "all") && (
+              <div className="text-sm text-gray-600">
+                Showing {filteredUsers.length} of {users.length} users
+                {searchTerm && (
+                  <span className="ml-1">matching "{searchTerm}"</span>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Stats Cards */}
@@ -205,8 +205,8 @@ const UserManagement: React.FC = () => {
                 color: "text-green-600",
               },
               {
-                label: "Drivers",
-                count: users.filter((u) => u.accountType === "Driver").length,
+                label: "Users with Ads",
+                count: users.filter((u) => u.adSummary.totalAds > 0).length,
                 color: "text-purple-600",
               },
               {
@@ -237,22 +237,19 @@ const UserManagement: React.FC = () => {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      User
+                      User Info
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Account Type
+                      Email Address
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Plan
+                      Ads Breakdown
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Sign-up Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Last Login
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
@@ -272,7 +269,7 @@ const UserManagement: React.FC = () => {
                               <span className="text-sm font-medium text-white">
                                 {user.name
                                   .split(" ")
-                                  .map((n) => n[0])
+                                  .map((n: string) => n[0])
                                   .join("")}
                               </span>
                             </div>
@@ -281,29 +278,43 @@ const UserManagement: React.FC = () => {
                             <div className="text-sm font-medium text-gray-900">
                               {user.name}
                             </div>
-                            <div className="text-sm text-gray-500">
-                              {user.email}
+                            <div className="text-xs text-gray-500">
+                              ID: {user.id}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getAccountTypeColor(
-                            user.accountType
-                          )}`}
-                        >
-                          {user.accountType}
-                        </span>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-900 font-medium">
+                          {user.email}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {user.email.includes("@gmail.com")
+                            ? "Gmail"
+                            : user.email.includes("@yahoo.com")
+                            ? "Yahoo"
+                            : user.email.includes("@outlook.com")
+                            ? "Outlook"
+                            : "Other"}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPlanColor(
-                            user.subscriptionPlan
-                          )}`}
-                        >
-                          {user.subscriptionPlan}
-                        </span>
+                        <div className="text-sm text-gray-900">
+                          <div className="font-medium">
+                            Total: {user.adSummary.totalAds}
+                          </div>
+                          <div className="text-xs text-gray-500 space-x-2">
+                            <span className="text-orange-600">
+                              VIP Prime: {user.adSummary.vipPrimeCount}
+                            </span>
+                            <span className="text-blue-600">
+                              VIP: {user.adSummary.vipCount}
+                            </span>
+                            <span className="text-gray-600">
+                              Free: {user.adSummary.freeCount}
+                            </span>
+                          </div>
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
@@ -317,16 +328,26 @@ const UserManagement: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                         {new Date(user.signUpDate).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {new Date(user.lastLogin).toLocaleDateString()}
-                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button
-                          onClick={() => setSelectedUser(user)}
-                          className="text-blue-600 hover:text-blue-800 transition-colors"
-                        >
-                          View Details
-                        </button>
+                        <div className="flex items-center justify-end space-x-2">
+                          <button
+                            onClick={() =>
+                              setShowUserAds({
+                                userId: user.id,
+                                userName: user.name,
+                              })
+                            }
+                            className="text-blue-600 hover:text-blue-800 transition-colors px-2 py-1 rounded hover:bg-blue-50"
+                          >
+                            View Ads
+                          </button>
+                          <button
+                            onClick={() => setSelectedUser(user)}
+                            className="text-green-600 hover:text-green-800 transition-colors px-2 py-1 rounded hover:bg-green-50"
+                          >
+                            Details
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -350,11 +371,23 @@ const UserManagement: React.FC = () => {
                   />
                 </svg>
                 <h3 className="mt-2 text-sm font-medium text-gray-900">
-                  No users found
+                  {searchTerm
+                    ? "No users found"
+                    : "No users match the current filters"}
                 </h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  No users match the current filter criteria.
+                  {searchTerm
+                    ? `No users found matching "${searchTerm}". Try searching with a different name or email address.`
+                    : "No users match the current filter criteria."}
                 </p>
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm("")}
+                    className="mt-3 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    Clear search
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -399,11 +432,27 @@ const UserManagement: React.FC = () => {
                             .join("")}
                         </span>
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <h4 className="text-xl font-semibold text-gray-900">
                           {selectedUser.name}
                         </h4>
-                        <p className="text-gray-600">{selectedUser.email}</p>
+                        <div className="mt-1">
+                          <p className="text-gray-600 font-medium">
+                            {selectedUser.email}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            User ID: {selectedUser.id}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span
+                          className={`inline-flex px-3 py-1 text-sm font-medium rounded-full capitalize ${getStatusColor(
+                            selectedUser.status
+                          )}`}
+                        >
+                          {selectedUser.status}
+                        </span>
                       </div>
                     </div>
 
@@ -411,46 +460,10 @@ const UserManagement: React.FC = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700">
-                          Account Type
-                        </label>
-                        <span
-                          className={`inline-flex mt-1 px-2 py-1 text-xs font-semibold rounded-full ${getAccountTypeColor(
-                            selectedUser.accountType
-                          )}`}
-                        >
-                          {selectedUser.accountType}
-                        </span>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Status
-                        </label>
-                        <span
-                          className={`inline-flex mt-1 px-2 py-1 text-xs font-semibold rounded-full capitalize ${getStatusColor(
-                            selectedUser.status
-                          )}`}
-                        >
-                          {selectedUser.status}
-                        </span>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Subscription Plan
-                        </label>
-                        <span
-                          className={`inline-flex mt-1 px-2 py-1 text-xs font-semibold rounded-full ${getPlanColor(
-                            selectedUser.subscriptionPlan
-                          )}`}
-                        >
-                          {selectedUser.subscriptionPlan}
-                        </span>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
                           Total Advertisements
                         </label>
                         <p className="mt-1 text-sm text-gray-900 font-semibold">
-                          {selectedUser.totalAds}
+                          {selectedUser.adSummary.totalAds}
                         </p>
                       </div>
                       <div>
@@ -478,22 +491,6 @@ const UserManagement: React.FC = () => {
                     {/* Action Buttons */}
                     <div className="flex space-x-3 pt-6 border-t">
                       <button
-                        onClick={() =>
-                          alert("Message functionality not implemented yet")
-                        }
-                        className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-                      >
-                        Send Message
-                      </button>
-                      <button
-                        onClick={() =>
-                          handleStatusUpdate(selectedUser.id, "suspended")
-                        }
-                        className="flex-1 bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 transition-colors"
-                      >
-                        Suspend Account
-                      </button>
-                      <button
                         onClick={() => handleDeleteUser(selectedUser.id)}
                         className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
                       >
@@ -513,6 +510,15 @@ const UserManagement: React.FC = () => {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* User Ads View Modal */}
+          {showUserAds && (
+            <UserAdsView
+              userId={showUserAds.userId}
+              userName={showUserAds.userName}
+              onClose={() => setShowUserAds(null)}
+            />
           )}
         </>
       )}

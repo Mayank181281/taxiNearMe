@@ -6,12 +6,14 @@ import {
   orderBy,
   updateDoc,
   doc,
+  deleteDoc,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
 
 export interface AdminAdvertisement {
   id: string;
-  customerName: string;
+  customerEmail: string; // Changed from customerName to customerEmail
   title: string;
   description: string;
   email: string;
@@ -35,6 +37,23 @@ export interface AdminAdvertisement {
 }
 
 /**
+ * Helper function to get user email by userId
+ */
+const getUserEmail = async (userId: string): Promise<string> => {
+  try {
+    const userDoc = await getDoc(doc(db, "users", userId));
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      return userData.email || "No Email";
+    }
+    return "User Not Found";
+  } catch (error) {
+    console.error(`Error fetching user email for userId ${userId}:`, error);
+    return "Email Error";
+  }
+};
+
+/**
  * Get all advertisements pending admin approval
  */
 export const getPendingAdvertisements = async (): Promise<
@@ -49,42 +68,48 @@ export const getPendingAdvertisements = async (): Promise<
     );
 
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        customerName: data.name || "Unknown Customer",
-        title: data.title,
-        description: data.description,
-        email: data.email,
-        category: data.category,
-        state: data.state,
-        city: data.city,
-        phoneNumber: data.phoneNumber,
-        whatsappNumber: data.whatsappNumber,
-        photoUrls: data.photoUrls || [],
-        subscriptionPlan:
-          data.tag === "vip-prime"
-            ? "VIP Prime"
-            : data.tag === "vip"
-            ? "VIP"
-            : "Free",
-        tag: data.tag,
-        submittedDate: data.publishedAt
-          ? data.publishedAt.toDate().toISOString().split("T")[0]
-          : data.createdAt
-          ? data.createdAt.toDate().toISOString().split("T")[0]
-          : new Date().toISOString().split("T")[0],
-        location: `${data.city}, ${data.state}`,
-        status: data.status,
-        userId: data.userId,
-        transactionId: data.transactionId,
-        paymentMode: data.paymentMode,
-        createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
-        publishedAt: data.publishedAt ? data.publishedAt.toDate() : undefined,
-        expiryDate: data.expiryDate ? data.expiryDate.toDate() : undefined,
-      } as AdminAdvertisement;
-    });
+    const ads = await Promise.all(
+      querySnapshot.docs.map(async (doc) => {
+        const data = doc.data();
+        const customerEmail = await getUserEmail(data.userId);
+
+        return {
+          id: doc.id,
+          customerEmail: customerEmail,
+          title: data.title,
+          description: data.description,
+          email: data.email || customerEmail, // Fallback to fetched email
+          category: data.category,
+          state: data.state,
+          city: data.city,
+          phoneNumber: data.phoneNumber,
+          whatsappNumber: data.whatsappNumber,
+          photoUrls: data.photoUrls || [],
+          subscriptionPlan:
+            data.tag === "vip-prime"
+              ? "VIP Prime"
+              : data.tag === "vip"
+              ? "VIP"
+              : "Free",
+          tag: data.tag,
+          submittedDate: data.publishedAt
+            ? data.publishedAt.toDate().toISOString().split("T")[0]
+            : data.createdAt
+            ? data.createdAt.toDate().toISOString().split("T")[0]
+            : new Date().toISOString().split("T")[0],
+          location: `${data.city}, ${data.state}`,
+          status: data.status,
+          userId: data.userId,
+          transactionId: data.transactionId,
+          paymentMode: data.paymentMode,
+          createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
+          publishedAt: data.publishedAt ? data.publishedAt.toDate() : undefined,
+          expiryDate: data.expiryDate ? data.expiryDate.toDate() : undefined,
+        } as AdminAdvertisement;
+      })
+    );
+
+    return ads;
   } catch (error) {
     console.error("Error fetching pending advertisements:", error);
     throw error;
@@ -101,42 +126,48 @@ export const getAllAdvertisementsForAdmin = async (): Promise<
     const q = query(collection(db, "adData"), orderBy("publishedAt", "desc"));
 
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        customerName: data.name || "Unknown Customer",
-        title: data.title,
-        description: data.description,
-        email: data.email,
-        category: data.category,
-        state: data.state,
-        city: data.city,
-        phoneNumber: data.phoneNumber,
-        whatsappNumber: data.whatsappNumber,
-        photoUrls: data.photoUrls || [],
-        subscriptionPlan:
-          data.tag === "vip-prime"
-            ? "VIP Prime"
-            : data.tag === "vip"
-            ? "VIP"
-            : "Free",
-        tag: data.tag,
-        submittedDate: data.publishedAt
-          ? data.publishedAt.toDate().toISOString().split("T")[0]
-          : data.createdAt
-          ? data.createdAt.toDate().toISOString().split("T")[0]
-          : new Date().toISOString().split("T")[0],
-        location: `${data.city}, ${data.state}`,
-        status: data.status,
-        userId: data.userId,
-        transactionId: data.transactionId,
-        paymentMode: data.paymentMode,
-        createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
-        publishedAt: data.publishedAt ? data.publishedAt.toDate() : undefined,
-        expiryDate: data.expiryDate ? data.expiryDate.toDate() : undefined,
-      } as AdminAdvertisement;
-    });
+    const ads = await Promise.all(
+      querySnapshot.docs.map(async (doc) => {
+        const data = doc.data();
+        const customerEmail = await getUserEmail(data.userId);
+
+        return {
+          id: doc.id,
+          customerEmail: customerEmail,
+          title: data.title,
+          description: data.description,
+          email: data.email || customerEmail, // Fallback to fetched email
+          category: data.category,
+          state: data.state,
+          city: data.city,
+          phoneNumber: data.phoneNumber,
+          whatsappNumber: data.whatsappNumber,
+          photoUrls: data.photoUrls || [],
+          subscriptionPlan:
+            data.tag === "vip-prime"
+              ? "VIP Prime"
+              : data.tag === "vip"
+              ? "VIP"
+              : "Free",
+          tag: data.tag,
+          submittedDate: data.publishedAt
+            ? data.publishedAt.toDate().toISOString().split("T")[0]
+            : data.createdAt
+            ? data.createdAt.toDate().toISOString().split("T")[0]
+            : new Date().toISOString().split("T")[0],
+          location: `${data.city}, ${data.state}`,
+          status: data.status,
+          userId: data.userId,
+          transactionId: data.transactionId,
+          paymentMode: data.paymentMode,
+          createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
+          publishedAt: data.publishedAt ? data.publishedAt.toDate() : undefined,
+          expiryDate: data.expiryDate ? data.expiryDate.toDate() : undefined,
+        } as AdminAdvertisement;
+      })
+    );
+
+    return ads;
   } catch (error) {
     console.error("Error fetching all advertisements:", error);
     throw error;
@@ -193,44 +224,62 @@ export const getAdvertisementsByStatus = async (
     );
 
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        customerName: data.name || "Unknown Customer",
-        title: data.title,
-        description: data.description,
-        email: data.email,
-        category: data.category,
-        state: data.state,
-        city: data.city,
-        phoneNumber: data.phoneNumber,
-        whatsappNumber: data.whatsappNumber,
-        photoUrls: data.photoUrls || [],
-        subscriptionPlan:
-          data.tag === "vip-prime"
-            ? "VIP Prime"
-            : data.tag === "vip"
-            ? "VIP"
-            : "Free",
-        tag: data.tag,
-        submittedDate: data.publishedAt
-          ? data.publishedAt.toDate().toISOString().split("T")[0]
-          : data.createdAt
-          ? data.createdAt.toDate().toISOString().split("T")[0]
-          : new Date().toISOString().split("T")[0],
-        location: `${data.city}, ${data.state}`,
-        status: data.status,
-        userId: data.userId,
-        transactionId: data.transactionId,
-        paymentMode: data.paymentMode,
-        createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
-        publishedAt: data.publishedAt ? data.publishedAt.toDate() : undefined,
-        expiryDate: data.expiryDate ? data.expiryDate.toDate() : undefined,
-      } as AdminAdvertisement;
-    });
+    const ads = await Promise.all(
+      querySnapshot.docs.map(async (doc) => {
+        const data = doc.data();
+        const customerEmail = await getUserEmail(data.userId);
+
+        return {
+          id: doc.id,
+          customerEmail: customerEmail,
+          title: data.title,
+          description: data.description,
+          email: data.email || customerEmail, // Fallback to fetched email
+          category: data.category,
+          state: data.state,
+          city: data.city,
+          phoneNumber: data.phoneNumber,
+          whatsappNumber: data.whatsappNumber,
+          photoUrls: data.photoUrls || [],
+          subscriptionPlan:
+            data.tag === "vip-prime"
+              ? "VIP Prime"
+              : data.tag === "vip"
+              ? "VIP"
+              : "Free",
+          tag: data.tag,
+          submittedDate: data.publishedAt
+            ? data.publishedAt.toDate().toISOString().split("T")[0]
+            : data.createdAt
+            ? data.createdAt.toDate().toISOString().split("T")[0]
+            : new Date().toISOString().split("T")[0],
+          location: `${data.city}, ${data.state}`,
+          status: data.status,
+          userId: data.userId,
+          transactionId: data.transactionId,
+          paymentMode: data.paymentMode,
+          createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
+          publishedAt: data.publishedAt ? data.publishedAt.toDate() : undefined,
+          expiryDate: data.expiryDate ? data.expiryDate.toDate() : undefined,
+        } as AdminAdvertisement;
+      })
+    );
+
+    return ads;
   } catch (error) {
     console.error(`Error fetching ${status} advertisements:`, error);
+    throw error;
+  }
+};
+
+export const deleteAdvertisementFromAdmin = async (
+  id: string
+): Promise<void> => {
+  try {
+    const adRef = doc(db, "adData", id);
+    await deleteDoc(adRef);
+  } catch (error) {
+    console.error("Error deleting advertisement:", error);
     throw error;
   }
 };

@@ -1,8 +1,10 @@
 import React from "react";
+import { Routes, Route } from "react-router-dom";
 import { AdminAuthProvider } from "./contexts/AdminAuthContext";
 import { useAdminAuth } from "./contexts/useAdminAuth";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdDetails from "./pages/AdDetails";
 
 const AdminApp: React.FC = () => {
   const { isAuthenticated, loading } = useAdminAuth();
@@ -37,7 +39,17 @@ const AdminApp: React.FC = () => {
     );
   }
 
-  return isAuthenticated ? <AdminDashboard /> : <AdminLogin />;
+  if (!isAuthenticated) {
+    return <AdminLogin />;
+  }
+
+  return (
+    <Routes>
+      <Route path="/" element={<AdminDashboard />} />
+      <Route path="/ad-details/:adId" element={<AdDetails />} />
+      <Route path="/*" element={<AdminDashboard />} />
+    </Routes>
+  );
 };
 
 const Admin: React.FC = () => {

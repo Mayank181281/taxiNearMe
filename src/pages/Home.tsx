@@ -7,8 +7,12 @@ import {
   getAllCities,
   getCategories,
 } from "../utils/statesAndCities";
+import { useAdDisplayExpiration } from "../hooks/useAutoExpiration";
 
 const Home: React.FC = () => {
+  // Process expired ads before displaying content
+  useAdDisplayExpiration();
+
   const [searchCity, setSearchCity] = useState("");
   const [selectedState, setSelectedState] = useState("");
   const [selectedCity, setSelectedCity] = useState("");

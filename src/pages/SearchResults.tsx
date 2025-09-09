@@ -8,8 +8,12 @@ import {
   getCitiesByState,
   getCategories,
 } from "../utils/statesAndCities";
+import { useAdDisplayExpiration } from "../hooks/useAutoExpiration";
 
 const SearchResults: React.FC = () => {
+  // Process expired ads before showing search results
+  useAdDisplayExpiration();
+
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 

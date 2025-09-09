@@ -1,21 +1,25 @@
 import React, { useState } from "react";
 import { useAdminAuth } from "../contexts/useAdminAuth";
-import Dashboard from "./Dashboard";
 import AdManagement from "./AdManagement";
 import UserManagement from "./UserManagement";
 import QRCodeManagement from "./QRCodeManagement";
+import AdExpirationManager from "../components/AdExpirationManager";
+import { useAdminExpiration } from "../../hooks/useAutoExpiration";
 
-type ActivePage = "dashboard" | "ads" | "users" | "qrcode";
+type ActivePage = "users" | "ads" | "payments" | "expiration";
 
 const AdminDashboard: React.FC = () => {
-  const [activePage, setActivePage] = useState<ActivePage>("dashboard");
+  // Process expired ads in admin panel for real-time data
+  useAdminExpiration();
+
+  const [activePage, setActivePage] = useState<ActivePage>("users");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { logout } = useAdminAuth();
 
   const navigation = [
     {
-      id: "dashboard" as ActivePage,
-      name: "Dashboard",
+      id: "users" as ActivePage,
+      name: "User Management",
       icon: (
         <svg
           className="w-5 h-5"
@@ -27,7 +31,7 @@ const AdminDashboard: React.FC = () => {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-4l-2-3H9L7 6H5a2 2 0 00-2 2z"
+            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
           />
         </svg>
       ),
@@ -52,8 +56,8 @@ const AdminDashboard: React.FC = () => {
       ),
     },
     {
-      id: "users" as ActivePage,
-      name: "User Management",
+      id: "payments" as ActivePage,
+      name: "Payment Management",
       icon: (
         <svg
           className="w-5 h-5"
@@ -65,14 +69,14 @@ const AdminDashboard: React.FC = () => {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
       ),
     },
     {
-      id: "qrcode" as ActivePage,
-      name: "QR Code Management",
+      id: "expiration" as ActivePage,
+      name: "Ad Expiration",
       icon: (
         <svg
           className="w-5 h-5"
@@ -84,7 +88,7 @@ const AdminDashboard: React.FC = () => {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V4a1 1 0 00-1-1H5a1 1 0 00-1 1v3a1 1 0 001 1zm12 0h2a1 1 0 001-1V4a1 1 0 00-1-1h-2a1 1 0 00-1 1v3a1 1 0 001 1zM5 20h2a1 1 0 001-1v-3a1 1 0 00-1-1H5a1 1 0 00-1 1v3a1 1 0 001 1z"
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
       ),
@@ -97,16 +101,16 @@ const AdminDashboard: React.FC = () => {
 
   const renderContent = () => {
     switch (activePage) {
-      case "dashboard":
-        return <Dashboard />;
-      case "ads":
-        return <AdManagement />;
       case "users":
         return <UserManagement />;
-      case "qrcode":
+      case "ads":
+        return <AdManagement />;
+      case "payments":
         return <QRCodeManagement />;
+      case "expiration":
+        return <AdExpirationManager />;
       default:
-        return <Dashboard />;
+        return <UserManagement />;
     }
   };
 

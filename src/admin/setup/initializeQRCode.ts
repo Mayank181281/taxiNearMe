@@ -14,7 +14,6 @@ export const initializeQRCodeData = async () => {
     };
 
     await setDoc(qrCodeRef, initialData);
-    console.log("QR Code document initialized successfully");
     return true;
   } catch (error) {
     console.error("Error initializing QR code document:", error);

@@ -45,6 +45,10 @@ export interface Advertisement {
   paymentMode?: string;
   publishedAt?: Date;
   expiryDate?: Date;
+  // Auto-expiration fields
+  originalTag?: string;
+  autoDowngraded?: boolean;
+  downgradedAt?: Date;
 }
 
 export const publishDraftAdvertisement = async (
@@ -56,11 +60,6 @@ export const publishDraftAdvertisement = async (
   }
 ): Promise<string> => {
   try {
-    console.log("Starting draft advertisement publishing...", {
-      draftId,
-      planDetails,
-    });
-
     // Get the draft ad from advertisements collection
     const draftRef = doc(db, "advertisements", draftId);
     const draftDoc = await getDocs(
@@ -88,14 +87,8 @@ export const publishDraftAdvertisement = async (
       expiryDate: Timestamp.fromDate(expiryDate),
     });
 
-    console.log(
-      "Draft advertisement published successfully with ID:",
-      docRef.id
-    );
-
     // Remove the draft from advertisements collection
     await deleteDoc(draftRef);
-    console.log("Draft removed from advertisements collection");
 
     return docRef.id;
   } catch (error: unknown) {
@@ -114,22 +107,13 @@ export const publishAdvertisement = async (
   }
 ): Promise<string> => {
   try {
-    console.log("Starting advertisement publishing...", {
-      adData,
-      planDetails,
-    });
-
     // Upload photos to Cloudinary
     const photoUrls: string[] = [];
 
     for (const photo of photos) {
-      console.log("Uploading photo to Cloudinary:", photo.name);
       const url = await uploadToCloudinary(photo);
-      console.log("Photo uploaded successfully:", url);
       photoUrls.push(url);
     }
-
-    console.log("All photos uploaded successfully");
 
     // Create the advertisement document in adData collection
     const docRef = await addDoc(collection(db, "adData"), {
@@ -141,7 +125,6 @@ export const publishAdvertisement = async (
       createdAt: Timestamp.now(),
     });
 
-    console.log("Advertisement published successfully with ID:", docRef.id);
     return docRef.id;
   } catch (error: unknown) {
     console.error("Error publishing advertisement:", error);
@@ -154,19 +137,13 @@ export const createAdvertisement = async (
   photos: File[]
 ): Promise<string> => {
   try {
-    console.log("Starting advertisement creation...", { adData });
-
     // Upload photos to Cloudinary
     const photoUrls: string[] = [];
 
     for (const photo of photos) {
-      console.log("Uploading photo to Cloudinary:", photo.name);
       const url = await uploadToCloudinary(photo);
-      console.log("Photo uploaded successfully:", url);
       photoUrls.push(url);
     }
-
-    console.log("All photos uploaded successfully");
 
     // Check if an advertisement with similar data already exists
     const existingAdsQuery = query(
@@ -190,7 +167,6 @@ export const createAdvertisement = async (
       createdAt: Timestamp.now(),
     });
 
-    console.log("Advertisement created successfully with ID:", docRef.id);
     return docRef.id;
   } catch (error: unknown) {
     console.error("Error creating advertisement:", error);
@@ -210,22 +186,13 @@ export const updateAdvertisement = async (
   existingPhotoUrls: string[] = []
 ): Promise<void> => {
   try {
-    console.log("Starting advertisement update...", {
-      advertisementId,
-      adData,
-    });
-
     // Handle photo uploads - only upload new photos (File objects)
     const photoUrls: string[] = [...existingPhotoUrls];
 
     for (const photo of photos) {
-      console.log("Uploading new photo to Cloudinary:", photo.name);
       const url = await uploadToCloudinary(photo);
-      console.log("Photo uploaded successfully:", url);
       photoUrls.push(url);
     }
-
-    console.log("Photos processed successfully");
 
     // Try to find the document in adData collection first
     try {
@@ -234,24 +201,15 @@ export const updateAdvertisement = async (
         ...adData,
         photoUrls,
       });
-      console.log("Advertisement updated successfully in adData collection");
       return;
     } catch {
-      console.log(
-        "Document not found in adData collection, trying advertisements collection"
-      );
+      // If not found in adData, try advertisements collection
+      const adRef = doc(db, "advertisements", advertisementId);
+      await updateDoc(adRef, {
+        ...adData,
+        photoUrls,
+      });
     }
-
-    // If not found in adData, try advertisements collection
-    const adRef = doc(db, "advertisements", advertisementId);
-    await updateDoc(adRef, {
-      ...adData,
-      photoUrls,
-    });
-
-    console.log(
-      "Advertisement updated successfully in advertisements collection"
-    );
   } catch (error: unknown) {
     console.error("Error updating advertisement:", error);
     throw error;
@@ -269,23 +227,13 @@ export const resubmitRejectedAdvertisement = async (
   adTag: "free" | "vip" | "vip-prime" = "free"
 ): Promise<void> => {
   try {
-    console.log("Starting rejected advertisement resubmission...", {
-      advertisementId,
-      adData,
-      adTag,
-    });
-
     // Handle photo uploads - only upload new photos (File objects)
     const photoUrls: string[] = [...existingPhotoUrls];
 
     for (const photo of photos) {
-      console.log("Uploading new photo to Cloudinary:", photo.name);
       const url = await uploadToCloudinary(photo);
-      console.log("Photo uploaded successfully:", url);
       photoUrls.push(url);
     }
-
-    console.log("Photos processed successfully");
 
     // Determine the new status based on ad type
     let newStatus: string;
@@ -312,12 +260,28 @@ export const resubmitRejectedAdvertisement = async (
       // Keep the original publishing data
       tag: adTag,
     });
-
-    console.log(
-      `Advertisement resubmitted successfully with status: ${newStatus}`
-    );
   } catch (error: unknown) {
     console.error("Error resubmitting advertisement:", error);
+    throw error;
+  }
+};
+
+export const deleteAdvertisement = async (
+  advertisementId: string
+): Promise<void> => {
+  try {
+    // Try to delete from adData collection first (published ads)
+    try {
+      const adDataRef = doc(db, "adData", advertisementId);
+      await deleteDoc(adDataRef);
+      return;
+    } catch {
+      // If not found in adData, try advertisements collection (drafts)
+      const adRef = doc(db, "advertisements", advertisementId);
+      await deleteDoc(adRef);
+    }
+  } catch (error: unknown) {
+    console.error("Error deleting advertisement:", error);
     throw error;
   }
 };
@@ -495,17 +459,14 @@ export const getUserOrderHistory = async (
   userId: string
 ): Promise<Advertisement[]> => {
   try {
-    // Query for all published/approved ads by the user (including free ones)
-    const q = query(
-      collection(db, "adData"),
-      where("userId", "==", userId),
-      where("approved", "==", true)
-      // Include both "published" and "approved" status ads
-    );
+    // Query for ALL ads by the user (not just approved ones)
+    const q = query(collection(db, "adData"), where("userId", "==", userId));
 
     const querySnapshot = await getDocs(q);
+
     const orders = querySnapshot.docs.map((doc) => {
       const data = doc.data();
+
       return {
         ...data,
         id: doc.id,
@@ -514,12 +475,14 @@ export const getUserOrderHistory = async (
       } as Advertisement;
     });
 
-    // Sort by publishedAt date, most recent first
-    return orders.sort((a, b) => {
-      const dateA = a.publishedAt || a.createdAt || new Date(0);
-      const dateB = b.publishedAt || b.createdAt || new Date(0);
+    // Sort the results client-side by createdAt (most recent first)
+    orders.sort((a, b) => {
+      const dateA = a.createdAt || new Date(0);
+      const dateB = b.createdAt || new Date(0);
       return dateB.getTime() - dateA.getTime();
     });
+
+    return orders;
   } catch (error) {
     console.error("Error fetching user order history:", error);
     throw error;
