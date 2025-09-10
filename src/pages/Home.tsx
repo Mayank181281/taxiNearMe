@@ -280,7 +280,7 @@ const Home: React.FC = () => {
                     {hoveredCity === city && (
                       <>
                         {/* Taxi Top */}
-                        <div className="absolute bottom-full left-0 right-0 z-10 mb-2">
+                        <div className="absolute bottom-full left-0 right-0 z-10">
                           <button
                             onClick={() => handleCityClick(city)}
                             className="w-full px-4 py-2.5 bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors rounded-full shadow-lg border border-blue-200 text-sm"
@@ -291,7 +291,7 @@ const Home: React.FC = () => {
                         </div>
 
                         {/* Tour Bottom */}
-                        <div className="absolute top-full left-0 right-0 z-10 mt-2">
+                        <div className="absolute top-full left-0 right-0 z-10">
                           <button
                             onClick={() => handleCityClick(city)}
                             className="w-full px-4 py-2.5 bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors rounded-full shadow-lg border border-blue-200 text-sm"

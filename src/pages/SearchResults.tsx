@@ -32,9 +32,11 @@ const SearchResults: React.FC = () => {
       const decodedCity = decodeURIComponent(city);
       // Properly capitalize city name for display
       const formattedCity = decodedCity
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join(' ');
+        .split(" ")
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join(" ");
       setSelectedCity(formattedCity);
     }
   }, [city]);
@@ -44,9 +46,13 @@ const SearchResults: React.FC = () => {
     e.preventDefault();
     if (searchFormCity || searchFormState) {
       const searchQuery = searchFormCity || searchFormState;
-      const categoryParam = searchFormCategory || category || 'taxi';
-      const formattedCategory = categoryParam.toLowerCase().replace(/\s+/g, '-');
-      navigate(`/${formattedCategory}/${encodeURIComponent(searchQuery.toLowerCase())}`);
+      const categoryParam = searchFormCategory || category || "taxi";
+      const formattedCategory = categoryParam
+        .toLowerCase()
+        .replace(/\s+/g, "-");
+      navigate(
+        `/${formattedCategory}/${encodeURIComponent(searchQuery.toLowerCase())}`
+      );
     }
   };
 
@@ -76,7 +82,7 @@ const SearchResults: React.FC = () => {
         </div>
 
         {/* Search Form - Positioned to avoid tagline overlap - Mobile optimized */}
-        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/4 w-full max-w-[280px] xs:max-w-xs sm:max-w-2xl px-3 xs:px-4 sm:px-6">
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 w-[90%] max-w-[280px] xs:max-w-xs sm:max-w-2xl px-0">
           <div className="bg-white rounded-lg shadow-2xl p-2 xs:p-2.5 sm:p-6">
             <form
               onSubmit={handleFormSearch}
