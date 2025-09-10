@@ -281,12 +281,12 @@ const YourAdverts: React.FC = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6 flex-1 min-h-0">
             {/* Free Plan */}
-            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+            <div className="border border-sky-400 rounded-lg p-4 bg-[linear-gradient(145deg,_#ffffff_0%,_#f0f9ff_100%)]">
               <div className="text-center mb-3">
-                <div className="bg-gray-500 text-white px-3 py-1 rounded text-sm inline-block mb-2">
+                <div className="bg-sky-500 text-white px-3 py-1 rounded text-sm inline-block mb-2">
                   Free
                 </div>
-                <div className="text-2xl font-bold text-gray-600 mb-1">$0</div>
+                <div className="text-2xl font-bold text-sky-500 mb-1">$0</div>
                 <div className="text-gray-600 text-sm">/ Forever</div>
                 <div className="text-green-600 text-xs font-medium mt-1">
                   ✓ Publishes Immediately
@@ -295,25 +295,25 @@ const YourAdverts: React.FC = () => {
 
               <div className="space-y-2 mb-4">
                 <div className="flex items-center text-sm">
-                  <div className="w-2 h-2 bg-gray-500 rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-sky-500 rounded-full mr-3"></div>
                   <span>
                     <strong>Placement:</strong> Basic Listings
                   </span>
                 </div>
                 <div className="flex items-center text-sm">
-                  <div className="w-2 h-2 bg-gray-500 rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-sky-500 rounded-full mr-3"></div>
                   <span>
                     <strong>Highlight:</strong> Standard Ad Card Display
                   </span>
                 </div>
                 <div className="flex items-center text-sm">
-                  <div className="w-2 h-2 bg-gray-500 rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-sky-500 rounded-full mr-3"></div>
                   <span>
                     <strong>Exposure:</strong> Standard Visibility
                   </span>
                 </div>
                 <div className="flex items-center text-sm">
-                  <div className="w-2 h-2 bg-gray-500 rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-sky-500 rounded-full mr-3"></div>
                   <span>
                     <strong>Duration:</strong> No Time Limit
                   </span>
@@ -329,45 +329,45 @@ const YourAdverts: React.FC = () => {
                   })
                 }
                 disabled={loading}
-                className="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-sky-500 text-white py-2 rounded-lg hover:bg-sky-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Publishing..." : "Publish Free Ad"}
               </button>
             </div>
 
             {/* VIP Plan */}
-            <div className="border border-blue-200 rounded-lg p-4 bg-blue-50">
+            <div className="border border-indigo-500 rounded-lg p-4 bg-[linear-gradient(145deg,_#ffffff_0%,_#faf5ff_100%)]">
               <div className="text-center mb-3">
-                <div className="bg-blue-500 text-white px-3 py-1 rounded text-sm inline-block mb-2">
+                <div className="bg-indigo-500 text-white px-3 py-1 rounded text-sm inline-block mb-2">
                   VIP
                 </div>
-                <div className="text-2xl font-bold text-blue-600 mb-1">
+                <div className="text-2xl font-bold text-indigo-500 mb-1">
                   ${billingPeriod === "month" ? "40" : "3"}
                 </div>
                 <div className="text-gray-600 text-sm">
                   / {billingPeriod === "month" ? "Month" : "Day"}
                 </div>
-                <div className="text-blue-600 text-xs font-medium mt-1">
+                <div className="text-indigo-500 text-xs font-medium mt-1">
                   💳 Payment Required
                 </div>
               </div>
 
               <div className="space-y-2 mb-4">
                 <div className="flex items-center text-sm">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
                   <span>
                     <strong>Placement:</strong> Appears In Top Listings
                   </span>
                 </div>
                 <div className="flex items-center text-sm">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
                   <span>
                     <strong>Highlight:</strong> Driver Ad Card Is Marked With A
                     VIP Tag/Badge
                   </span>
                 </div>
                 <div className="flex items-center text-sm">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
                   <span>
                     <strong>Exposure:</strong> 3X More Visibility Than
                     Free/Normal Ads
@@ -375,7 +375,7 @@ const YourAdverts: React.FC = () => {
                 </div>
                 {billingPeriod === "day" && (
                   <div className="flex items-center text-sm">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                    <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
                     <span>
                       <strong>Duration:</strong> 24-hour premium exposure
                     </span>
@@ -392,14 +392,14 @@ const YourAdverts: React.FC = () => {
                   })
                 }
                 disabled={loading}
-                className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-600 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Processing..." : "Proceed to Payment"}
               </button>
             </div>
 
             {/* VIP Prime Plan */}
-            <div className="border border-orange-200 rounded-lg p-4 bg-orange-50">
+            <div className="border border-amber-400 rounded-lg p-4 bg-[linear-gradient(145deg,#ffffff_0%,#fefce8_100%)]">
               <div className="text-center mb-3">
                 <div className="bg-orange-500 text-white px-3 py-1 rounded text-sm inline-block mb-2">
                   VIP Prime

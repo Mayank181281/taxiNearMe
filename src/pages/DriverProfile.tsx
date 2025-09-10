@@ -176,14 +176,6 @@ const DriverProfile: React.FC = () => {
         </div>
 
         {/* Photos Section - Responsive Grid */}
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200 mb-4 sm:mb-6">
-          <div className="p-4 sm:p-6 border-b border-gray-200">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900">
-              Photos
-            </h2>
-          </div>
-
-          <div className="p-4 sm:p-6">
             {advertisement.photoUrls && advertisement.photoUrls.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {advertisement.photoUrls.map((imageUrl, index) => (
@@ -204,11 +196,9 @@ const DriverProfile: React.FC = () => {
                 <p className="text-gray-500">No photos available</p>
               </div>
             )}
-          </div>
-        </div>
 
         {/* Profile Info Section - Responsive Table */}
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200">
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200 mt-4 sm:mt-6">
           <div className="p-4 sm:p-6 border-b border-gray-200">
             <h2 className="text-lg sm:text-xl font-bold text-gray-900">
               Advertisement Details

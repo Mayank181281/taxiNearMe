@@ -195,16 +195,10 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
   const getPremiumBadge = (ad: Advertisement) => {
     if (ad.tag === "vip-prime") {
       return (
-        <div className="absolute -top-0 left-1/2 -translate-x-1/2 lg:left-auto lg:translate-x-0 lg:right-4 z-30">
-          <div className="relative inline-flex items-center gap-2 px-4 py-2">
-            <Crown
-              className="h-5 w-5 text-yellow-800"
-              style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))" }}
-            />
-            <span
-              className="text-yellow-900 font-serif font-bold text-sm uppercase tracking-wider"
-              style={{ textShadow: "0 1px 2px rgba(255,255,255,0.5)" }}
-            >
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-30 lg:right-10 lg:left-auto lg:translate-x-0">
+          <div className="bg-gradient-to-r from-yellow-100 via-yellow-200 to-yellow-100 px-4 py-1 rounded-full shadow-md flex items-center gap-2 border border-yellow-300">
+            <Crown className="h-5 w-5 text-yellow-800" />
+            <span className="text-yellow-900 font-serif font-bold text-sm uppercase tracking-wider">
               VIP Prime
             </span>
           </div>
@@ -214,17 +208,18 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
 
     if (ad.tag === "vip") {
       return (
-        <div className="absolute -top-0 left-1/2 -translate-x-1/2 lg:left-auto lg:translate-x-0 lg:right-10 z-30">
-          <div className="relative inline-flex items-center gap-2 px-4 py-2">
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-30 lg:right-16 lg:left-auto lg:translate-x-0">
+          <div className="bg-white px-4 py-1 rounded-full shadow-md flex items-center gap-2 border border-indigo-800">
             <Shield
               className="h-5 w-5 text-indigo-800"
               style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))" }}
-            />
+            />{" "}
             <span
               className="text-indigo-900 font-serif font-bold text-sm uppercase tracking-wider"
               style={{ textShadow: "0 1px 2px rgba(255,255,255,0.5)" }}
             >
-              VIP
+              {" "}
+              VIP{" "}
             </span>
           </div>
         </div>
@@ -232,17 +227,18 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
     }
 
     return (
-      <div className="absolute -top-0 left-1/2 -translate-x-1/2 lg:left-auto lg:translate-x-0 lg:right-6 z-30">
-        <div className="relative inline-flex items-center gap-2 px-4 py-2">
+      <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-30 lg:right-16 lg:left-auto lg:translate-x-0">
+        <div className="bg-white px-4 py-1 rounded-full shadow-md flex items-center gap-2 border border-sky-400">
           <Star
-            className="h-5 w-5 text-gray-800"
+            className="h-5 w-5 text-sky-600"
             style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))" }}
-          />
+          />{" "}
           <span
-            className="text-gray-900 font-serif font-bold text-sm uppercase tracking-wider"
+            className="text-sky-600 font-serif font-bold text-sm uppercase tracking-wider"
             style={{ textShadow: "0 1px 2px rgba(255,255,255,0.5)" }}
           >
-            FREE
+            {" "}
+            Free{" "}
           </span>
         </div>
       </div>
@@ -270,15 +266,18 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                       ? {
                           background:
                             "linear-gradient(145deg, #ffffff 0%, #fefce8 100%)",
+                          borderColor: "#fbbf24",
                         }
                       : ad.tag === "vip"
                       ? {
                           background:
                             "linear-gradient(145deg, #ffffff 0%, #faf5ff 100%)",
+                          borderColor: "#8b5cf6",
                         }
                       : {
                           background:
                             "linear-gradient(145deg, #ffffff 0%, #f0f9ff 100%)",
+                          borderColor: "#38bdf8",
                         }
                   }
                 >

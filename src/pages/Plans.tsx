@@ -154,7 +154,9 @@ const Plans: React.FC = () => {
           </div>
 
           <div className="text-center mb-6 mt-4">
-            <div className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-medium inline-block mb-4">
+            <div
+              className="bg-[linear-gradient(145deg,#ffffff_0%,#fefce8_100%)] text-white px-4 py-2 rounded-lg text-sm font-medium inline-block mb-4"
+            >
               VIP Prime
             </div>
             <div className="text-4xl font-bold text-orange-600 mb-2">
