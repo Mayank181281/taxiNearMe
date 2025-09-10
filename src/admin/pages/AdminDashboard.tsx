@@ -5,8 +5,9 @@ import UserManagement from "./UserManagement";
 import QRCodeManagement from "./QRCodeManagement";
 import AdExpirationManager from "../components/AdExpirationManager";
 import { useAdminExpiration } from "../../hooks/useAutoExpiration";
+import WatermarkPreview from "../../components/WatermarkPreview";
 
-type ActivePage = "users" | "ads" | "payments" | "expiration";
+type ActivePage = "users" | "ads" | "payments" | "expiration" | "watermark";
 
 const AdminDashboard: React.FC = () => {
   // Process expired ads in admin panel for real-time data
@@ -93,6 +94,25 @@ const AdminDashboard: React.FC = () => {
         </svg>
       ),
     },
+    {
+      id: "watermark" as ActivePage,
+      name: "Watermark Settings",
+      icon: (
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
+        </svg>
+      ),
+    },
   ];
 
   const handleLogout = () => {
@@ -109,6 +129,51 @@ const AdminDashboard: React.FC = () => {
         return <QRCodeManagement />;
       case "expiration":
         return <AdExpirationManager />;
+      case "watermark":
+        return (
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+                Watermark Management
+              </h1>
+              <p className="text-gray-600">
+                Manage automatic watermarking for uploaded advertisement images.
+              </p>
+            </div>
+            
+            <WatermarkPreview />
+            
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                Watermark Status
+              </h2>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-700">Automatic Watermarking</span>
+                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                    ✓ Active
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-700">Watermark Text</span>
+                  <span className="text-gray-900 font-medium">TAXI NEAR ME</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-700">Opacity</span>
+                  <span className="text-gray-900 font-medium">25%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-700">Position</span>
+                  <span className="text-gray-900 font-medium">Center (Multiple)</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-700">Minimum Size</span>
+                  <span className="text-gray-900 font-medium">300x300 pixels</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
       default:
         return <UserManagement />;
     }
