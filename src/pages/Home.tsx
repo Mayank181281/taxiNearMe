@@ -24,13 +24,17 @@ const Home: React.FC = () => {
   const featuredCities = getAllCities();
 
   const handleCityClick = (city: string) => {
-    navigate(`/search?city=${encodeURIComponent(city)}`);
+    const category = selectedCategory || 'taxi';
+    const formattedCategory = category.toLowerCase().replace(/\s+/g, '-');
+    navigate(`/${formattedCategory}/${encodeURIComponent(city.toLowerCase())}`);
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchCity.trim()) {
-      navigate(`/search?city=${encodeURIComponent(searchCity.trim())}`);
+      const category = selectedCategory || 'taxi';
+      const formattedCategory = category.toLowerCase().replace(/\s+/g, '-');
+      navigate(`/${formattedCategory}/${encodeURIComponent(searchCity.trim().toLowerCase())}`);
     }
   };
 
@@ -38,7 +42,9 @@ const Home: React.FC = () => {
     e.preventDefault();
     if (selectedCity || selectedState) {
       const searchQuery = selectedCity || selectedState;
-      navigate(`/search?city=${encodeURIComponent(searchQuery)}`);
+      const category = selectedCategory || 'taxi';
+      const formattedCategory = category.toLowerCase().replace(/\s+/g, '-');
+      navigate(`/${formattedCategory}/${encodeURIComponent(searchQuery.toLowerCase())}`);
     }
   };
 

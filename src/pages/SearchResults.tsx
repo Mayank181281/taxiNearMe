@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Search, ChevronDown } from "lucide-react";
 import PrimeMembersCarousel from "../components/PrimeMembersCarousel";
 import UnifiedDriverSection from "../components/UnifiedDriverSection";
@@ -14,7 +14,7 @@ const SearchResults: React.FC = () => {
   // Process expired ads before showing search results
   useAdDisplayExpiration();
 
-  const [searchParams] = useSearchParams();
+  const { category, city } = useParams<{ category: string; city: string }>();
   const navigate = useNavigate();
 
   // States for the hero search form
@@ -28,20 +28,25 @@ const SearchResults: React.FC = () => {
 
   // Get initial city from URL params
   useEffect(() => {
-    const cityParam = searchParams.get("city");
-    console.log("SearchResults - URL city param:", cityParam);
-    if (cityParam) {
-      setSelectedCity(cityParam);
-      console.log("SearchResults - selectedCity set to:", cityParam);
+    if (city) {
+      const decodedCity = decodeURIComponent(city);
+      // Properly capitalize city name for display
+      const formattedCity = decodedCity
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+      setSelectedCity(formattedCity);
     }
-  }, [searchParams]);
+  }, [city]);
 
   // Handler for the hero search form
   const handleFormSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchFormCity || searchFormState) {
       const searchQuery = searchFormCity || searchFormState;
-      navigate(`/search?city=${encodeURIComponent(searchQuery)}`);
+      const categoryParam = searchFormCategory || category || 'taxi';
+      const formattedCategory = categoryParam.toLowerCase().replace(/\s+/g, '-');
+      navigate(`/${formattedCategory}/${encodeURIComponent(searchQuery.toLowerCase())}`);
     }
   };
 

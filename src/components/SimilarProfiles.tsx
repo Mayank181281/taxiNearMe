@@ -133,7 +133,7 @@ const SimilarProfiles: React.FC<SimilarProfilesProps> = ({
       </div>
 
       {/* Ad Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-40">
         {similarAds.map((ad) => (
           <div
             key={ad.id}
@@ -169,7 +169,7 @@ const SimilarProfiles: React.FC<SimilarProfilesProps> = ({
             {/* Ad Details */}
             <div className="p-3 flex-1 flex flex-col justify-between">
               {/* Title */}
-              <h3 className="font-bold text-sm text-gray-900 mb-2">
+              <h3 className="font-bold text-lg text-gray-900">
                 {ad.title.length > 40
                   ? ad.title.substring(0, 40) + "..."
                   : ad.title}

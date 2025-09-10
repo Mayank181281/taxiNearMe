@@ -318,7 +318,7 @@ const DriverProfile: React.FC = () => {
         </div>
 
         {/* Similar Profiles Section */}
-        <div className="mt-6 sm:mt-8">
+        <div className="mt-6 sm:mt-8 ">
           <SimilarProfiles
             currentDriverId={advertisement.id}
             city={advertisement.city}
