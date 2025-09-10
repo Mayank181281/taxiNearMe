@@ -57,42 +57,10 @@ export const updateQRCodeData = async (
   }
 };
 
+import { uploadToCloudinaryWithoutWatermark } from "../../services/cloudinaryService";
+
 // Upload image to Cloudinary
 export const uploadImageToCloudinary = async (file: File): Promise<string> => {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append(
-    "upload_preset",
-    import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || "taxinearme"
-  );
-  formData.append("folder", "taxi-app/qr-codes");
-
-  // Get Cloudinary cloud name from environment variables
-  const CLOUDINARY_CLOUD_NAME =
-    import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || "dplkknhin";
-
-  try {
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        `Failed to upload image to Cloudinary: ${
-          errorData.error?.message || response.statusText
-        }`
-      );
-    }
-
-    const data = await response.json();
-    return data.secure_url;
-  } catch (error) {
-    console.error("Error uploading to Cloudinary:", error);
-    throw error;
-  }
+  // Use the non-watermarked version for QR codes
+  return uploadToCloudinaryWithoutWatermark(file);
 };

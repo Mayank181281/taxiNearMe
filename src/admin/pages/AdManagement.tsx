@@ -291,9 +291,9 @@ const AdManagement: React.FC = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Customer Email & Title
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Ad ID
-                    </th>
+                    </th> */}
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Plan
                     </th>
@@ -330,22 +330,30 @@ const AdManagement: React.FC = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      {/* <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900 font-mono bg-gray-50 px-2 py-1 rounded text-xs">
                           {ad.id.substring(0, 12)}...
                         </div>
                         <div className="text-xs text-gray-500 mt-1">
                           Click for full ID
                         </div>
-                      </td>
+                      </td> */}
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPlanColor(
-                            ad.subscriptionPlan
-                          )}`}
-                        >
-                          {ad.subscriptionPlan}
-                        </span>
+                        <div className="flex flex-col">
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPlanColor(
+                              ad.subscriptionPlan
+                            )}`}
+                          >
+                            {ad.subscriptionPlan}
+                          </span>
+                          {ad.planDuration && ad.planUnit && (
+                            <span className="text-xs text-gray-500 mt-1">
+                              {ad.planDuration} {ad.planUnit}
+                              {ad.planDuration > 1 ? "s" : ""}
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                         {ad.location}
@@ -501,7 +509,7 @@ const AdManagement: React.FC = () => {
                       <label className="block text-sm font-medium text-gray-700">
                         Advertisement ID
                       </label>
-                      <p className="mt-1 text-sm text-gray-900 bg-gray-50 p-2 rounded font-mono text-xs break-all">
+                      <p className="mt-1 text-gray-900 bg-gray-50 p-2 rounded font-mono text-xs break-all">
                         {selectedAd.id}
                       </p>
                     </div>
@@ -529,13 +537,21 @@ const AdManagement: React.FC = () => {
                         <label className="block text-sm font-medium text-gray-700">
                           Subscription Plan
                         </label>
-                        <span
-                          className={`inline-flex mt-1 px-2 py-1 text-xs font-semibold rounded-full ${getPlanColor(
-                            selectedAd.subscriptionPlan
-                          )}`}
-                        >
-                          {selectedAd.subscriptionPlan}
-                        </span>
+                        <div className="flex flex-col mt-1">
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPlanColor(
+                              selectedAd.subscriptionPlan
+                            )}`}
+                          >
+                            {selectedAd.subscriptionPlan}
+                          </span>
+                          {selectedAd.planDuration && selectedAd.planUnit && (
+                            <span className="text-xs text-gray-500 mt-1">
+                              {selectedAd.planDuration} {selectedAd.planUnit}
+                              {selectedAd.planDuration > 1 ? "s" : ""}
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700">

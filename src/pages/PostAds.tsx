@@ -483,6 +483,34 @@ const PostAds: React.FC = () => {
                 <label className="block text-blue-600 font-medium mb-2">
                   Choose photo to upload (Maximum 5 photos allowed)
                 </label>
+                
+                {/* Watermark Notice */}
+                <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-start">
+                    <svg
+                      className="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <div>
+                      <p className="text-sm text-blue-700 font-medium">
+                        Automatic Watermark Protection
+                      </p>
+                      <p className="text-xs text-blue-600 mt-1">
+                        Your uploaded images will automatically include a "TAXI NEAR ME" watermark for brand protection and authenticity.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="space-y-4">
                   {/* Upload Button */}
                   <div className="relative">

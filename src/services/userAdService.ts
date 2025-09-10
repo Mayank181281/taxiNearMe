@@ -47,6 +47,10 @@ export interface UserAdvertisement {
   // Payment information
   paymentMode?: string;
   transactionId?: string;
+  // Previous plan information
+  originalTag?: string;
+  autoDowngraded?: boolean;
+  downgradedAt?: Date;
 }
 
 export interface EnhancedUserData {
@@ -379,6 +383,10 @@ export const getAdvertisementDetails = async (
       // Payment information
       paymentMode: data.paymentMode || undefined,
       transactionId: data.transactionId || undefined,
+      // Previous plan information
+      originalTag: data.originalTag || undefined,
+      autoDowngraded: data.autoDowngraded || false,
+      downgradedAt: data.downgradedAt ? data.downgradedAt.toDate() : undefined,
     } as UserAdvertisement;
   } catch (error) {
     console.error("Error fetching advertisement details:", error);

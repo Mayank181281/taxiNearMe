@@ -10,6 +10,7 @@ interface Advertisement {
   title: string;
   description: string;
   phoneNumber: string;
+  email?: string;
   city: string;
   state: string;
   category: string;
@@ -49,9 +50,26 @@ const DriverProfile: React.FC = () => {
 
         if (adSnapshot.exists()) {
           const adData = adSnapshot.data();
+          
+          // Fetch user email from users collection
+          let userEmail = "";
+          if (adData.userId) {
+            try {
+              const userDoc = doc(db, "users", adData.userId);
+              const userSnapshot = await getDoc(userDoc);
+              if (userSnapshot.exists()) {
+                const userData = userSnapshot.data();
+                userEmail = userData.email || "";
+              }
+            } catch (err) {
+              console.error("Error fetching user email:", err);
+            }
+          }
+          
           setAdvertisement({
             id: adSnapshot.id,
             ...adData,
+            email: userEmail,
           } as Advertisement);
         } else {
           setError("Advertisement not found");
@@ -171,6 +189,16 @@ const DriverProfile: React.FC = () => {
               >
                 <span>Contact</span>
               </a>
+              {advertisement.email && (
+                <a
+                  href={`mailto:${advertisement.email}?subject=Inquiry%20about%20${encodeURIComponent(
+                    advertisement.title
+                  )}&body=Hi,%20I%20would%20like%20to%20inquire%20about%20your%20taxi%20service.`}
+                  className="bg-purple-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2 min-w-[120px] sm:min-w-[140px] flex-1 sm:flex-none"
+                >
+                  <span>Email</span>
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -227,6 +255,23 @@ const DriverProfile: React.FC = () => {
                 </a>
               </div>
             </div>
+            {advertisement.email && (
+              <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">
+                <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
+                  Email:
+                </div>
+                <div className="text-gray-700 text-sm sm:text-base">
+                  <a
+                    href={`mailto:${advertisement.email}?subject=Inquiry%20about%20${encodeURIComponent(
+                      advertisement.title
+                    )}&body=Hi,%20I%20would%20like%20to%20inquire%20about%20your%20taxi%20service.`}
+                    className="text-purple-600 hover:text-purple-800"
+                  >
+                    {advertisement.email}
+                  </a>
+                </div>
+              </div>
+            )}
             <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-white">
               <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
                 Category:

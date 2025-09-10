@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import WatermarkDemo from '../components/WatermarkDemo';
 
 const Plans: React.FC = () => {
   const [billingPeriod, setBillingPeriod] = useState<"month" | "day">("month");
@@ -378,6 +379,20 @@ const Plans: React.FC = () => {
             Email Support
           </button>
         </div>
+      </div>
+
+      {/* Watermark Feature Demo */}
+      <div className="mt-12">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Automatic Image Protection
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            All your advertisement images are automatically protected with our subtle watermark technology for brand authenticity and security.
+          </p>
+        </div>
+        
+        <WatermarkDemo />
       </div>
     </div>
   );

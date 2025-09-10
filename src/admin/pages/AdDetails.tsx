@@ -288,7 +288,7 @@ const AdDetails: React.FC = () => {
               <div className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    Plan Type
+                    Current Plan
                   </label>
                   <span
                     className={`inline-flex mt-1 px-3 py-1 text-sm font-semibold rounded-full border uppercase ${getTagColor(
@@ -300,6 +300,39 @@ const AdDetails: React.FC = () => {
                       : ad.tag.toUpperCase()}
                   </span>
                 </div>
+                
+                {/* Previous Plan Information */}
+                {ad.originalTag && ad.originalTag !== ad.tag && (
+                  <div className="border-t pt-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Previous Plan
+                      </label>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <span
+                          className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full border uppercase ${getTagColor(
+                            ad.originalTag
+                          )}`}
+                        >
+                          {ad.originalTag === "vip-prime"
+                            ? "VIP Prime"
+                            : ad.originalTag.toUpperCase()}
+                        </span>
+                        {ad.autoDowngraded && (
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800 border-orange-200">
+                            Auto-downgraded
+                          </span>
+                        )}
+                      </div>
+                      {ad.downgradedAt && (
+                        <p className="text-sm text-gray-500 mt-1">
+                          Downgraded on: {formatDate(ad.downgradedAt)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     Plan Duration

@@ -25,6 +25,8 @@ export interface AdminAdvertisement {
   photoUrls: string[];
   subscriptionPlan: "Free" | "VIP" | "VIP Prime";
   tag: "free" | "vip" | "vip-prime";
+  planDuration?: number;
+  planUnit?: string;
   submittedDate: string;
   location: string;
   status: "pending" | "approved" | "rejected" | "published";
@@ -92,6 +94,8 @@ export const getPendingAdvertisements = async (): Promise<
               ? "VIP"
               : "Free",
           tag: data.tag,
+          planDuration: data.planDuration || 1,
+          planUnit: data.planUnit || "Day",
           submittedDate: data.publishedAt
             ? data.publishedAt.toDate().toISOString().split("T")[0]
             : data.createdAt
@@ -150,6 +154,8 @@ export const getAllAdvertisementsForAdmin = async (): Promise<
               ? "VIP"
               : "Free",
           tag: data.tag,
+          planDuration: data.planDuration || 1,
+          planUnit: data.planUnit || "Day",
           submittedDate: data.publishedAt
             ? data.publishedAt.toDate().toISOString().split("T")[0]
             : data.createdAt
@@ -248,6 +254,8 @@ export const getAdvertisementsByStatus = async (
               ? "VIP"
               : "Free",
           tag: data.tag,
+          planDuration: data.planDuration || 1,
+          planUnit: data.planUnit || "Day",
           submittedDate: data.publishedAt
             ? data.publishedAt.toDate().toISOString().split("T")[0]
             : data.createdAt
