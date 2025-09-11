@@ -4,6 +4,7 @@ import {
   approveAdvertisement,
   rejectAdvertisement,
   deleteAdvertisementFromAdmin,
+  updateAdvertisement,
   AdminAdvertisement,
 } from "../../services/adminService";
 
@@ -18,6 +19,15 @@ const AdManagement: React.FC = () => {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Edit modal state
+  const [editingAd, setEditingAd] = useState<AdminAdvertisement | null>(null);
+  const [editFormData, setEditFormData] = useState({
+    customerEmail: "",
+    id: "",
+    title: "",
+    description: "",
+  });
+
   // Fetch advertisements from Firebase
   useEffect(() => {
     fetchAds();
@@ -27,6 +37,7 @@ const AdManagement: React.FC = () => {
     try {
       setLoading(true);
       const adsData = await getAllAdvertisementsForAdmin();
+      console.log("Fetched ads:", adsData); // Debug log
       setAds(adsData);
     } catch (error) {
       console.error("Error fetching ads:", error);
@@ -39,8 +50,8 @@ const AdManagement: React.FC = () => {
     try {
       await approveAdvertisement(id);
       // Update local state
-      setAds(
-        ads.map((ad) =>
+      setAds((prevAds) =>
+        prevAds.map((ad) =>
           ad.id === id ? { ...ad, status: "approved" as const } : ad
         )
       );
@@ -58,8 +69,8 @@ const AdManagement: React.FC = () => {
     try {
       await rejectAdvertisement(id);
       // Update local state
-      setAds(
-        ads.map((ad) =>
+      setAds((prevAds) =>
+        prevAds.map((ad) =>
           ad.id === id ? { ...ad, status: "rejected" as const } : ad
         )
       );
@@ -86,7 +97,7 @@ const AdManagement: React.FC = () => {
       await deleteAdvertisementFromAdmin(deletingAd.id);
 
       // Remove from local state
-      setAds(ads.filter((ad) => ad.id !== deletingAd.id));
+      setAds((prevAds) => prevAds.filter((ad) => ad.id !== deletingAd.id));
 
       // Close modal if the deleted ad was selected
       if (selectedAd?.id === deletingAd.id) {
@@ -109,6 +120,96 @@ const AdManagement: React.FC = () => {
   const cancelDelete = () => {
     setShowDeleteConfirmation(false);
     setDeletingAd(null);
+  };
+
+  // Edit modal handlers
+  const handleEdit = (ad: AdminAdvertisement) => {
+    setEditingAd(ad);
+    setEditFormData({
+      customerEmail: ad.customerEmail,
+      id: ad.id,
+      title: ad.title,
+      description: ad.description,
+    });
+  };
+
+  const handleEditFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setEditFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingAd) return;
+
+    try {
+      // Show loading state
+      setLoading(true);
+
+      // Update in Firebase backend
+      await updateAdvertisement(editingAd.id, {
+        customerEmail: editFormData.customerEmail,
+        title: editFormData.title,
+        description: editFormData.description,
+      });
+
+      // Update local state only after successful backend update
+      setAds((prevAds) =>
+        prevAds.map((ad) =>
+          ad.id === editingAd.id
+            ? {
+                ...ad,
+                customerEmail: editFormData.customerEmail,
+                title: editFormData.title,
+                description: editFormData.description,
+                email: editFormData.customerEmail, // Also update the email field
+              }
+            : ad
+        )
+      );
+
+      // Update selectedAd if it's currently being viewed
+      if (selectedAd?.id === editingAd.id) {
+        setSelectedAd({
+          ...selectedAd,
+          customerEmail: editFormData.customerEmail,
+          title: editFormData.title,
+          description: editFormData.description,
+          email: editFormData.customerEmail,
+        });
+      }
+
+      // Close edit modal
+      setEditingAd(null);
+      setEditFormData({
+        customerEmail: "",
+        id: "",
+        title: "",
+        description: "",
+      });
+
+      // Show success message
+      alert("Advertisement updated successfully!");
+    } catch (error) {
+      console.error("Error updating advertisement:", error);
+      alert("Failed to update advertisement. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingAd(null);
+    setEditFormData({
+      customerEmail: "",
+      id: "",
+      title: "",
+      description: "",
+    });
   };
 
   const getStatusColor = (status: string) => {
@@ -137,6 +238,7 @@ const AdManagement: React.FC = () => {
     }
   };
 
+  // Debug filteredAds
   const filteredAds = ads.filter((ad) => {
     const matchesStatus = filter === "all" || ad.status === filter;
     const searchLower = searchTerm.toLowerCase().trim();
@@ -148,6 +250,10 @@ const AdManagement: React.FC = () => {
       ad.id.toLowerCase().includes(searchLower);
     return matchesStatus && matchesSearch;
   });
+
+  console.log("Total ads:", ads.length); // Debug log
+  console.log("Filtered ads:", filteredAds.length); // Debug log
+  console.log("Current filter:", filter); // Debug log
 
   return (
     <div className="space-y-6">
@@ -291,9 +397,6 @@ const AdManagement: React.FC = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Customer Email & Title
                     </th>
-                    {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Ad ID
-                    </th> */}
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Plan
                     </th>
@@ -330,14 +433,6 @@ const AdManagement: React.FC = () => {
                           </div>
                         </div>
                       </td>
-                      {/* <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900 font-mono bg-gray-50 px-2 py-1 rounded text-xs">
-                          {ad.id.substring(0, 12)}...
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          Click for full ID
-                        </div>
-                      </td> */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
                           <span
@@ -394,13 +489,8 @@ const AdManagement: React.FC = () => {
                         {new Date(ad.submittedDate).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                        <button
-                          onClick={() => setSelectedAd(ad)}
-                          className="text-blue-600 hover:text-blue-800 transition-colors"
-                        >
-                          View
-                        </button>
-                        {ad.status === "pending" && (
+                        {ad.status === "pending" ? (
+                          // For pending ads: only show Approve and Reject buttons
                           <>
                             <button
                               onClick={() => handleApprove(ad.id)}
@@ -415,13 +505,29 @@ const AdManagement: React.FC = () => {
                               Reject
                             </button>
                           </>
+                        ) : (
+                          // For approved/rejected ads: show Edit, View, and Delete buttons
+                          <>
+                            <button
+                              onClick={() => handleEdit(ad)}
+                              className="text-blue-600 hover:text-blue-800 transition-colors"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => setSelectedAd(ad)}
+                              className="text-blue-600 hover:text-blue-800 transition-colors"
+                            >
+                              View
+                            </button>
+                            <button
+                              onClick={() => handleDelete(ad)}
+                              className="text-red-600 hover:text-red-800 transition-colors font-medium"
+                            >
+                              Delete
+                            </button>
+                          </>
                         )}
-                        <button
-                          onClick={() => handleDelete(ad)}
-                          className="text-red-600 hover:text-red-800 transition-colors font-medium"
-                        >
-                          Delete
-                        </button>
                       </td>
                     </tr>
                   ))}
@@ -441,7 +547,7 @@ const AdManagement: React.FC = () => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 0 012 2"
                   />
                 </svg>
                 <h3 className="mt-2 text-sm font-medium text-gray-900">
@@ -465,6 +571,109 @@ const AdManagement: React.FC = () => {
               </div>
             )}
           </div>
+
+          {/* Edit Ad Modal */}
+          {editingAd && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Edit Advertisement
+                    </h3>
+                    <button
+                      onClick={handleCancelEdit}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Customer Email
+                      </label>
+                      <input
+                        type="email"
+                        name="customerEmail"
+                        value={editFormData.customerEmail}
+                        onChange={handleEditFormChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Advertisement ID (Read-only)
+                      </label>
+                      <input
+                        type="text"
+                        name="id"
+                        value={editFormData.id}
+                        readOnly
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed font-mono text-sm"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Title
+                      </label>
+                      <input
+                        type="text"
+                        name="title"
+                        value={editFormData.title}
+                        onChange={handleEditFormChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Description
+                      </label>
+                      <textarea
+                        name="description"
+                        value={editFormData.description}
+                        onChange={handleEditFormChange}
+                        rows={4}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-3 mt-6 pt-6 border-t">
+                    <button
+                      onClick={handleCancelEdit}
+                      className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveEdit}
+                      disabled={loading}
+                      className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                    >
+                      {loading ? "Saving..." : "Save Changes"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* View Ad Modal */}
           {selectedAd && (

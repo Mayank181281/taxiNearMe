@@ -60,14 +60,12 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
           where("tag", "==", "vip-prime"),
           where("approved", "==", true),
           where("city", "==", selectedCity)
-          // Remove status filter to include both "published" and "approved"
         );
       } else {
         adsQuery = query(
           collection(db, "adData"),
           where("tag", "==", "vip-prime"),
           where("approved", "==", true)
-          // Remove status filter to include both "published" and "approved"
         );
       }
 
@@ -96,20 +94,20 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
     fetchVipPrimeAds();
   }, [fetchVipPrimeAds]);
 
-  // Auto-scroll functionality - only auto-scroll if we have multiple unique ads
+  // Auto-scroll functionality - simple carousel
   useEffect(() => {
     if (!isAutoScrolling || vipPrimeAds.length <= 1) return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => {
         const nextIndex = prevIndex + 1;
-        // Reset to beginning when we've scrolled through one full set
+        // Reset to beginning when we reach the end
         if (nextIndex >= vipPrimeAds.length) {
           return 0;
         }
         return nextIndex;
       });
-    }, 2000); // Move every 2 seconds
+    }, 3000); // Move every 3 seconds
 
     return () => clearInterval(interval);
   }, [isAutoScrolling, vipPrimeAds.length]);
@@ -135,7 +133,31 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
 
   return (
     <div className="mb-8 max-w-6xl mx-auto px-4">
-      {/* Continuous Carousel Container */}
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+          <Crown className="h-5 w-5 text-yellow-500" />
+          VIP Prime Members
+        </h2>
+        {vipPrimeAds.length > 4 && (
+          <div className="flex space-x-1">
+            {Array.from({ length: Math.ceil(vipPrimeAds.length / 4) }).map(
+              (_, index) => (
+                <div
+                  key={index}
+                  className={`h-2 w-2 rounded-full transition-colors ${
+                    Math.floor(currentIndex / 4) === index
+                      ? "bg-yellow-500"
+                      : "bg-gray-300"
+                  }`}
+                />
+              )
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Carousel Container */}
       <div
         className="overflow-hidden"
         onMouseEnter={() => setIsAutoScrolling(false)}
@@ -147,12 +169,8 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
             transform: `translateX(-${currentIndex * (144 + 12)}px)`, // 144px card width + 12px gap
           }}
         >
-          {/* Show ads - only triple if we have enough unique ads for smooth scroll */}
-          {(vipPrimeAds.length >= 3
-            ? [...vipPrimeAds, ...vipPrimeAds, ...vipPrimeAds]
-            : vipPrimeAds
-          ).map((ad, globalIndex) => {
-            const index = globalIndex % 6; // For color rotation
+          {/* Show only original ads - NO DUPLICATES */}
+          {vipPrimeAds.map((ad, index) => {
             // Subtle, professional colors
             const colors = [
               "bg-slate-600",
@@ -166,7 +184,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
 
             return (
               <Link
-                key={`${ad.id}-${globalIndex}`}
+                key={ad.id} // Use unique ad ID only
                 to={`/driver/${ad.id}`}
                 className="w-36 flex-shrink-0"
               >
