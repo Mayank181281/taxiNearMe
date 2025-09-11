@@ -374,72 +374,80 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                         </div>
                       </div>
 
-                      {/* Action Buttons without hover effects */}
-                      <div className="flex flex-col gap-3 min-w-[160px]">
-                        {/* Only show WhatsApp and Contact buttons for VIP and VIP Prime ads */}
-                        {ad.tag !== "free" && (
-                          <>
-                            <a
-                              href={`https://wa.me/${ad.phoneNumber.replace(
-                                /[^0-9]/g,
-                                ""
-                              )}?text=Hi,%20I%20would%20like%20to%20book%20your%20${
-                                ad.tag === "vip-prime"
-                                  ? "VIP Prime luxury"
-                                  : ad.tag === "vip"
-                                  ? "VIP premium"
-                                  : "FREE"
-                              } taxi%20service.`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 relative z-10 ${
-                                ad.tag === "vip-prime"
-                                  ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg"
-                                  : ad.tag === "vip"
-                                  ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md"
-                                  : "bg-green-500 text-white shadow-md"
-                              }`}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <MessageCircle size={20} />
-                              WhatsApp
-                            </a>
+                      {/* Action Buttons */}
+                      {ad.tag !== "free" ? (
+                        // VIP & VIP Prime → WhatsApp + Contact + View AD
+                        <div className="flex flex-col gap-3 min-w-[160px]">
+                          {/* WhatsApp */}
+                          <a
+                            href={`https://wa.me/${ad.phoneNumber.replace(
+                              /[^0-9]/g,
+                              ""
+                            )}?text=Hi,%20I%20would%20like%20to%20book%20your%20${
+                              ad.tag === "vip-prime"
+                                ? "VIP Prime luxury"
+                                : ad.tag === "vip"
+                                ? "VIP premium"
+                                : "FREE"
+                            } taxi%20service.`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 relative z-10 ${
+                              ad.tag === "vip-prime"
+                                ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg"
+                                : "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md"
+                            }`}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <MessageCircle size={20} />
+                            WhatsApp
+                          </a>
 
-                            <a
-                              href={`tel:${ad.phoneNumber}`}
-                              className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 relative z-10 ${
-                                ad.tag === "vip-prime"
-                                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg"
-                                  : ad.tag === "vip"
-                                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
-                                  : "bg-blue-500 text-white shadow-md"
-                              }`}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <Phone size={20} />
-                              Contact
-                            </a>
-                          </>
-                        )}
+                          {/* Contact */}
+                          <a
+                            href={`tel:${ad.phoneNumber}`}
+                            className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 relative z-10 ${
+                              ad.tag === "vip-prime"
+                                ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg"
+                                : "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
+                            }`}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Phone size={20} />
+                            Contact
+                          </a>
 
-                        {/* View AD button is always shown for all ad types */}
-                        <div
-                          className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 cursor-pointer ${
-                            ad.tag === "vip-prime"
-                              ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg"
-                              : ad.tag === "vip"
-                              ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-md"
-                              : "bg-teal-500 text-white shadow-md"
-                          }`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/driver/${ad.id}`);
-                          }}
-                        >
-                          <span>👤</span>
-                          View AD
+                          {/* View AD */}
+                          <div
+                            className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 cursor-pointer ${
+                              ad.tag === "vip-prime"
+                                ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg"
+                                : "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-md"
+                            }`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/driver/${ad.id}`);
+                            }}
+                          >
+                            <span>👤</span>
+                            View AD
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        // FREE ads → Column layout for md and sm, centered for lg+
+                        <div className="flex flex-col md:flex-col lg:flex lg:items-center lg:justify-center gap-3 min-w-[160px] lg:self-stretch">
+                          <div
+                            className="w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 cursor-pointer bg-teal-500 text-white shadow-md"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/driver/${ad.id}`);
+                            }}
+                          >
+                            <span>👤</span>
+                            View AD
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
