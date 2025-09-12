@@ -6,6 +6,7 @@ import {
   Advertisement,
   publishDraftAdvertisement,
   deleteAdvertisement,
+  getUserAdsSummary,
 } from "../services/advertisementService";
 import { useAdDisplayExpiration } from "../hooks/useAutoExpiration";
 
@@ -31,6 +32,13 @@ const YourAdverts: React.FC = () => {
   const [billingPeriod, setBillingPeriod] = useState<"month" | "day">("day");
   const [deletingAd, setDeletingAd] = useState<Advertisement | null>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [adsSummary, setAdsSummary] = useState<{
+    totalAds: number;
+    canPostMore: boolean;
+  }>({
+    totalAds: 0,
+    canPostMore: true,
+  });
 
   // Helper function to check if an ad can be upgraded
   const canAdBeUpgraded = (ad: Advertisement): boolean => {
@@ -49,33 +57,32 @@ const YourAdverts: React.FC = () => {
       const userId = firebaseUser?.uid;
       const userEmail = user?.email;
 
-      if (!userId) {
-        return;
-      }
-
-      if (!userEmail) {
+      if (!userId || !userEmail) {
         return;
       }
 
       try {
         if (force) setLoading(true);
-        console.log("� Current user ID:", userId);
-        console.log("🔍 Current user object:", user);
-        console.log("�🔄 Fetching user advertisements...");
-        console.log("🔍 About to call debugUserAds...");
-        console.log("User ID:", userId);
-        console.log("User Email:", userEmail);
 
+        // Get ads summary for post limit check
+        const summary = await getUserAdsSummary(userId);
+        if (summary) {
+          setAdsSummary({
+            totalAds: summary.totalAds,
+            canPostMore: summary.canPostMore,
+          });
+        }
+
+        // Fetch user's ads
         const userAds = await getUserAdvertisements(userId);
-
         setAds(userAds);
       } catch (error) {
-        console.error("Error fetching advertisements:", error);
+        console.error("Error fetching data:", error);
       } finally {
         if (force) setLoading(false);
       }
     },
-    [user, firebaseUser]
+    [firebaseUser, user]
   );
 
   // Fetch user's advertisements from Firebase
@@ -560,30 +567,73 @@ const YourAdverts: React.FC = () => {
       </div>
 
       {/* Refresh Button */}
-      <div className="mb-6 flex justify-between items-center">
+      <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
         <h1 className="text-2xl font-bold text-gray-900">
           Your Advertisements
         </h1>
-        <button
-          onClick={() => fetchAds(true)}
-          disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        <div className="flex flex-wrap items-center gap-4">
+          {/* Post New Ad Button */}
+          {adsSummary?.canPostMore ? (
+            <Link
+              to="/profile/post-ads"
+              className="inline-flex items-center px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
+            >
+              <svg
+                className="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Post New Ad
+            </Link>
+          ) : (
+            <div className="inline-flex items-center px-6 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed font-medium">
+              <svg
+                className="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636"
+                />
+              </svg>
+              Ad Limit Reached (10/10)
+            </div>
+          )}
+
+          {/* Refresh Button */}
+          <button
+            onClick={() => fetchAds(true)}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-            />
-          </svg>
-          {loading ? "Refreshing..." : "Refresh"}
-        </button>
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            {loading ? "Refreshing..." : "Refresh"}
+          </button>
+        </div>
       </div>
 
       <div className="space-y-6">
@@ -1072,7 +1122,7 @@ const YourAdverts: React.FC = () => {
                       const getPremiumBadge = (tag: string) => {
                         if (tag === "vip-prime") {
                           return (
-                            <div className="absolute -top-0 left-1/2 -translate-x-1/2 lg:right-4 lg:left-auto lg:translate-x-0 z-30">
+                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 lg:right-8 lg:left-auto lg:translate-x-0 z-30">
                               <div className="relative inline-flex items-center gap-2 px-4 py-2">
                                 <div className="flex items-center gap-1 text-yellow-900 font-black tracking-wider transition-all duration-300 bg-gradient-to-r from-yellow-300 via-yellow-400 to-amber-400 border-2 border-yellow-500 shadow-lg hover:shadow-xl hover:shadow-yellow-400/50 px-3 py-1 rounded-full">
                                   <svg
@@ -1096,9 +1146,9 @@ const YourAdverts: React.FC = () => {
                         }
                         if (tag === "vip") {
                           return (
-                            <div className="absolute -top-0 left-1/2 -translate-x-1/2 lg:right-4 lg:left-auto lg:translate-x-0 z-30">
+                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 lg:right-14 lg:left-auto lg:translate-x-0 z-30">
                               <div className="relative inline-flex items-center gap-2 px-4 py-2">
-                                <div className="flex items-center gap-1 text-purple-900 font-bold tracking-wide bg-gradient-to-r from-purple-400 via-purple-500 to-purple-600 border-2 border-purple-600 shadow-lg px-3 py-1 rounded-full text-white">
+                                <div className="flex items-center gap-1 font-bold tracking-wide bg-gradient-to-r from-purple-400 via-purple-500 to-purple-600 border-2 border-purple-600 shadow-lg px-3 py-1 rounded-full text-white">
                                   <svg
                                     className="h-3 w-3 filter drop-shadow-sm"
                                     fill="currentColor"
