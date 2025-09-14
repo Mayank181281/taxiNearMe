@@ -288,7 +288,7 @@ const PaymentPage: React.FC = () => {
             Selected Plan: {getPlanDisplayName()}
           </h2>
           <p className="text-2xl font-bold text-blue-600">
-            ${price} / {billingPeriod === "month" ? "Month" : "Day"}
+            Rs. {price} / {billingPeriod === "month" ? "Month" : "Day"}
           </p>
           <p className="text-sm text-orange-600 mt-2">
             ⚡ After payment, your ad will require admin approval before going

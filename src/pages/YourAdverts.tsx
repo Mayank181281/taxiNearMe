@@ -207,9 +207,9 @@ const YourAdverts: React.FC = () => {
         // For VIP and VIP Prime plans, redirect to payment page
         let planPrice = "0";
         if (plan.tag === "vip") {
-          planPrice = billingPeriod === "month" ? "40" : "3";
+          planPrice = billingPeriod === "month" ? "1500" : "100";
         } else if (plan.tag === "vip-prime") {
-          planPrice = billingPeriod === "month" ? "80" : "6";
+          planPrice = billingPeriod === "month" ? "3000" : "200";
         }
 
         let adId = publishingDraft.id!;
@@ -293,7 +293,7 @@ const YourAdverts: React.FC = () => {
                 <div className="bg-sky-500 text-white px-3 py-1 rounded text-sm inline-block mb-2">
                   Free
                 </div>
-                <div className="text-2xl font-bold text-sky-500 mb-1">$0</div>
+                <div className="text-2xl font-bold text-sky-500 mb-1">Rs. 0</div>
                 <div className="text-gray-600 text-sm">/ Forever</div>
                 <div className="text-green-600 text-xs font-medium mt-1">
                   ✓ Publishes Immediately
@@ -349,7 +349,7 @@ const YourAdverts: React.FC = () => {
                   VIP
                 </div>
                 <div className="text-2xl font-bold text-indigo-500 mb-1">
-                  ${billingPeriod === "month" ? "40" : "3"}
+                  Rs. {billingPeriod === "month" ? "1500" : "100"}
                 </div>
                 <div className="text-gray-600 text-sm">
                   / {billingPeriod === "month" ? "Month" : "Day"}
@@ -412,7 +412,7 @@ const YourAdverts: React.FC = () => {
                   VIP Prime
                 </div>
                 <div className="text-2xl font-bold text-orange-600 mb-1">
-                  ${billingPeriod === "month" ? "80" : "6"}
+                  Rs. {billingPeriod === "month" ? "3000" : "200"}
                 </div>
                 <div className="text-gray-600 text-sm">
                   / {billingPeriod === "month" ? "Month" : "Day"}
