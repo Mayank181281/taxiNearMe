@@ -134,7 +134,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
   return (
     <div className="mb-8 max-w-6xl mx-auto px-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      {/* <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
           <Crown className="h-5 w-5 text-yellow-500" />
           VIP Prime Members
@@ -155,7 +155,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
             )}
           </div>
         )}
-      </div>
+      </div> */}
 
       {/* Carousel Container */}
       <div

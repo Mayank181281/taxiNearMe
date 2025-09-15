@@ -363,6 +363,8 @@ const PaymentPage: React.FC = () => {
 
       {/* Payment Form */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h4 className="text-center mb-3 text-red-500 font-semibold">Kindly send the screenshot on what's app to this number</h4>
+        <h3 className="text-center mb-5 text-blue-500 font-extrabold text-xl">123456789</h3>
         <h3 className="text-xl font-semibold text-gray-900 mb-6">
           Payment Verification
         </h3>
