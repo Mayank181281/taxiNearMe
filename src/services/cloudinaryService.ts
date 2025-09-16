@@ -19,18 +19,17 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
         console.log('Applying watermark to image:', file.name);
         fileToUpload = await addWatermarkToImage(file, {
           text: 'TAXI NEAR ME',
-          fontSize: Math.min(file.size / 50000, 48), // Dynamic font size based on file size
-          opacity: 0.25,
+          opacity: 0.6, // Slightly higher opacity for better visibility
           position: 'center',
           color: '#ffffff',
-          angle: -30
+          angle: 0 // Keep horizontal for best readability
         });
         console.log('Watermark applied successfully');
       } else {
         console.log('Image too small for watermark, uploading original');
       }
     } catch (watermarkError) {
-      console.warn('Watermark failed, uploading original image:', watermarkError);
+      console.error('Watermark failed, uploading original image:', watermarkError);
       // Continue with original file if watermarking fails
     }
 

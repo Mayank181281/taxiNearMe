@@ -383,7 +383,16 @@ const PaymentPage: React.FC = () => {
             >
               Payment Mode *
             </label>
-            <select
+            <input 
+  type="text"
+  id="paymentMode"
+  value={paymentMode}
+  onChange={(e) => setPaymentMode(e.target.value)}
+  required
+  placeholder="Enter Payment Mode"
+  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+/>
+            {/* <select 
               id="paymentMode"
               value={paymentMode}
               onChange={(e) => setPaymentMode(e.target.value)}
@@ -396,7 +405,7 @@ const PaymentPage: React.FC = () => {
               <option value="Debit Card">Debit Card</option>
               <option value="Credit Card">Credit Card</option>
               <option value="Other">Other</option>
-            </select>
+            </select> */}
           </div>
 
           <div>

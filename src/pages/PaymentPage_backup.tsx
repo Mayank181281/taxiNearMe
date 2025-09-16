@@ -6,7 +6,7 @@ import {
   getDoc,
   addDoc,
   collection,
-  deleteDoc,
+  deleteDoc, 
 } from "firebase/firestore";
 import { db } from "../config/firebase";
 import { useAuth } from "../contexts/useAuth";
