@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc, Timestamp } from "firebase/firestore";
 import { db } from "../config/firebase";
@@ -34,6 +34,10 @@ const DriverProfile: React.FC = () => {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
+    null
+  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchAdvertisement = async () => {
@@ -50,7 +54,7 @@ const DriverProfile: React.FC = () => {
 
         if (adSnapshot.exists()) {
           const adData = adSnapshot.data();
-          
+
           // Fetch user email from users collection
           let userEmail = "";
           if (adData.userId) {
@@ -65,7 +69,7 @@ const DriverProfile: React.FC = () => {
               console.error("Error fetching user email:", err);
             }
           }
-          
+
           setAdvertisement({
             id: adSnapshot.id,
             ...adData,
@@ -88,6 +92,56 @@ const DriverProfile: React.FC = () => {
   const handleGoBack = () => {
     navigate(-1);
   };
+
+  const openImageModal = useCallback((index: number) => {
+    setSelectedImageIndex(index);
+    setIsModalOpen(true);
+  }, []);
+
+  const closeImageModal = useCallback(() => {
+    setIsModalOpen(false);
+    setSelectedImageIndex(null);
+  }, []);
+
+  const navigateImage = useCallback(
+    (direction: "prev" | "next") => {
+      if (!advertisement?.photoUrls || selectedImageIndex === null) return;
+
+      const totalImages = advertisement.photoUrls.length;
+      if (direction === "prev") {
+        setSelectedImageIndex(
+          selectedImageIndex === 0 ? totalImages - 1 : selectedImageIndex - 1
+        );
+      } else {
+        setSelectedImageIndex(
+          selectedImageIndex === totalImages - 1 ? 0 : selectedImageIndex + 1
+        );
+      }
+    },
+    [advertisement?.photoUrls, selectedImageIndex]
+  );
+
+  // Keyboard navigation for modal
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!isModalOpen) return;
+
+      switch (event.key) {
+        case "Escape":
+          closeImageModal();
+          break;
+        case "ArrowLeft":
+          navigateImage("prev");
+          break;
+        case "ArrowRight":
+          navigateImage("next");
+          break;
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isModalOpen, closeImageModal, navigateImage]);
 
   // Helper function to determine driver tier from ad tag
   const getDriverTier = (): DriverTier => {
@@ -197,7 +251,9 @@ const DriverProfile: React.FC = () => {
               {/* Email button is always shown for all ad types */}
               {advertisement.email && (
                 <a
-                  href={`mailto:${advertisement.email}?subject=Inquiry%20about%20${encodeURIComponent(
+                  href={`mailto:${
+                    advertisement.email
+                  }?subject=Inquiry%20about%20${encodeURIComponent(
                     advertisement.title
                   )}&body=Hi,%20I%20would%20like%20to%20inquire%20about%20your%20taxi%20service.`}
                   className="bg-purple-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2 min-w-[120px] sm:min-w-[140px] flex-1 sm:flex-none"
@@ -210,26 +266,52 @@ const DriverProfile: React.FC = () => {
         </div>
 
         {/* Photos Section - Responsive Grid */}
-            {advertisement.photoUrls && advertisement.photoUrls.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {advertisement.photoUrls.map((imageUrl, index) => (
-                  <div
-                    key={index}
-                    className="aspect-[4/3] sm:aspect-square bg-gray-200 rounded-lg overflow-hidden"
-                  >
-                    <img
-                      src={imageUrl}
-                      alt={`Advertisement photo ${index + 1}`}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
-                    />
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
+          <div className="mb-4">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+              Advertisement Photos
+            </h2>
+          </div>
+
+          {advertisement.photoUrls && advertisement.photoUrls.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {advertisement.photoUrls.map((imageUrl, index) => (
+                <div
+                  key={index}
+                  className="aspect-[4/3] sm:aspect-square bg-gray-200 rounded-lg overflow-hidden cursor-pointer group relative"
+                  onClick={() => openImageModal(index)}
+                >
+                  <img
+                    src={imageUrl}
+                    alt={`Advertisement photo ${index + 1}`}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <svg
+                        className="w-8 h-8 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
+                        />
+                      </svg>
+                    </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-gray-500">No photos available</p>
-              </div>
-            )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500">No photos available</p>
+            </div>
+          )}
+        </div>
 
         {/* Profile Info Section - Responsive Table */}
         <div className="bg-white rounded-lg shadow-lg border border-gray-200 mt-4 sm:mt-6">
@@ -272,7 +354,9 @@ const DriverProfile: React.FC = () => {
                 </div>
                 <div className="text-gray-700 text-sm sm:text-base">
                   <a
-                    href={`mailto:${advertisement.email}?subject=Inquiry%20about%20${encodeURIComponent(
+                    href={`mailto:${
+                      advertisement.email
+                    }?subject=Inquiry%20about%20${encodeURIComponent(
                       advertisement.title
                     )}&body=Hi,%20I%20would%20like%20to%20inquire%20about%20your%20taxi%20service.`}
                     className="text-purple-600 hover:text-purple-800"
@@ -334,6 +418,100 @@ const DriverProfile: React.FC = () => {
             city={advertisement.city}
           />
         </div>
+
+        {/* Full-Screen Image Modal */}
+        {isModalOpen &&
+          selectedImageIndex !== null &&
+          advertisement.photoUrls && (
+            <div className="fixed inset-0 z-50 bg-black bg-opacity-95 flex items-center justify-center">
+              {/* Close Button */}
+              <button
+                onClick={closeImageModal}
+                className="absolute top-4 right-4 z-60 text-white hover:text-gray-300 transition-colors p-2"
+                aria-label="Close modal"
+              >
+                <svg
+                  className="w-8 h-8"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+
+              {/* Previous Button */}
+              {advertisement.photoUrls.length > 1 && (
+                <button
+                  onClick={() => navigateImage("prev")}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 z-60 text-white hover:text-gray-300 transition-colors p-2"
+                  aria-label="Previous image"
+                >
+                  <svg
+                    className="w-10 h-10"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                </button>
+              )}
+
+              {/* Next Button */}
+              {advertisement.photoUrls.length > 1 && (
+                <button
+                  onClick={() => navigateImage("next")}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 z-60 text-white hover:text-gray-300 transition-colors p-2"
+                  aria-label="Next image"
+                >
+                  <svg
+                    className="w-10 h-10"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+              )}
+
+              {/* Main Image Container */}
+              <div
+                className="w-full h-full flex items-center justify-center p-2 sm:p-4"
+                onClick={closeImageModal}
+              >
+                <img
+                  src={advertisement.photoUrls[selectedImageIndex]}
+                  alt={`Advertisement photo ${selectedImageIndex + 1}`}
+                  className="w-[95vw] h-[95vh] object-contain shadow-2xl"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </div>
+
+              {/* Image Counter */}
+              {advertisement.photoUrls.length > 1 && (
+                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-full text-sm font-medium">
+                  {selectedImageIndex + 1} / {advertisement.photoUrls.length}
+                </div>
+              )}
+            </div>
+          )}
       </div>
     </div>
   );
