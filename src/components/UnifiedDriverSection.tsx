@@ -195,16 +195,10 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
   const getPremiumBadge = (ad: Advertisement) => {
     if (ad.tag === "vip-prime") {
       return (
-        <div className="absolute -top-0 left-1/2 -translate-x-1/2 lg:left-auto lg:translate-x-0 lg:right-4 z-30">
-          <div className="relative inline-flex items-center gap-2 px-4 py-2">
-            <Crown
-              className="h-5 w-5 text-yellow-800"
-              style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))" }}
-            />
-            <span
-              className="text-yellow-900 font-serif font-bold text-sm uppercase tracking-wider"
-              style={{ textShadow: "0 1px 2px rgba(255,255,255,0.5)" }}
-            >
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-30 lg:right-10 lg:left-auto lg:translate-x-0">
+          <div className="bg-gradient-to-r from-yellow-100 via-yellow-200 to-yellow-100 px-4 py-1 rounded-full shadow-md flex items-center gap-2 border border-yellow-300">
+            <Crown className="h-5 w-5 text-yellow-800" />
+            <span className="text-yellow-900 font-serif font-bold text-sm uppercase tracking-wider">
               VIP Prime
             </span>
           </div>
@@ -214,17 +208,18 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
 
     if (ad.tag === "vip") {
       return (
-        <div className="absolute -top-0 left-1/2 -translate-x-1/2 lg:left-auto lg:translate-x-0 lg:right-10 z-30">
-          <div className="relative inline-flex items-center gap-2 px-4 py-2">
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-30 lg:right-16 lg:left-auto lg:translate-x-0">
+          <div className="bg-white px-4 py-1 rounded-full shadow-md flex items-center gap-2 border border-indigo-800">
             <Shield
               className="h-5 w-5 text-indigo-800"
               style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))" }}
-            />
+            />{" "}
             <span
               className="text-indigo-900 font-serif font-bold text-sm uppercase tracking-wider"
               style={{ textShadow: "0 1px 2px rgba(255,255,255,0.5)" }}
             >
-              VIP
+              {" "}
+              VIP{" "}
             </span>
           </div>
         </div>
@@ -232,17 +227,18 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
     }
 
     return (
-      <div className="absolute -top-0 left-1/2 -translate-x-1/2 lg:left-auto lg:translate-x-0 lg:right-6 z-30">
-        <div className="relative inline-flex items-center gap-2 px-4 py-2">
+      <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-30 lg:right-16 lg:left-auto lg:translate-x-0">
+        <div className="bg-white px-4 py-1 rounded-full shadow-md flex items-center gap-2 border border-sky-400">
           <Star
-            className="h-5 w-5 text-gray-800"
+            className="h-5 w-5 text-sky-600"
             style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.3))" }}
-          />
+          />{" "}
           <span
-            className="text-gray-900 font-serif font-bold text-sm uppercase tracking-wider"
+            className="text-sky-600 font-serif font-bold text-sm uppercase tracking-wider"
             style={{ textShadow: "0 1px 2px rgba(255,255,255,0.5)" }}
           >
-            FREE
+            {" "}
+            Free{" "}
           </span>
         </div>
       </div>
@@ -270,15 +266,18 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                       ? {
                           background:
                             "linear-gradient(145deg, #ffffff 0%, #fefce8 100%)",
+                          borderColor: "#fbbf24",
                         }
                       : ad.tag === "vip"
                       ? {
                           background:
                             "linear-gradient(145deg, #ffffff 0%, #faf5ff 100%)",
+                          borderColor: "#8b5cf6",
                         }
                       : {
                           background:
                             "linear-gradient(145deg, #ffffff 0%, #f0f9ff 100%)",
+                          borderColor: "#38bdf8",
                         }
                   }
                 >
@@ -375,66 +374,80 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                         </div>
                       </div>
 
-                      {/* Action Buttons without hover effects */}
-                      <div className="flex flex-col gap-3 min-w-[160px]">
-                        <a
-                          href={`https://wa.me/${ad.phoneNumber.replace(
-                            /[^0-9]/g,
-                            ""
-                          )}?text=Hi,%20I%20would%20like%20to%20book%20your%20${
-                            ad.tag === "vip-prime"
-                              ? "VIP Prime luxury"
-                              : ad.tag === "vip"
-                              ? "VIP premium"
-                              : "FREE"
-                          } taxi%20service.`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 relative z-10 ${
-                            ad.tag === "vip-prime"
-                              ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg"
-                              : ad.tag === "vip"
-                              ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md"
-                              : "bg-green-500 text-white shadow-md"
-                          }`}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <MessageCircle size={20} />
-                          WhatsApp
-                        </a>
+                      {/* Action Buttons */}
+                      {ad.tag !== "free" ? (
+                        // VIP & VIP Prime → WhatsApp + Contact + View AD
+                        <div className="flex flex-col gap-3 min-w-[160px]">
+                          {/* WhatsApp */}
+                          <a
+                            href={`https://wa.me/${ad.phoneNumber.replace(
+                              /[^0-9]/g,
+                              ""
+                            )}?text=Hi,%20I%20would%20like%20to%20book%20your%20${
+                              ad.tag === "vip-prime"
+                                ? "VIP Prime luxury"
+                                : ad.tag === "vip"
+                                ? "VIP premium"
+                                : "FREE"
+                            } taxi%20service.`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 relative z-10 ${
+                              ad.tag === "vip-prime"
+                                ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg"
+                                : "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md"
+                            }`}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <MessageCircle size={20} />
+                            WhatsApp
+                          </a>
 
-                        <a
-                          href={`tel:${ad.phoneNumber}`}
-                          className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 relative z-10 ${
-                            ad.tag === "vip-prime"
-                              ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg"
-                              : ad.tag === "vip"
-                              ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
-                              : "bg-blue-500 text-white shadow-md"
-                          }`}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Phone size={20} />
-                          Contact
-                        </a>
+                          {/* Contact */}
+                          <a
+                            href={`tel:${ad.phoneNumber}`}
+                            className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 relative z-10 ${
+                              ad.tag === "vip-prime"
+                                ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg"
+                                : "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
+                            }`}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Phone size={20} />
+                            Contact
+                          </a>
 
-                        <div
-                          className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 cursor-pointer ${
-                            ad.tag === "vip-prime"
-                              ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg"
-                              : ad.tag === "vip"
-                              ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-md"
-                              : "bg-teal-500 text-white shadow-md"
-                          }`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/driver/${ad.id}`);
-                          }}
-                        >
-                          <span>👤</span>
-                          View AD
+                          {/* View AD */}
+                          <div
+                            className={`w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 cursor-pointer ${
+                              ad.tag === "vip-prime"
+                                ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-lg"
+                                : "bg-gradient-to-r from-teal-500 to-teal-600 text-white shadow-md"
+                            }`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/driver/${ad.id}`);
+                            }}
+                          >
+                            <span>👤</span>
+                            View AD
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        // FREE ads → Column layout for md and sm, centered for lg+
+                        <div className="flex flex-col md:flex-col lg:flex lg:items-center lg:justify-center gap-3 min-w-[160px] lg:self-stretch">
+                          <div
+                            className="w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 cursor-pointer bg-teal-500 text-white shadow-md"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/driver/${ad.id}`);
+                            }}
+                          >
+                            <span>👤</span>
+                            View AD
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

@@ -46,12 +46,10 @@ const SimilarProfiles: React.FC<SimilarProfilesProps> = ({
       try {
         setLoading(true);
 
-        // Query ads from the same city, excluding current ad
         const cityQuery = query(
           collection(db, "adData"),
           where("city", "==", city),
           where("approved", "==", true)
-          // Include both "published" and "approved" status ads
         );
 
         const querySnapshot = await getDocs(cityQuery);
@@ -59,7 +57,6 @@ const SimilarProfiles: React.FC<SimilarProfilesProps> = ({
 
         querySnapshot.forEach((doc) => {
           const data = doc.data();
-          // Exclude the current ad
           if (doc.id !== currentDriverId) {
             ads.push({
               id: doc.id,
@@ -68,17 +65,15 @@ const SimilarProfiles: React.FC<SimilarProfilesProps> = ({
           }
         });
 
-        // Sort by priority: VIP Prime (1), VIP (2), Free (3)
         ads.sort((a, b) => {
           const getPriority = (tag: string) => {
             if (tag === "vip-prime") return 1;
             if (tag === "vip") return 2;
-            return 3; // free
+            return 3;
           };
           return getPriority(a.tag) - getPriority(b.tag);
         });
 
-        // Limit to 2 ads
         setSimilarAds(ads.slice(0, 2));
       } catch (error) {
         console.error("Error fetching similar ads:", error);
@@ -95,7 +90,6 @@ const SimilarProfiles: React.FC<SimilarProfilesProps> = ({
     }
   }, [city, currentDriverId]);
 
-  // Show loading state
   if (loading) {
     return (
       <div>
@@ -130,6 +124,7 @@ const SimilarProfiles: React.FC<SimilarProfilesProps> = ({
   if (similarAds.length === 0) {
     return null;
   }
+
   return (
     <div>
       {/* Header */}
@@ -137,14 +132,14 @@ const SimilarProfiles: React.FC<SimilarProfilesProps> = ({
         <h2 className="text-lg font-semibold text-gray-900">Similar Listing</h2>
       </div>
 
-      {/* Ad Cards - 2 Cards Side by Side */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* Ad Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-40">
         {similarAds.map((ad) => (
           <div
             key={ad.id}
             className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden flex"
           >
-            {/* Ad Photo - Left Side */}
+            {/* Ad Photo */}
             <div className="relative w-32 flex-shrink-0">
               {ad.photoUrls && ad.photoUrls.length > 0 ? (
                 <img
@@ -169,21 +164,18 @@ const SimilarProfiles: React.FC<SimilarProfilesProps> = ({
                   </svg>
                 </div>
               )}
-
-              {/* Title Badge at Bottom */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent">
-                <div className="p-2">
-                  <h3 className="text-white font-semibold text-xs truncate">
-                    {ad.title.length > 20
-                      ? ad.title.substring(0, 20) + "..."
-                      : ad.title}
-                  </h3>
-                </div>
-              </div>
             </div>
 
-            {/* Ad Description - Right Side */}
+            {/* Ad Details */}
             <div className="p-3 flex-1 flex flex-col justify-between">
+              {/* Title */}
+              <h3 className="font-bold text-lg text-gray-900">
+                {ad.title.length > 40
+                  ? ad.title.substring(0, 40) + "..."
+                  : ad.title}
+              </h3>
+
+              {/* Description */}
               <div className="mb-3">
                 <p className="text-xs text-gray-700 leading-relaxed">
                   {ad.description.length > 80

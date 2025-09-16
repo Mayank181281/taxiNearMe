@@ -34,11 +34,10 @@ const WatermarkDemo: React.FC<WatermarkDemoProps> = ({ className = '' }) => {
         // Apply watermark
         const watermarkedFile = await addWatermarkToImage(file, {
           text: 'TAXI NEAR ME',
-          fontSize: 32,
-          opacity: 0.25,
+          opacity: 0.6,
           position: 'center',
           color: '#ffffff',
-          angle: -30
+          angle: 0
         });
 
         // Show watermarked image
@@ -49,7 +48,7 @@ const WatermarkDemo: React.FC<WatermarkDemoProps> = ({ className = '' }) => {
         };
         watermarkedReader.readAsDataURL(watermarkedFile);
       } else {
-        alert('Image is too small for watermark demonstration. Please select a larger image (minimum 300x300 pixels).');
+        alert('Image is too small for watermark demonstration. Please select a larger image (minimum 100x100 pixels).');
         setIsProcessing(false);
       }
     } catch (error) {

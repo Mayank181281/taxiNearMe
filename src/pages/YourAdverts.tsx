@@ -6,6 +6,7 @@ import {
   Advertisement,
   publishDraftAdvertisement,
   deleteAdvertisement,
+  getUserAdsSummary,
 } from "../services/advertisementService";
 import { useAdDisplayExpiration } from "../hooks/useAutoExpiration";
 
@@ -31,6 +32,13 @@ const YourAdverts: React.FC = () => {
   const [billingPeriod, setBillingPeriod] = useState<"month" | "day">("day");
   const [deletingAd, setDeletingAd] = useState<Advertisement | null>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [adsSummary, setAdsSummary] = useState<{
+    totalAds: number;
+    canPostMore: boolean;
+  }>({
+    totalAds: 0,
+    canPostMore: true,
+  });
 
   // Helper function to check if an ad can be upgraded
   const canAdBeUpgraded = (ad: Advertisement): boolean => {
@@ -49,33 +57,32 @@ const YourAdverts: React.FC = () => {
       const userId = firebaseUser?.uid;
       const userEmail = user?.email;
 
-      if (!userId) {
-        return;
-      }
-
-      if (!userEmail) {
+      if (!userId || !userEmail) {
         return;
       }
 
       try {
         if (force) setLoading(true);
-        console.log("� Current user ID:", userId);
-        console.log("🔍 Current user object:", user);
-        console.log("�🔄 Fetching user advertisements...");
-        console.log("🔍 About to call debugUserAds...");
-        console.log("User ID:", userId);
-        console.log("User Email:", userEmail);
 
+        // Get ads summary for post limit check
+        const summary = await getUserAdsSummary(userId);
+        if (summary) {
+          setAdsSummary({
+            totalAds: summary.totalAds,
+            canPostMore: summary.canPostMore,
+          });
+        }
+
+        // Fetch user's ads
         const userAds = await getUserAdvertisements(userId);
-
         setAds(userAds);
       } catch (error) {
-        console.error("Error fetching advertisements:", error);
+        console.error("Error fetching data:", error);
       } finally {
         if (force) setLoading(false);
       }
     },
-    [user, firebaseUser]
+    [firebaseUser, user]
   );
 
   // Fetch user's advertisements from Firebase
@@ -200,9 +207,9 @@ const YourAdverts: React.FC = () => {
         // For VIP and VIP Prime plans, redirect to payment page
         let planPrice = "0";
         if (plan.tag === "vip") {
-          planPrice = billingPeriod === "month" ? "40" : "3";
+          planPrice = billingPeriod === "month" ? "1500" : "100";
         } else if (plan.tag === "vip-prime") {
-          planPrice = billingPeriod === "month" ? "80" : "6";
+          planPrice = billingPeriod === "month" ? "3000" : "200";
         }
 
         let adId = publishingDraft.id!;
@@ -281,12 +288,12 @@ const YourAdverts: React.FC = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6 flex-1 min-h-0">
             {/* Free Plan */}
-            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+            <div className="border border-sky-400 rounded-lg p-4 bg-[linear-gradient(145deg,_#ffffff_0%,_#f0f9ff_100%)]">
               <div className="text-center mb-3">
-                <div className="bg-gray-500 text-white px-3 py-1 rounded text-sm inline-block mb-2">
+                <div className="bg-sky-500 text-white px-3 py-1 rounded text-sm inline-block mb-2">
                   Free
                 </div>
-                <div className="text-2xl font-bold text-gray-600 mb-1">$0</div>
+                <div className="text-2xl font-bold text-sky-500 mb-1">Rs. 0</div>
                 <div className="text-gray-600 text-sm">/ Forever</div>
                 <div className="text-green-600 text-xs font-medium mt-1">
                   ✓ Publishes Immediately
@@ -295,25 +302,25 @@ const YourAdverts: React.FC = () => {
 
               <div className="space-y-2 mb-4">
                 <div className="flex items-center text-sm">
-                  <div className="w-2 h-2 bg-gray-500 rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-sky-500 rounded-full mr-3"></div>
                   <span>
                     <strong>Placement:</strong> Basic Listings
                   </span>
                 </div>
                 <div className="flex items-center text-sm">
-                  <div className="w-2 h-2 bg-gray-500 rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-sky-500 rounded-full mr-3"></div>
                   <span>
                     <strong>Highlight:</strong> Standard Ad Card Display
                   </span>
                 </div>
                 <div className="flex items-center text-sm">
-                  <div className="w-2 h-2 bg-gray-500 rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-sky-500 rounded-full mr-3"></div>
                   <span>
                     <strong>Exposure:</strong> Standard Visibility
                   </span>
                 </div>
                 <div className="flex items-center text-sm">
-                  <div className="w-2 h-2 bg-gray-500 rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-sky-500 rounded-full mr-3"></div>
                   <span>
                     <strong>Duration:</strong> No Time Limit
                   </span>
@@ -329,45 +336,45 @@ const YourAdverts: React.FC = () => {
                   })
                 }
                 disabled={loading}
-                className="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-sky-500 text-white py-2 rounded-lg hover:bg-sky-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Publishing..." : "Publish Free Ad"}
               </button>
             </div>
 
             {/* VIP Plan */}
-            <div className="border border-blue-200 rounded-lg p-4 bg-blue-50">
+            <div className="border border-indigo-500 rounded-lg p-4 bg-[linear-gradient(145deg,_#ffffff_0%,_#faf5ff_100%)]">
               <div className="text-center mb-3">
-                <div className="bg-blue-500 text-white px-3 py-1 rounded text-sm inline-block mb-2">
+                <div className="bg-indigo-500 text-white px-3 py-1 rounded text-sm inline-block mb-2">
                   VIP
                 </div>
-                <div className="text-2xl font-bold text-blue-600 mb-1">
-                  ${billingPeriod === "month" ? "40" : "3"}
+                <div className="text-2xl font-bold text-indigo-500 mb-1">
+                  Rs. {billingPeriod === "month" ? "1500" : "100"}
                 </div>
                 <div className="text-gray-600 text-sm">
                   / {billingPeriod === "month" ? "Month" : "Day"}
                 </div>
-                <div className="text-blue-600 text-xs font-medium mt-1">
+                <div className="text-indigo-500 text-xs font-medium mt-1">
                   💳 Payment Required
                 </div>
               </div>
 
               <div className="space-y-2 mb-4">
                 <div className="flex items-center text-sm">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
                   <span>
                     <strong>Placement:</strong> Appears In Top Listings
                   </span>
                 </div>
                 <div className="flex items-center text-sm">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
                   <span>
                     <strong>Highlight:</strong> Driver Ad Card Is Marked With A
                     VIP Tag/Badge
                   </span>
                 </div>
                 <div className="flex items-center text-sm">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
                   <span>
                     <strong>Exposure:</strong> 3X More Visibility Than
                     Free/Normal Ads
@@ -375,7 +382,7 @@ const YourAdverts: React.FC = () => {
                 </div>
                 {billingPeriod === "day" && (
                   <div className="flex items-center text-sm">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                    <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
                     <span>
                       <strong>Duration:</strong> 24-hour premium exposure
                     </span>
@@ -392,20 +399,20 @@ const YourAdverts: React.FC = () => {
                   })
                 }
                 disabled={loading}
-                className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-600 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Processing..." : "Proceed to Payment"}
               </button>
             </div>
 
             {/* VIP Prime Plan */}
-            <div className="border border-orange-200 rounded-lg p-4 bg-orange-50">
+            <div className="border border-amber-400 rounded-lg p-4 bg-[linear-gradient(145deg,#ffffff_0%,#fefce8_100%)]">
               <div className="text-center mb-3">
                 <div className="bg-orange-500 text-white px-3 py-1 rounded text-sm inline-block mb-2">
                   VIP Prime
                 </div>
                 <div className="text-2xl font-bold text-orange-600 mb-1">
-                  ${billingPeriod === "month" ? "80" : "6"}
+                  Rs. {billingPeriod === "month" ? "3000" : "200"}
                 </div>
                 <div className="text-gray-600 text-sm">
                   / {billingPeriod === "month" ? "Month" : "Day"}
@@ -560,30 +567,73 @@ const YourAdverts: React.FC = () => {
       </div>
 
       {/* Refresh Button */}
-      <div className="mb-6 flex justify-between items-center">
+      <div className="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
         <h1 className="text-2xl font-bold text-gray-900">
           Your Advertisements
         </h1>
-        <button
-          onClick={() => fetchAds(true)}
-          disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        <div className="flex flex-wrap items-center gap-4">
+          {/* Post New Ad Button */}
+          {adsSummary?.canPostMore ? (
+            <Link
+              to="/profile/post-ads"
+              className="inline-flex items-center px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
+            >
+              <svg
+                className="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Post New Ad
+            </Link>
+          ) : (
+            <div className="inline-flex items-center px-6 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed font-medium">
+              <svg
+                className="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636"
+                />
+              </svg>
+              Ad Limit Reached (10/10)
+            </div>
+          )}
+
+          {/* Refresh Button */}
+          <button
+            onClick={() => fetchAds(true)}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-            />
-          </svg>
-          {loading ? "Refreshing..." : "Refresh"}
-        </button>
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            {loading ? "Refreshing..." : "Refresh"}
+          </button>
+        </div>
       </div>
 
       <div className="space-y-6">
@@ -1072,7 +1122,7 @@ const YourAdverts: React.FC = () => {
                       const getPremiumBadge = (tag: string) => {
                         if (tag === "vip-prime") {
                           return (
-                            <div className="absolute -top-0 left-1/2 -translate-x-1/2 lg:right-4 lg:left-auto lg:translate-x-0 z-30">
+                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 lg:right-8 lg:left-auto lg:translate-x-0 z-30">
                               <div className="relative inline-flex items-center gap-2 px-4 py-2">
                                 <div className="flex items-center gap-1 text-yellow-900 font-black tracking-wider transition-all duration-300 bg-gradient-to-r from-yellow-300 via-yellow-400 to-amber-400 border-2 border-yellow-500 shadow-lg hover:shadow-xl hover:shadow-yellow-400/50 px-3 py-1 rounded-full">
                                   <svg
@@ -1096,9 +1146,9 @@ const YourAdverts: React.FC = () => {
                         }
                         if (tag === "vip") {
                           return (
-                            <div className="absolute -top-0 left-1/2 -translate-x-1/2 lg:right-4 lg:left-auto lg:translate-x-0 z-30">
+                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 lg:right-14 lg:left-auto lg:translate-x-0 z-30">
                               <div className="relative inline-flex items-center gap-2 px-4 py-2">
-                                <div className="flex items-center gap-1 text-purple-900 font-bold tracking-wide bg-gradient-to-r from-purple-400 via-purple-500 to-purple-600 border-2 border-purple-600 shadow-lg px-3 py-1 rounded-full text-white">
+                                <div className="flex items-center gap-1 font-bold tracking-wide bg-gradient-to-r from-purple-400 via-purple-500 to-purple-600 border-2 border-purple-600 shadow-lg px-3 py-1 rounded-full text-white">
                                   <svg
                                     className="h-3 w-3 filter drop-shadow-sm"
                                     fill="currentColor"

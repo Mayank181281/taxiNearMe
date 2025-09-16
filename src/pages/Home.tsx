@@ -24,13 +24,17 @@ const Home: React.FC = () => {
   const featuredCities = getAllCities();
 
   const handleCityClick = (city: string) => {
-    navigate(`/search?city=${encodeURIComponent(city)}`);
+    const category = selectedCategory || 'taxi';
+    const formattedCategory = category.toLowerCase().replace(/\s+/g, '-');
+    navigate(`/${formattedCategory}/${encodeURIComponent(city.toLowerCase())}`);
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchCity.trim()) {
-      navigate(`/search?city=${encodeURIComponent(searchCity.trim())}`);
+      const category = selectedCategory || 'taxi';
+      const formattedCategory = category.toLowerCase().replace(/\s+/g, '-');
+      navigate(`/${formattedCategory}/${encodeURIComponent(searchCity.trim().toLowerCase())}`);
     }
   };
 
@@ -38,7 +42,9 @@ const Home: React.FC = () => {
     e.preventDefault();
     if (selectedCity || selectedState) {
       const searchQuery = selectedCity || selectedState;
-      navigate(`/search?city=${encodeURIComponent(searchQuery)}`);
+      const category = selectedCategory || 'taxi';
+      const formattedCategory = category.toLowerCase().replace(/\s+/g, '-');
+      navigate(`/${formattedCategory}/${encodeURIComponent(searchQuery.toLowerCase())}`);
     }
   };
 
@@ -228,43 +234,77 @@ const Home: React.FC = () => {
               filteredCities.map((city, index) => (
                 <div
                   key={index}
-                  className="relative"
+                  className="relative flex flex-col items-center"
                   onMouseEnter={() => setHoveredCity(city)}
                   onMouseLeave={() => setHoveredCity(null)}
                 >
-                  <button
-                    onClick={() => handleCityClick(city)}
-                    className="w-full bg-blue-400 hover:bg-blue-500 text-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-full font-medium transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
-                  >
-                    {city}
-                  </button>
+                  {/* --- Mobile: Always visible --- */}
+                  <div className="block md:hidden w-full space-y-2">
+                    {/* Taxi Top */}
+                    <button
+                      onClick={() => handleCityClick(city)}
+                      className="w-full px-4 py-2.5 bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors rounded-full shadow-md border border-blue-200 text-sm"
+                    >
+                      <span className="font-medium">Taxi</span>
+                      <span className="text-blue-600 ml-1">- {city}</span>
+                    </button>
 
-                  {/* Hover Dropdown */}
-                  {hoveredCity === city && (
-                    <>
-                      {/* Top Option */}
-                      <div className="absolute bottom-full left-0 right-0 z-10">
-                        <button
-                          onClick={() => handleCityClick(city)}
-                          className="w-full px-4 py-2.5 bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors rounded-full shadow-lg border border-blue-200 text-sm"
-                        >
-                          <span className="font-medium">Taxi</span>
-                          <span className="text-blue-600 ml-1">- {city}</span>
-                        </button>
-                      </div>
+                    {/* City Middle */}
+                    <button
+                      onClick={() => handleCityClick(city)}
+                      className="w-full bg-blue-400 hover:bg-blue-500 text-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-full font-medium transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
+                    >
+                      {city}
+                    </button>
 
-                      {/* Bottom Option */}
-                      <div className="absolute top-full left-0 right-0 z-10">
-                        <button
-                          onClick={() => handleCityClick(city)}
-                          className="w-full px-4 py-2.5 bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors rounded-full shadow-lg border border-blue-200 text-sm"
-                        >
-                          <span className="font-medium">Tour and Travels</span>
-                          <span className="text-blue-600 ml-1">- {city}</span>
-                        </button>
-                      </div>
-                    </>
-                  )}
+                    {/* Tour Bottom */}
+                    <button
+                      onClick={() => handleCityClick(city)}
+                      className="w-full px-4 py-2.5 bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors rounded-full shadow-md border border-blue-200 text-sm"
+                    >
+                      <span className="font-medium">Tour and Travels</span>
+                      <span className="text-blue-600 ml-1">- {city}</span>
+                    </button>
+                  </div>
+
+                  {/* --- Desktop: Hover behavior --- */}
+                  <div className="hidden md:block w-full relative">
+                    {/* Main City Button */}
+                    <button
+                      onClick={() => handleCityClick(city)}
+                      className="w-full bg-blue-400 hover:bg-blue-500 text-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-full font-medium transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
+                    >
+                      {city}
+                    </button>
+
+                    {hoveredCity === city && (
+                      <>
+                        {/* Taxi Top */}
+                        <div className="absolute bottom-full left-0 right-0 z-10">
+                          <button
+                            onClick={() => handleCityClick(city)}
+                            className="w-full px-4 py-2.5 bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors rounded-full shadow-lg border border-blue-200 text-sm"
+                          >
+                            <span className="font-medium">Taxi</span>
+                            <span className="text-blue-600 ml-1">- {city}</span>
+                          </button>
+                        </div>
+
+                        {/* Tour Bottom */}
+                        <div className="absolute top-full left-0 right-0 z-10">
+                          <button
+                            onClick={() => handleCityClick(city)}
+                            className="w-full px-4 py-2.5 bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors rounded-full shadow-lg border border-blue-200 text-sm"
+                          >
+                            <span className="font-medium">
+                              Tour and Travels
+                            </span>
+                            <span className="text-blue-600 ml-1">- {city}</span>
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               ))
             ) : (

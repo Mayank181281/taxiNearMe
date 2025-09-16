@@ -288,7 +288,7 @@ const PaymentPage: React.FC = () => {
             Selected Plan: {getPlanDisplayName()}
           </h2>
           <p className="text-2xl font-bold text-blue-600">
-            ${price} / {billingPeriod === "month" ? "Month" : "Day"}
+            Rs. {price} / {billingPeriod === "month" ? "Month" : "Day"}
           </p>
           <p className="text-sm text-orange-600 mt-2">
             ⚡ After payment, your ad will require admin approval before going
@@ -363,6 +363,8 @@ const PaymentPage: React.FC = () => {
 
       {/* Payment Form */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h4 className="text-center mb-3 text-red-500 font-semibold">Kindly send the screenshot on what's app to this number</h4>
+        <h3 className="text-center mb-5 text-blue-500 font-extrabold text-xl">123456789</h3>
         <h3 className="text-xl font-semibold text-gray-900 mb-6">
           Payment Verification
         </h3>
@@ -381,7 +383,16 @@ const PaymentPage: React.FC = () => {
             >
               Payment Mode *
             </label>
-            <select
+            <input 
+  type="text"
+  id="paymentMode"
+  value={paymentMode}
+  onChange={(e) => setPaymentMode(e.target.value)}
+  required
+  placeholder="Enter Payment Mode"
+  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+/>
+            {/* <select 
               id="paymentMode"
               value={paymentMode}
               onChange={(e) => setPaymentMode(e.target.value)}
@@ -394,7 +405,7 @@ const PaymentPage: React.FC = () => {
               <option value="Debit Card">Debit Card</option>
               <option value="Credit Card">Credit Card</option>
               <option value="Other">Other</option>
-            </select>
+            </select> */}
           </div>
 
           <div>

@@ -217,6 +217,35 @@ export const rejectAdvertisement = async (adId: string): Promise<void> => {
 };
 
 /**
+ * Update advertisement details (NEW FUNCTION)
+ */
+export const updateAdvertisement = async (
+  adId: string,
+  updateData: {
+    customerEmail: string;
+    title: string;
+    description: string;
+  }
+): Promise<void> => {
+  try {
+    const adRef = doc(db, "adData", adId);
+    await updateDoc(adRef, {
+      // Update the main advertisement fields
+      title: updateData.title,
+      description: updateData.description,
+      email: updateData.customerEmail, // Update the email field in the ad document
+      // Add timestamp for tracking
+      updatedAt: new Date(),
+      lastModifiedBy: "admin", // Optional: track who made the change
+    });
+    console.log(`Advertisement ${adId} updated successfully`);
+  } catch (error) {
+    console.error("Error updating advertisement:", error);
+    throw error;
+  }
+};
+
+/**
  * Get advertisements by status for filtering
  */
 export const getAdvertisementsByStatus = async (

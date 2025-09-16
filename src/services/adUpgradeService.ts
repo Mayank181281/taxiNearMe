@@ -86,12 +86,12 @@ export const wasAdDowngraded = (ad: Advertisement): boolean => {
 export const getUpgradePricing = () => {
   return {
     vip: {
-      daily: { price: 50, duration: 1 },
-      monthly: { price: 1200, duration: 30 },
+      daily: { price: 100, duration: 1 },
+      monthly: { price: 1500, duration: 30 },
     },
     "vip-prime": {
-      daily: { price: 100, duration: 1 },
-      monthly: { price: 2400, duration: 30 },
+      daily: { price: 200, duration: 1 },
+      monthly: { price: 3000, duration: 30 },
     },
   };
 };

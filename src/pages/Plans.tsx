@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import WatermarkDemo from '../components/WatermarkDemo';
+import WatermarkDemo from "../components/WatermarkDemo";
 
 const Plans: React.FC = () => {
   const [billingPeriod, setBillingPeriod] = useState<"month" | "day">("month");
@@ -49,7 +49,7 @@ const Plans: React.FC = () => {
             <div className="bg-gray-500 text-white px-4 py-2 rounded-lg text-sm font-medium inline-block mb-4">
               Free
             </div>
-            <div className="text-4xl font-bold text-gray-600 mb-2">$0</div>
+            <div className="text-4xl font-bold text-gray-600 mb-2">Rs. 0</div>
             <div className="text-gray-600">/ Forever</div>
           </div>
 
@@ -84,9 +84,9 @@ const Plans: React.FC = () => {
             </div>
           </div>
 
-          <button className="w-full bg-gray-500 text-white py-3 rounded-lg font-medium hover:bg-gray-600 transition-colors">
+          {/* <button className="w-full bg-gray-500 text-white py-3 rounded-lg font-medium hover:bg-gray-600 transition-colors">
             Current Plan
-          </button>
+          </button> */}
         </div>
 
         {/* VIP Plan */}
@@ -96,7 +96,7 @@ const Plans: React.FC = () => {
               VIP
             </div>
             <div className="text-4xl font-bold text-blue-600 mb-2">
-              ${billingPeriod === "month" ? "40" : "3"}
+              Rs. {billingPeriod === "month" ? "1500" : "100"}
             </div>
             <div className="text-gray-600">
               / {billingPeriod === "month" ? "Month" : "Day"}
@@ -140,9 +140,9 @@ const Plans: React.FC = () => {
             )}
           </div>
 
-          <button className="w-full bg-blue-500 text-white py-3 rounded-lg font-medium hover:bg-blue-600 transition-colors">
+          {/* <button className="w-full bg-blue-500 text-white py-3 rounded-lg font-medium hover:bg-blue-600 transition-colors">
             Select Plan
-          </button>
+          </button> */}
         </div>
 
         {/* VIP Prime Plan */}
@@ -155,11 +155,11 @@ const Plans: React.FC = () => {
           </div>
 
           <div className="text-center mb-6 mt-4">
-            <div className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-medium inline-block mb-4">
+            <div className="bg-[linear-gradient(145deg,#ffffff_0%,#fefce8_100%)] text-white px-4 py-2 rounded-lg text-sm font-medium inline-block mb-4">
               VIP Prime
             </div>
             <div className="text-4xl font-bold text-orange-600 mb-2">
-              ${billingPeriod === "month" ? "80" : "6"}
+              Rs. {billingPeriod === "month" ? "3000" : "200"}
             </div>
             <div className="text-gray-600">
               / {billingPeriod === "month" ? "Month" : "Day"}
@@ -215,9 +215,9 @@ const Plans: React.FC = () => {
             )}
           </div>
 
-          <button className="w-full bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition-colors">
+          {/* <button className="w-full bg-orange-500 text-white py-3 rounded-lg font-medium hover:bg-orange-600 transition-colors">
             Select Plan
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -386,10 +386,11 @@ const Plans: React.FC = () => {
             Automatic Image Protection
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            All your advertisement images are automatically protected with our subtle watermark technology for brand authenticity and security.
+            All your advertisement images are automatically protected with our
+            subtle watermark technology for brand authenticity and security.
           </p>
         </div>
-        
+
         <WatermarkDemo />
       </div>
     </div>

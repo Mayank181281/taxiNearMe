@@ -170,25 +170,31 @@ const DriverProfile: React.FC = () => {
 
             {/* Action Buttons - Responsive */}
             <div className="flex flex-row sm:flex-col gap-3 justify-center lg:justify-start">
-              <a
-                href={`https://wa.me/${advertisement.phoneNumber.replace(
-                  /[^0-9]/g,
-                  ""
-                )}?text=Hi%20${encodeURIComponent(
-                  advertisement.title
-                )},%20I%20would%20like%20to%20book%20your%20taxi%20service.`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-green-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 transition-colors flex items-center justify-center space-x-2 min-w-[120px] sm:min-w-[140px] flex-1 sm:flex-none"
-              >
-                <span>WhatsApp</span>
-              </a>
-              <a
-                href={`tel:${advertisement.phoneNumber}`}
-                className="bg-blue-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 min-w-[120px] sm:min-w-[140px] flex-1 sm:flex-none"
-              >
-                <span>Contact</span>
-              </a>
+              {/* Only show WhatsApp and Contact buttons for VIP and VIP Prime ads */}
+              {advertisement.tag !== "free" && (
+                <>
+                  <a
+                    href={`https://wa.me/${advertisement.phoneNumber.replace(
+                      /[^0-9]/g,
+                      ""
+                    )}?text=Hi%20${encodeURIComponent(
+                      advertisement.title
+                    )},%20I%20would%20like%20to%20book%20your%20taxi%20service.`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-green-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 transition-colors flex items-center justify-center space-x-2 min-w-[120px] sm:min-w-[140px] flex-1 sm:flex-none"
+                  >
+                    <span>WhatsApp</span>
+                  </a>
+                  <a
+                    href={`tel:${advertisement.phoneNumber}`}
+                    className="bg-blue-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 min-w-[120px] sm:min-w-[140px] flex-1 sm:flex-none"
+                  >
+                    <span>Contact</span>
+                  </a>
+                </>
+              )}
+              {/* Email button is always shown for all ad types */}
               {advertisement.email && (
                 <a
                   href={`mailto:${advertisement.email}?subject=Inquiry%20about%20${encodeURIComponent(
@@ -204,14 +210,6 @@ const DriverProfile: React.FC = () => {
         </div>
 
         {/* Photos Section - Responsive Grid */}
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200 mb-4 sm:mb-6">
-          <div className="p-4 sm:p-6 border-b border-gray-200">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900">
-              Photos
-            </h2>
-          </div>
-
-          <div className="p-4 sm:p-6">
             {advertisement.photoUrls && advertisement.photoUrls.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {advertisement.photoUrls.map((imageUrl, index) => (
@@ -232,11 +230,9 @@ const DriverProfile: React.FC = () => {
                 <p className="text-gray-500">No photos available</p>
               </div>
             )}
-          </div>
-        </div>
 
         {/* Profile Info Section - Responsive Table */}
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200">
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200 mt-4 sm:mt-6">
           <div className="p-4 sm:p-6 border-b border-gray-200">
             <h2 className="text-lg sm:text-xl font-bold text-gray-900">
               Advertisement Details
@@ -252,19 +248,23 @@ const DriverProfile: React.FC = () => {
                 {advertisement.title}
               </div>
             </div>
-            <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-white">
-              <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
-                Phone:
+            {/* Only show phone number for VIP and VIP Prime ads */}
+            {advertisement.tag !== "free" && (
+              <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-white">
+                <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
+                  Phone:
+                </div>
+                <div className="text-gray-700 text-sm sm:text-base">
+                  <a
+                    href={`tel:${advertisement.phoneNumber}`}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    {advertisement.phoneNumber}
+                  </a>
+                </div>
               </div>
-              <div className="text-gray-700 text-sm sm:text-base">
-                <a
-                  href={`tel:${advertisement.phoneNumber}`}
-                  className="text-blue-600 hover:text-blue-800"
-                >
-                  {advertisement.phoneNumber}
-                </a>
-              </div>
-            </div>
+            )}
+            {/* Email is always shown for all ad types */}
             {advertisement.email && (
               <div className="flex flex-col xs:flex-row px-4 sm:px-6 py-3 sm:py-4 bg-gray-50">
                 <div className="w-full xs:w-32 sm:w-36 font-semibold text-gray-800 text-sm sm:text-base mb-1 xs:mb-0">
@@ -328,7 +328,7 @@ const DriverProfile: React.FC = () => {
         </div>
 
         {/* Similar Profiles Section */}
-        <div className="mt-6 sm:mt-8">
+        <div className="mt-6 sm:mt-8 ">
           <SimilarProfiles
             currentDriverId={advertisement.id}
             city={advertisement.city}
