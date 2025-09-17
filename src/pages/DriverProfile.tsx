@@ -201,7 +201,7 @@ const DriverProfile: React.FC = () => {
             {/* Ad Info - Responsive layout */}
             <div className="flex-1 space-y-3 sm:space-y-4 text-center lg:text-left">
               <div className="flex flex-col items-center lg:items-start gap-2 sm:gap-3">
-                <h1 className="text-xl xs:text-2xl sm:text-3xl lg:text-2xl font-bold text-gray-900 text-center lg:text-left">
+                <h1 className="text-lg xs:text-xl sm:text-2xl lg:text-2xl font-bold text-gray-900 text-center lg:text-left break-words word-break leading-tight max-w-full overflow-hidden">
                   {advertisement.title}
                 </h1>
                 <div className="flex justify-center lg:justify-start">
@@ -213,17 +213,17 @@ const DriverProfile: React.FC = () => {
                 </div>
               </div>
 
-              <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
+              <p className="text-sm sm:text-base text-gray-700 leading-relaxed break-words max-w-full">
                 {advertisement.description}
               </p>
 
-              <p className="text-xs sm:text-sm text-gray-600 font-medium">
+              <p className="text-xs sm:text-sm text-gray-600 font-medium break-words">
                 📍 {advertisement.city}, {advertisement.state}
               </p>
             </div>
 
             {/* Action Buttons - Responsive */}
-            <div className="flex flex-row sm:flex-col gap-3 justify-center lg:justify-start">
+            <div className="flex flex-col gap-2 sm:gap-3 w-full sm:w-auto lg:w-auto">
               {/* Only show WhatsApp and Contact buttons for VIP and VIP Prime ads */}
               {advertisement.tag !== "free" && (
                 <>
@@ -236,13 +236,13 @@ const DriverProfile: React.FC = () => {
                     )},%20I%20would%20like%20to%20book%20your%20taxi%20service.`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-green-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 transition-colors flex items-center justify-center space-x-2 min-w-[120px] sm:min-w-[140px] flex-1 sm:flex-none"
+                    className="bg-green-600 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-lg text-xs sm:text-base font-semibold hover:bg-green-700 transition-colors flex items-center justify-center w-full sm:w-[140px] lg:w-[140px]"
                   >
                     <span>WhatsApp</span>
                   </a>
                   <a
                     href={`tel:${advertisement.phoneNumber}`}
-                    className="bg-blue-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 min-w-[120px] sm:min-w-[140px] flex-1 sm:flex-none"
+                    className="bg-blue-600 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-lg text-xs sm:text-base font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center w-full sm:w-[140px] lg:w-[140px]"
                   >
                     <span>Contact</span>
                   </a>
@@ -256,7 +256,7 @@ const DriverProfile: React.FC = () => {
                   }?subject=Inquiry%20about%20${encodeURIComponent(
                     advertisement.title
                   )}&body=Hi,%20I%20would%20like%20to%20inquire%20about%20your%20taxi%20service.`}
-                  className="bg-purple-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center space-x-2 min-w-[120px] sm:min-w-[140px] flex-1 sm:flex-none"
+                  className="bg-purple-600 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-lg text-xs sm:text-base font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center w-full sm:w-[140px] lg:w-[140px]"
                 >
                   <span>Email</span>
                 </a>
@@ -266,13 +266,7 @@ const DriverProfile: React.FC = () => {
         </div>
 
         {/* Photos Section - Responsive Grid */}
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
-          <div className="mb-4">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900">
-              Advertisement Photos
-            </h2>
-          </div>
-
+        <div>
           {advertisement.photoUrls && advertisement.photoUrls.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {advertisement.photoUrls.map((imageUrl, index) => (
