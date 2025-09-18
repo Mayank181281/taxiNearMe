@@ -326,48 +326,70 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                         </div>
 
                         {/* Ad Details */}
-                        <div className="flex-1 space-y-4 text-center sm:text-left">
+                        <div className="flex-1 space-y-4 text-center sm:text-left min-w-0 overflow-hidden">
                           {/* Title with Premium Styling */}
                           <h3
-                            className={`text-2xl font-bold leading-tight ${
+                            className={`text-xl sm:text-2xl font-bold leading-tight break-words overflow-hidden max-w-full ${
                               ad.tag === "vip-prime"
                                 ? "text-amber-900 drop-shadow-sm"
                                 : ad.tag === "vip"
                                 ? "text-purple-900"
                                 : "text-gray-900"
                             }`}
+                            style={{
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              wordBreak: 'break-word'
+                            }}
                           >
                             {ad.title}
                             {ad.tag === "vip-prime" && (
-                              <Crown className="inline ml-2 h-6 w-6 text-amber-600" />
+                              <Crown className="inline ml-2 h-5 w-5 sm:h-6 sm:w-6 text-amber-600" />
                             )}
                             {ad.tag === "vip" && (
-                              <Shield className="inline ml-2 h-5 w-5 text-purple-600" />
+                              <Shield className="inline ml-2 h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
                             )}
                           </h3>
 
                           {/* Premium Description */}
                           <p
-                            className={`text-base leading-relaxed ${
+                            className={`text-sm sm:text-base leading-relaxed break-words overflow-hidden max-w-full ${
                               ad.tag === "vip-prime"
                                 ? "text-amber-800"
                                 : ad.tag === "vip"
                                 ? "text-purple-800"
                                 : "text-gray-700"
                             }`}
+                            style={{
+                              display: '-webkit-box',
+                              WebkitLineClamp: 3,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              wordBreak: 'break-word'
+                            }}
                           >
                             {ad.description}
                           </p>
 
                           {/* Location with Premium Accent */}
                           <p
-                            className={`text-base font-medium ${
+                            className={`text-sm sm:text-base font-medium break-words overflow-hidden max-w-full ${
                               ad.tag === "vip-prime"
                                 ? "text-amber-700"
                                 : ad.tag === "vip"
                                 ? "text-purple-700"
                                 : "text-gray-600"
                             }`}
+                            style={{
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              wordBreak: 'break-word'
+                            }}
                           >
                             📍 {ad.city}, {ad.state}
                           </p>
