@@ -337,12 +337,12 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                                 : "text-gray-900"
                             }`}
                             style={{
-                              display: '-webkit-box',
+                              display: "-webkit-box",
                               WebkitLineClamp: 2,
-                              WebkitBoxOrient: 'vertical',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              wordBreak: 'break-word'
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              wordBreak: "break-word",
                             }}
                           >
                             {ad.title}
@@ -364,12 +364,12 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                                 : "text-gray-700"
                             }`}
                             style={{
-                              display: '-webkit-box',
+                              display: "-webkit-box",
                               WebkitLineClamp: 3,
-                              WebkitBoxOrient: 'vertical',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              wordBreak: 'break-word'
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              wordBreak: "break-word",
                             }}
                           >
                             {ad.description}
@@ -385,10 +385,10 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                                 : "text-gray-600"
                             }`}
                             style={{
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                              wordBreak: 'break-word'
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                              wordBreak: "break-word",
                             }}
                           >
                             📍 {ad.city}, {ad.state}
