@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import WatermarkDemo from "../components/WatermarkDemo";
 
 const Plans: React.FC = () => {
   const [billingPeriod, setBillingPeriod] = useState<"month" | "day">("month");
@@ -116,7 +115,7 @@ const Plans: React.FC = () => {
               <div>
                 <span className="font-semibold text-gray-900">Highlight:</span>
                 <p className="text-gray-700">
-                  Driver Ad Card Is Marked With A VIP Tag/Badge
+                   Ad Card Is Marked With A VIP Tag/Badge
                 </p>
               </div>
             </div>
@@ -179,7 +178,7 @@ const Plans: React.FC = () => {
               <div>
                 <span className="font-semibold text-gray-900">Highlight:</span>
                 <p className="text-gray-700">
-                  Driver Ad Card Is Marked With A VIP PRIME Badge + Priority
+                  Ad Card Is Marked With A VIP PRIME Badge + Priority
                   Highlight
                 </p>
               </div>
@@ -198,7 +197,7 @@ const Plans: React.FC = () => {
               <div>
                 <span className="font-semibold text-gray-900">Rotation:</span>
                 <p className="text-gray-700">
-                  Auto Rotated Randomly If There Are Multiple VIP Prime Drivers
+                  Auto Rotated Randomly If There Are Multiple VIP Prime Taxi and Tour & Travels Ads
                 </p>
               </div>
             </div>
@@ -377,21 +376,6 @@ const Plans: React.FC = () => {
             Email Support
           </button>
         </div>
-      </div>
-
-      {/* Watermark Feature Demo */}
-      <div className="mt-12">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Automatic Image Protection
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            All your advertisement images are automatically protected with our
-            subtle watermark technology for brand authenticity and security.
-          </p>
-        </div>
-
-        <WatermarkDemo />
       </div>
     </div>
   );

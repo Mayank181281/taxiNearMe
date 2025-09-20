@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc, Timestamp } from "firebase/firestore";
 import { db } from "../config/firebase";
+import { findAdBySlug } from "../utils/urlUtils";
 import SimilarProfiles from "../components/SimilarProfiles";
 import DriverTierTag, { DriverTier } from "../components/DriverTierTags";
 
@@ -27,7 +28,12 @@ interface Advertisement {
 }
 
 const DriverProfile: React.FC = () => {
-  const { driverId } = useParams<{ driverId: string }>();
+  const { driverId, citySlug, categorySlug, titleSlug } = useParams<{
+    driverId?: string;
+    citySlug?: string;
+    categorySlug?: string;
+    titleSlug?: string;
+  }>();
   const navigate = useNavigate();
   const [advertisement, setAdvertisement] = useState<Advertisement | null>(
     null
@@ -41,23 +47,37 @@ const DriverProfile: React.FC = () => {
 
   useEffect(() => {
     const fetchAdvertisement = async () => {
-      if (!driverId) {
-        setError("Advertisement ID not provided");
+      // Check if we have a driverId (legacy URL) or slug parameters (new URL)
+      if (!driverId && (!citySlug || !categorySlug || !titleSlug)) {
+        setError("Advertisement not found - invalid URL");
         setLoading(false);
         return;
       }
 
       try {
         setLoading(true);
-        const adDoc = doc(db, "adData", driverId);
-        const adSnapshot = await getDoc(adDoc);
+        let adData = null;
 
-        if (adSnapshot.exists()) {
-          const adData = adSnapshot.data();
+        if (driverId) {
+          // Legacy URL format: /driver/:driverId
+          const adDoc = doc(db, "adData", driverId);
+          const adSnapshot = await getDoc(adDoc);
 
+          if (adSnapshot.exists()) {
+            adData = {
+              id: adSnapshot.id,
+              ...adSnapshot.data(),
+            };
+          }
+        } else if (citySlug && categorySlug && titleSlug) {
+          // New SEO-friendly URL format: /:citySlug/:categorySlug/:titleSlug
+          adData = await findAdBySlug(citySlug, categorySlug, titleSlug);
+        }
+
+        if (adData) {
           // Fetch user email from users collection
           let userEmail = "";
-          if (adData.userId) {
+          if (adData.userId && typeof adData.userId === "string") {
             try {
               const userDoc = doc(db, "users", adData.userId);
               const userSnapshot = await getDoc(userDoc);
@@ -71,7 +91,6 @@ const DriverProfile: React.FC = () => {
           }
 
           setAdvertisement({
-            id: adSnapshot.id,
             ...adData,
             email: userEmail,
           } as Advertisement);
@@ -87,7 +106,7 @@ const DriverProfile: React.FC = () => {
     };
 
     fetchAdvertisement();
-  }, [driverId]);
+  }, [driverId, citySlug, categorySlug, titleSlug]);
 
   const handleGoBack = () => {
     navigate(-1);

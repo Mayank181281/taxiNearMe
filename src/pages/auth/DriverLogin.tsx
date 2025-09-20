@@ -76,10 +76,10 @@ const DriverLogin: React.FC = () => {
             </div>
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Driver Login
+            Sign in 
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Access your driver dashboard
+            Access your dashboard
           </p>
         </div>
 
@@ -171,7 +171,7 @@ const DriverLogin: React.FC = () => {
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Don't have a driver account?{" "}
+              Don't have an account?{" "}
               <Link
                 to="/driver/register"
                 className="font-medium text-blue-600 hover:text-blue-500"

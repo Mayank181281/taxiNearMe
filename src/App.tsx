@@ -41,7 +41,16 @@ function App() {
                   <main className="flex-1">
                     <Routes>
                       <Route path="/" element={<Home />} />
-                      <Route path="/:category/:city" element={<SearchResults />} />
+                      <Route
+                        path="/:category/:city"
+                        element={<SearchResults />}
+                      />
+                      {/* New SEO-friendly ad detail routes */}
+                      <Route
+                        path="/:citySlug/:categorySlug/:titleSlug"
+                        element={<DriverProfile />}
+                      />
+                      {/* Legacy routes for backward compatibility */}
                       <Route
                         path="/driver/:driverId"
                         element={<DriverProfile />}

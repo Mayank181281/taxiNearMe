@@ -119,7 +119,7 @@ const Header: React.FC = () => {
                       className="block px-3 py-2 bg-blue-600 text-white rounded-lg"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Join as Driver
+                      Sign in
                     </Link>
                   </>
                 ) : (

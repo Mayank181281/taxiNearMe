@@ -8,6 +8,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
+import { generateAdUrlFromAd } from "../utils/urlUtils";
 
 interface Advertisement {
   id: string;
@@ -236,7 +237,7 @@ const SimilarProfiles: React.FC<SimilarProfilesProps> = ({
 
                 {/* View Profile button is always shown for all ad types */}
                 <Link
-                  to={`/driver/${ad.id}`}
+                  to={generateAdUrlFromAd(ad)}
                   className="bg-teal-600 text-white px-2 py-1.5 rounded-md hover:bg-teal-700 transition-colors w-full flex items-center justify-center text-xs font-medium"
                   title="View Profile"
                 >

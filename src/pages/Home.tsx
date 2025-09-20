@@ -23,18 +23,22 @@ const Home: React.FC = () => {
   // Extended cities from the shared utility
   const featuredCities = getAllCities();
 
-  const handleCityClick = (city: string) => {
-    const category = selectedCategory || 'taxi';
-    const formattedCategory = category.toLowerCase().replace(/\s+/g, '-');
+  const handleCityClick = (city: string, category?: string) => {
+    const categoryToUse = category || selectedCategory || "taxi";
+    const formattedCategory = categoryToUse.toLowerCase().replace(/\s+/g, "-");
     navigate(`/${formattedCategory}/${encodeURIComponent(city.toLowerCase())}`);
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchCity.trim()) {
-      const category = selectedCategory || 'taxi';
-      const formattedCategory = category.toLowerCase().replace(/\s+/g, '-');
-      navigate(`/${formattedCategory}/${encodeURIComponent(searchCity.trim().toLowerCase())}`);
+      const category = selectedCategory || "taxi";
+      const formattedCategory = category.toLowerCase().replace(/\s+/g, "-");
+      navigate(
+        `/${formattedCategory}/${encodeURIComponent(
+          searchCity.trim().toLowerCase()
+        )}`
+      );
     }
   };
 
@@ -42,9 +46,11 @@ const Home: React.FC = () => {
     e.preventDefault();
     if (selectedCity || selectedState) {
       const searchQuery = selectedCity || selectedState;
-      const category = selectedCategory || 'taxi';
-      const formattedCategory = category.toLowerCase().replace(/\s+/g, '-');
-      navigate(`/${formattedCategory}/${encodeURIComponent(searchQuery.toLowerCase())}`);
+      const category = selectedCategory || "taxi";
+      const formattedCategory = category.toLowerCase().replace(/\s+/g, "-");
+      navigate(
+        `/${formattedCategory}/${encodeURIComponent(searchQuery.toLowerCase())}`
+      );
     }
   };
 
@@ -74,7 +80,7 @@ const Home: React.FC = () => {
             "Your Journey, Our Priority"
           </h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto font-light opacity-90">
-            Easy bookings, trusted drivers, and rides that fit your schedule.
+            Easy bookings, trusted Taxi and tour & travels services, and rides that fit your schedule.
           </p>
         </div>
 
@@ -242,7 +248,7 @@ const Home: React.FC = () => {
                   <div className="block md:hidden w-full space-y-2">
                     {/* Taxi Top */}
                     <button
-                      onClick={() => handleCityClick(city)}
+                      onClick={() => handleCityClick(city, "taxi")}
                       className="w-full px-4 py-2.5 bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors rounded-full shadow-md border border-blue-200 text-sm"
                     >
                       <span className="font-medium">Taxi</span>
@@ -259,7 +265,7 @@ const Home: React.FC = () => {
 
                     {/* Tour Bottom */}
                     <button
-                      onClick={() => handleCityClick(city)}
+                      onClick={() => handleCityClick(city, "tour-and-travels")}
                       className="w-full px-4 py-2.5 bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors rounded-full shadow-md border border-blue-200 text-sm"
                     >
                       <span className="font-medium">Tour and Travels</span>
@@ -282,7 +288,7 @@ const Home: React.FC = () => {
                         {/* Taxi Top */}
                         <div className="absolute bottom-full left-0 right-0 z-10">
                           <button
-                            onClick={() => handleCityClick(city)}
+                            onClick={() => handleCityClick(city, "taxi")}
                             className="w-full px-4 py-2.5 bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors rounded-full shadow-lg border border-blue-200 text-sm"
                           >
                             <span className="font-medium">Taxi</span>
@@ -293,7 +299,9 @@ const Home: React.FC = () => {
                         {/* Tour Bottom */}
                         <div className="absolute top-full left-0 right-0 z-10">
                           <button
-                            onClick={() => handleCityClick(city)}
+                            onClick={() =>
+                              handleCityClick(city, "tour-and-travels")
+                            }
                             className="w-full px-4 py-2.5 bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors rounded-full shadow-lg border border-blue-200 text-sm"
                           >
                             <span className="font-medium">

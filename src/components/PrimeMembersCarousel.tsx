@@ -9,6 +9,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
+import { generateAdUrlFromAd } from "../utils/urlUtils";
 
 interface Advertisement {
   id: string;
@@ -33,10 +34,12 @@ interface Advertisement {
 interface PrimeMembersCarouselProps {
   selectedState?: string;
   selectedCity?: string;
+  selectedCategory?: string;
 }
 
 const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
   selectedCity,
+  selectedCategory,
 }) => {
   const [vipPrimeAds, setVipPrimeAds] = useState<Advertisement[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -47,37 +50,48 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
   const fetchVipPrimeAds = useCallback(async () => {
     console.log(
       "PrimeMembersCarousel - fetchVipPrimeAds called with selectedCity:",
-      selectedCity
+      selectedCity,
+      "selectedCategory:",
+      selectedCategory
     );
     try {
       setLoading(true);
 
-      let adsQuery;
-      // Add city filter if selectedCity is provided
-      if (selectedCity) {
-        adsQuery = query(
-          collection(db, "adData"),
-          where("tag", "==", "vip-prime"),
-          where("approved", "==", true),
-          where("city", "==", selectedCity)
-        );
-      } else {
-        adsQuery = query(
-          collection(db, "adData"),
-          where("tag", "==", "vip-prime"),
-          where("approved", "==", true)
-        );
-      }
+      // Get all VIP Prime ads first, then filter by city and category
+      const adsQuery = query(
+        collection(db, "adData"),
+        where("tag", "==", "vip-prime"),
+        where("approved", "==", true)
+      );
 
       const querySnapshot = await getDocs(adsQuery);
       const ads: Advertisement[] = [];
 
       querySnapshot.forEach((doc) => {
         const data = doc.data() as Omit<Advertisement, "id">;
-        ads.push({
-          id: doc.id,
-          ...data,
-        });
+
+        // Apply city filter
+        const cityMatches = !selectedCity || data.city === selectedCity;
+
+        // Apply category filter
+        let categoryMatches = true;
+        if (selectedCategory) {
+          // Normalize both stored category and selected category for comparison
+          const normalizedStoredCategory =
+            data.category?.toLowerCase().trim() || "";
+          const normalizedSelectedCategory = selectedCategory
+            .toLowerCase()
+            .trim();
+          categoryMatches =
+            normalizedStoredCategory === normalizedSelectedCategory;
+        }
+
+        if (cityMatches && categoryMatches) {
+          ads.push({
+            id: doc.id,
+            ...data,
+          });
+        }
       });
 
       setVipPrimeAds(ads);
@@ -87,9 +101,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [selectedCity]);
-
-  // Fetch ads when selectedCity changes
+  }, [selectedCity, selectedCategory]); // Fetch ads when selectedCity changes
   useEffect(() => {
     fetchVipPrimeAds();
   }, [fetchVipPrimeAds]);
@@ -185,7 +197,7 @@ const PrimeMembersCarousel: React.FC<PrimeMembersCarouselProps> = ({
             return (
               <Link
                 key={ad.id} // Use unique ad ID only
-                to={`/driver/${ad.id}`}
+                to={generateAdUrlFromAd(ad)}
                 className="w-36 flex-shrink-0"
               >
                 <div

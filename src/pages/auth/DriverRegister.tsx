@@ -128,7 +128,7 @@ const DriverRegister: React.FC = () => {
             </div>
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Driver Registration
+            Sign Up
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             Quick signup - Complete your profile later
@@ -377,7 +377,7 @@ const DriverRegister: React.FC = () => {
 
             <div className="text-center">
               <p className="text-sm text-gray-600">
-                Already have a driver account?{" "}
+                Already have an account?{" "}
                 <Link
                   to="/driver/login"
                   className="font-medium text-blue-600 hover:text-blue-500"

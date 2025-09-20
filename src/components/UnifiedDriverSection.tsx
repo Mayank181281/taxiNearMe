@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Phone, Car, MessageCircle, Crown, Star, Shield } from "lucide-react";
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  Timestamp,
-} from "firebase/firestore";
+import { collection, getDocs, Timestamp } from "firebase/firestore";
 import { db } from "../config/firebase";
+import { generateAdUrlFromAd } from "../utils/urlUtils";
 
 interface Advertisement {
   id: string;
@@ -33,11 +28,13 @@ interface Advertisement {
 interface UnifiedDriverSectionProps {
   selectedState?: string;
   selectedCity?: string;
+  selectedCategory?: string;
 }
 
 const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
   selectedState,
   selectedCity,
+  selectedCategory,
 }) => {
   const navigate = useNavigate();
   const [filteredAds, setFilteredAds] = useState<Advertisement[]>([]);
@@ -51,18 +48,8 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
       try {
         setLoading(true);
 
-        // Filter by city if specified
-        let querySnapshot;
-        if (selectedCity && selectedCity !== "all") {
-          const cityQuery = query(
-            collection(db, "adData"),
-            where("city", "==", selectedCity)
-          );
-          querySnapshot = await getDocs(cityQuery);
-        } else {
-          querySnapshot = await getDocs(collection(db, "adData"));
-        }
-
+        // Get all ads first, then filter by both city and category
+        const querySnapshot = await getDocs(collection(db, "adData"));
         const ads: Advertisement[] = [];
 
         querySnapshot.forEach((doc) => {
@@ -72,10 +59,31 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
             (data.status === "approved" || data.status === "published") &&
             data.approved
           ) {
-            ads.push({
-              id: doc.id,
-              ...data,
-            } as Advertisement);
+            // Apply city filter
+            const cityMatches =
+              !selectedCity ||
+              selectedCity === "all" ||
+              data.city === selectedCity;
+
+            // Apply category filter (convert URL format back to original format for comparison)
+            let categoryMatches = true;
+            if (selectedCategory) {
+              // Normalize both stored category and selected category for comparison
+              const normalizedStoredCategory =
+                data.category?.toLowerCase().trim() || "";
+              const normalizedSelectedCategory = selectedCategory
+                .toLowerCase()
+                .trim();
+              categoryMatches =
+                normalizedStoredCategory === normalizedSelectedCategory;
+            }
+
+            if (cityMatches && categoryMatches) {
+              ads.push({
+                id: doc.id,
+                ...data,
+              } as Advertisement);
+            }
           }
         });
 
@@ -99,7 +107,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
     };
 
     fetchAds();
-  }, [selectedState, selectedCity]);
+  }, [selectedCity, selectedCategory]);
 
   // Pagination calculations
   const totalAds = filteredAds.length;
@@ -109,18 +117,37 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
   const currentAds = filteredAds.slice(startIndex, endIndex);
 
   // Show message if no ads match the filter
-  if (filteredAds.length === 0 && (selectedState || selectedCity)) {
+  if (
+    filteredAds.length === 0 &&
+    (selectedState || selectedCity || selectedCategory)
+  ) {
     return (
       <section className="py-8 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center py-12">
             <Car className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-600 mb-2">
-              No ads found
+              No results found
             </h3>
             <p className="text-gray-500">
-              No ads available in {selectedCity || selectedState}. Try selecting
-              a different location.
+              {selectedCategory && selectedCity ? (
+                <>
+                  No {selectedCategory} ads available in {selectedCity}. Try
+                  selecting a different location or category.
+                </>
+              ) : selectedCategory ? (
+                <>
+                  No {selectedCategory} ads available. Try selecting a different
+                  category.
+                </>
+              ) : selectedCity ? (
+                <>
+                  No ads available in {selectedCity}. Try selecting a different
+                  location.
+                </>
+              ) : (
+                <>No ads available. Try adjusting your search criteria.</>
+              )}
             </p>
           </div>
         </div>
@@ -448,7 +475,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                             }`}
                             onClick={(e) => {
                               e.stopPropagation();
-                              navigate(`/driver/${ad.id}`);
+                              navigate(generateAdUrlFromAd(ad));
                             }}
                           >
                             <span>👤</span>
@@ -462,7 +489,7 @@ const UnifiedDriverSection: React.FC<UnifiedDriverSectionProps> = ({
                             className="w-full py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-3 cursor-pointer bg-teal-500 text-white shadow-md"
                             onClick={(e) => {
                               e.stopPropagation();
-                              navigate(`/driver/${ad.id}`);
+                              navigate(generateAdUrlFromAd(ad));
                             }}
                           >
                             <span>👤</span>

@@ -24,9 +24,10 @@ const SearchResults: React.FC = () => {
 
   // States for filtering results (used by PrimeMembersCarousel and RegularDriversSection)
   const [selectedCity, setSelectedCity] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const selectedState = "";
 
-  // Get initial city from URL params
+  // Get initial city and category from URL params
   useEffect(() => {
     if (city) {
       const decodedCity = decodeURIComponent(city);
@@ -39,7 +40,20 @@ const SearchResults: React.FC = () => {
         .join(" ");
       setSelectedCity(formattedCity);
     }
-  }, [city]);
+
+    if (category) {
+      const decodedCategory = decodeURIComponent(category);
+      // Convert URL format back to display format (e.g., "tour-and-travels" -> "Tour and Travels")
+      const formattedCategory = decodedCategory
+        .replace(/-/g, " ")
+        .split(" ")
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join(" ");
+      setSelectedCategory(formattedCategory);
+    }
+  }, [city, category]);
 
   // Handler for the hero search form
   const handleFormSearch = (e: React.FormEvent) => {
@@ -158,12 +172,14 @@ const SearchResults: React.FC = () => {
       <PrimeMembersCarousel
         selectedState={selectedState}
         selectedCity={selectedCity}
+        selectedCategory={selectedCategory}
       />
 
       {/* Unified Drivers Section - All drivers in priority order */}
       <UnifiedDriverSection
         selectedState={selectedState}
         selectedCity={selectedCity}
+        selectedCategory={selectedCategory}
       />
     </div>
   );

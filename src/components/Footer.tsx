@@ -28,7 +28,7 @@ const Footer: React.FC = () => {
             </h2>
             <p className="text-blue-100 leading-relaxed text-sm lg:text-lg">
               Book Your Taxi In Seconds With Our Easy-To-Use Platform. Enjoy
-              Safe Rides, Transparent Fares, And Trusted Drivers Across India.
+              Safe Rides, Transparent Fares, And Trusted Taxi and tour & travels services Across India.
               Available 24×7 — Because Your Journey Matters Anytime, Anywhere.
             </p>
           </div>
