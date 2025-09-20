@@ -115,7 +115,7 @@ const Plans: React.FC = () => {
               <div>
                 <span className="font-semibold text-gray-900">Highlight:</span>
                 <p className="text-gray-700">
-                   Ad Card Is Marked With A VIP Tag/Badge
+                  Ad Card Is Marked With A VIP Tag/Badge
                 </p>
               </div>
             </div>
@@ -178,8 +178,7 @@ const Plans: React.FC = () => {
               <div>
                 <span className="font-semibold text-gray-900">Highlight:</span>
                 <p className="text-gray-700">
-                  Ad Card Is Marked With A VIP PRIME Badge + Priority
-                  Highlight
+                  Ad Card Is Marked With A VIP PRIME Badge + Priority Highlight
                 </p>
               </div>
             </div>
@@ -197,7 +196,8 @@ const Plans: React.FC = () => {
               <div>
                 <span className="font-semibold text-gray-900">Rotation:</span>
                 <p className="text-gray-700">
-                  Auto Rotated Randomly If There Are Multiple VIP Prime Taxi and Tour & Travels Ads
+                  Auto Rotated Randomly If There Are Multiple VIP Prime Taxi and
+                  Tour & Travels Ads
                 </p>
               </div>
             </div>
