@@ -75,7 +75,9 @@ const SimilarProfiles: React.FC<SimilarProfilesProps> = ({
           return getPriority(a.tag) - getPriority(b.tag);
         });
 
-        setSimilarAds(ads.slice(0, 5));
+        // Show only 2 profiles (was 5 profiles - commented out for future use)
+        setSimilarAds(ads.slice(0, 2));
+        // setSimilarAds(ads.slice(0, 5)); // Uncomment this line to show 5 profiles again
       } catch (error) {
         console.error("Error fetching similar ads:", error);
         setSimilarAds([]);
@@ -100,7 +102,9 @@ const SimilarProfiles: React.FC<SimilarProfilesProps> = ({
           </h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {[1, 2, 3, 4, 5].map((i) => (
+          {/* Show only 2 loading placeholders (was 5 - commented out for future use) */}
+          {[1, 2].map((i) => (
+          // {[1, 2, 3, 4, 5].map((i) => ( // Uncomment this line to show 5 loading placeholders again
             <div
               key={i}
               className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden flex animate-pulse"
