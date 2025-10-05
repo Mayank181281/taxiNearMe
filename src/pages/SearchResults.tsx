@@ -9,6 +9,7 @@ import {
   getCategories,
 } from "../utils/statesAndCities";
 import { useAdDisplayExpiration } from "../hooks/useAutoExpiration";
+import { useSearchSEO } from "../hooks/useSEO";
 
 const SearchResults: React.FC = () => {
   // Process expired ads before showing search results
@@ -16,6 +17,13 @@ const SearchResults: React.FC = () => {
 
   const { category, city } = useParams<{ category: string; city: string }>();
   const navigate = useNavigate();
+
+  // Prepare SEO data
+  const decodedCategory = category ? decodeURIComponent(category).replace(/-/g, " ").split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ") : "";
+  const decodedCity = city ? decodeURIComponent(city).split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ") : "";
+  
+  // SEO optimization for search results page
+  useSearchSEO(decodedCategory, decodedCity);
 
   // States for the hero search form
   const [searchFormState, setSearchFormState] = useState("");

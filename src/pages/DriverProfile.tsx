@@ -5,6 +5,8 @@ import { db } from "../config/firebase";
 import { findAdBySlug } from "../utils/urlUtils";
 import SimilarProfiles from "../components/SimilarProfiles";
 import DriverTierTag, { DriverTier } from "../components/DriverTierTags";
+import { useDriverSEO } from "../hooks/useSEO";
+import type { DriverProfile as DriverProfileType } from "../utils/structuredData";
 
 interface Advertisement {
   id: string;
@@ -44,6 +46,26 @@ const DriverProfile: React.FC = () => {
     null
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Prepare driver profile data for SEO
+  const driverProfile: DriverProfileType = advertisement ? {
+    id: advertisement.id,
+    name: advertisement.title,
+    phone: advertisement.phoneNumber,
+    email: advertisement.email,
+    city: advertisement.city,
+    state: advertisement.state,
+    description: advertisement.description,
+    image: advertisement.photoUrls?.[0]
+  } : {
+    id: driverId || titleSlug || 'unknown',
+    name: 'Driver Profile',
+    city: citySlug || 'Unknown',
+    state: 'Unknown'
+  };
+
+  // SEO optimization for driver profile
+  useDriverSEO(driverProfile);
 
   useEffect(() => {
     const fetchAdvertisement = async () => {

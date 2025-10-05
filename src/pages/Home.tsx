@@ -8,8 +8,12 @@ import {
   getCategories,
 } from "../utils/statesAndCities";
 import { useAdDisplayExpiration } from "../hooks/useAutoExpiration";
+import { useHomeSEO } from "../hooks/useSEO";
 
 const Home: React.FC = () => {
+  // SEO optimization for home page
+  useHomeSEO();
+  
   // Process expired ads before displaying content
   useAdDisplayExpiration();
 
