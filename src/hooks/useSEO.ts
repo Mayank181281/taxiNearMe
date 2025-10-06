@@ -170,3 +170,39 @@ export function useSearchSEO(category: string, city: string, resultCount?: numbe
 
   useSEO(seoConfig);
 }
+
+/**
+ * Hook for contact page SEO
+ */
+export function useContactSEO() {
+  const seoConfig: SEOConfig = {
+    title: 'Contact Us - TaxiNearMe | Get Support & Information',
+    description: 'Get in touch with TaxiNearMe for support, business inquiries, or questions about our taxi driver platform. We\'re here to help connect you with local drivers.',
+    keywords: 'contact taxi near me, taxi platform support, driver registration help, customer service',
+    type: 'website',
+    breadcrumbs: [
+      { name: 'Home', url: '/' },
+      { name: 'Contact Us', url: '/contact' }
+    ]
+  };
+
+  useSEO(seoConfig);
+}
+
+/**
+ * Hook for about page SEO
+ */
+export function useAboutSEO() {
+  const seoConfig: SEOConfig = {
+    title: 'About Us - TaxiNearMe | Connecting Passengers with Local Drivers',
+    description: 'Learn about TaxiNearMe\'s mission to connect passengers with reliable local taxi drivers. Discover our platform, values, and commitment to safe transportation.',
+    keywords: 'about taxi near me, taxi platform company, local driver network, safe transportation',
+    type: 'website',
+    breadcrumbs: [
+      { name: 'Home', url: '/' },
+      { name: 'About Us', url: '/about' }
+    ]
+  };
+
+  useSEO(seoConfig);
+}

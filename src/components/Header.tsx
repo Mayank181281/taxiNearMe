@@ -114,9 +114,40 @@ const Header: React.FC = () => {
               <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 {!user ? (
                   <>
+                    {/* Navigation Links - Always visible in mobile */}
+                    <Link
+                      to="/"
+                      className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Home
+                    </Link>
+                    <Link
+                      to="/contact"
+                      className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Contact Us
+                    </Link>
+                    <Link
+                      to="/about"
+                      className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      About Us
+                    </Link>
+                    <Link
+                      to="/profile/plans"
+                      className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Plans
+                    </Link>
+                    {/* Divider */}
+                    <div className="border-t border-gray-200 my-2"></div>
                     <Link
                       to="/driver/register"
-                      className="block px-3 py-2 bg-blue-600 text-white rounded-lg"
+                      className="block px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Sign in
@@ -124,18 +155,49 @@ const Header: React.FC = () => {
                   </>
                 ) : (
                   <>
+                    {/* Navigation Links - Always visible in mobile */}
+                    <Link
+                      to="/"
+                      className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Home
+                    </Link>
+                    <Link
+                      to="/contact"
+                      className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Contact Us
+                    </Link>
+                    <Link
+                      to="/about"
+                      className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      About Us
+                    </Link>
+                    <Link
+                      to="/profile/plans"
+                      className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Plans
+                    </Link>
+                    {/* Divider */}
+                    <div className="border-t border-gray-200 my-2"></div>
                     <button
                       onClick={() => {
                         setIsMenuOpen(false);
                         navigate("/profile");
                       }}
-                      className="block w-full text-left px-3 py-2 text-gray-700 hover:text-blue-600"
+                      className="block w-full text-left px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg"
                     >
                       View Profile
                     </button>
                     <button
                       onClick={handleLogout}
-                      className="block w-full text-left px-3 py-2 text-gray-700 hover:text-blue-600"
+                      className="block w-full text-left px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg"
                     >
                       Logout
                     </button>

@@ -59,10 +59,10 @@ const Footer: React.FC = () => {
                 </li>
                 <li>
                   <a
-                    href="/driver/register"
+                    href="/profile/plans"
                     className="text-blue-100 hover:text-white transition-colors duration-300 text-sm lg:text-lg"
                   >
-                    List Member
+                    Plan Page
                   </a>
                 </li>
                 <li>

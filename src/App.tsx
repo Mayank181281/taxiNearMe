@@ -16,6 +16,8 @@ import DriverRegister from "./pages/auth/DriverRegister";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import SearchResults from "./pages/SearchResults";
+import ContactUs from "./pages/ContactUs";
+import AboutUs from "./pages/AboutUs";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Admin from "./admin/Admin";
 import { useAutoExpiration } from "./hooks/useAutoExpiration";
@@ -41,6 +43,8 @@ function App() {
                   <main className="flex-1">
                     <Routes>
                       <Route path="/" element={<Home />} />
+                      <Route path="/contact" element={<ContactUs />} />
+                      <Route path="/about" element={<AboutUs />} />
                       <Route
                         path="/:category/:city"
                         element={<SearchResults />}
