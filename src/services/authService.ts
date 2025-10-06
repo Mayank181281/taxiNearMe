@@ -52,6 +52,7 @@ export interface UserProfile {
   emailVerified?: boolean;
   isApproved?: boolean;
   availabilityStatus?: string;
+  profileImage?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -61,6 +62,7 @@ export interface RegisterData {
   email: string;
   password: string;
   phone?: string;
+  profileImage?: string;
   [key: string]: unknown;
 }
 
@@ -98,6 +100,7 @@ export const registerUser = async (
       profileCompleted: false,
       isApproved: false,
       availabilityStatus: "offline",
+      profileImage: userData.profileImage,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

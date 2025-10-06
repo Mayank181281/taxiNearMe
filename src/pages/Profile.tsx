@@ -206,6 +206,44 @@ const Profile: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
         </div>
 
+        {/* User Profile Section */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div className="flex items-center space-x-4">
+            <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+              {firebaseUser?.photoURL ? (
+                <img
+                  src={firebaseUser.photoURL}
+                  alt={firebaseUser.displayName || "User"}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg">
+                  {(firebaseUser?.displayName || firebaseUser?.email || "U")
+                    .split(" ")
+                    .map((n: string) => n[0])
+                    .join("")}
+                </div>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl font-semibold text-gray-900 truncate">
+                {firebaseUser?.displayName || firebaseUser?.email || "User"}
+              </h2>
+              <p className="text-sm text-gray-600 truncate">
+                {firebaseUser?.email}
+              </p>
+            </div>
+            <div>
+              <Link
+                to="/edit-profile"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Edit Profile
+              </Link>
+            </div>
+          </div>
+        </div>
+
         {/* Dashboard Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {/* Your Adverts */}

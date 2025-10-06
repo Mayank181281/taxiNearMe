@@ -16,6 +16,7 @@ import {
   validatePhone,
   validatePassword,
 } from "../../utils/validation";
+import ProfilePhotoUpload from "../../components/ProfilePhotoUpload";
 
 const DriverRegister: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -24,6 +25,7 @@ const DriverRegister: React.FC = () => {
     phone: "",
     password: "",
     confirmPassword: "",
+    profileImage: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -94,6 +96,7 @@ const DriverRegister: React.FC = () => {
         email: formData.email,
         password: formData.password,
         phone: formData.phone,
+        profileImage: formData.profileImage,
         isApproved: false,
         availabilityStatus: "offline",
         profileCompleted: false,
@@ -103,7 +106,6 @@ const DriverRegister: React.FC = () => {
 
       if (result.success) {
         setVerificationEmailSent(true);
-        // Show success message without navigating
         setErrors({});
       } else {
         setErrors({
@@ -131,7 +133,7 @@ const DriverRegister: React.FC = () => {
             Sign Up
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Quick signup - Complete your profile later
+            Create your driver account
           </p>
         </div>
 
@@ -143,7 +145,6 @@ const DriverRegister: React.FC = () => {
               </div>
             )}
 
-            {/* Essential Information Only */}
             <div className="space-y-4">
               <div>
                 <label
@@ -171,6 +172,20 @@ const DriverRegister: React.FC = () => {
                 )}
               </div>
 
+              {/* Profile Photo Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Profile Photo (Optional)
+                </label>
+                <ProfilePhotoUpload
+                  currentPhotoUrl={formData.profileImage}
+                  onPhotoUpdate={(imageUrl: string | null) => {
+                    setFormData(prev => ({ ...prev, profileImage: imageUrl || "" }));
+                  }}
+                  size="medium"
+                />
+              </div>
+
               <div>
                 <label
                   htmlFor="email"
@@ -194,13 +209,6 @@ const DriverRegister: React.FC = () => {
                 </div>
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                )}
-
-                {/* Email verification info */}
-                {!verificationEmailSent && (
-                  <p className="mt-2 text-sm text-gray-600">
-                    📧 A verification email will be sent to this address
-                  </p>
                 )}
               </div>
 
@@ -344,8 +352,8 @@ const DriverRegister: React.FC = () => {
               className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isLoading
-                ? "Sending Verification Email..."
-                : "Send Verification Link"}
+                ? "Creating Account..."
+                : "Create Account"}
             </button>
 
             {/* Success message */}
@@ -363,11 +371,10 @@ const DriverRegister: React.FC = () => {
                 </p>
                 <p className="text-xs text-green-700 mb-4">
                   Please check your inbox and click the verification link to
-                  activate your account. You'll be able to log in after
-                  verifying your email.
+                  activate your account.
                 </p>
                 <Link
-                  to="/driver/login"
+                  to="/auth/login"
                   className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
                 >
                   Go to Login Page
@@ -379,7 +386,7 @@ const DriverRegister: React.FC = () => {
               <p className="text-sm text-gray-600">
                 Already have an account?{" "}
                 <Link
-                  to="/driver/login"
+                  to="/auth/login"
                   className="font-medium text-blue-600 hover:text-blue-500"
                 >
                   Sign in here

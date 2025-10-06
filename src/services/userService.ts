@@ -11,6 +11,7 @@ export interface ProfileUpdateData {
   firstName: string;
   lastName: string;
   email: string;
+  profileImage?: string;
 }
 
 export interface PasswordUpdateData {
@@ -35,6 +36,7 @@ export const updateUserProfile = async (
       firstName: profileData.firstName,
       lastName: profileData.lastName,
       email: profileData.email,
+      profileImage: profileData.profileImage,
       updatedAt: new Date(),
     });
 

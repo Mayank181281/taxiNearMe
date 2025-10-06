@@ -60,11 +60,21 @@ const Header: React.FC = () => {
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                     className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-colors"
                   >
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold relative">
-                      {user.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
+                    <div className="w-10 h-10 rounded-full relative overflow-hidden">
+                      {user.profileImage ? (
+                        <img
+                          src={user.profileImage}
+                          alt={user.name}
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                          {user.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </div>
+                      )}
                       {user.isPremium && (
                         <div className="absolute -top-1 -right-1 bg-orange-500 text-white p-0.5 rounded-full">
                           <Crown className="h-2.5 w-2.5" />

@@ -1,15 +1,29 @@
 import React, { useState } from "react";
 import { useAuth } from "../contexts/useAuth";
 import { updateUserProfile, updateUserPassword } from "../services/userService";
+import ProfilePhotoUpload from "../components/ProfilePhotoUpload";
 
 const EditProfile: React.FC = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
 
   const [formData, setFormData] = useState({
-    firstName: user?.name?.split(" ")[0] || "",
-    lastName: user?.name?.split(" ").slice(1).join(" ") || "",
-    email: user?.email || "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    profileImage: "",
   });
+
+  // Update form data when user data loads
+  React.useEffect(() => {
+    if (user) {
+      setFormData({
+        firstName: user.name?.split(" ")[0] || "",
+        lastName: user.name?.split(" ").slice(1).join(" ") || "",
+        email: user.email || "",
+        profileImage: user.profileImage || "",
+      });
+    }
+  }, [user]);
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -155,6 +169,23 @@ const EditProfile: React.FC = () => {
                 {message.text}
               </div>
             )}
+
+            {/* Profile Photo Upload */}
+            <div>
+              <ProfilePhotoUpload
+                currentPhotoUrl={formData.profileImage}
+                onPhotoUpdate={async (imageUrl: string | null) => {
+                  const newImageUrl = imageUrl || "";
+                  setFormData(prev => ({ ...prev, profileImage: newImageUrl }));
+                  
+                  // Also update the user context immediately for better UX
+                  if (user) {
+                    await updateUser({ profileImage: newImageUrl });
+                  }
+                }}
+                size="large"
+              />
+            </div>
 
             {/* Name Fields Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
