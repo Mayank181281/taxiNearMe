@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AuthProvider from "./contexts/AuthContext";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import BackToTopButton from "./components/BackToTopButton";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import YourAdverts from "./pages/YourAdverts";
@@ -111,6 +112,7 @@ function App() {
                     </Routes>
                   </main>
                   <Footer />
+                  <BackToTopButton />
                 </>
               }
             />

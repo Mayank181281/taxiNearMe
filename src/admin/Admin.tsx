@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { AdminAuthProvider } from "./contexts/AdminAuthContext";
 import { useAdminAuth } from "./contexts/useAdminAuth";
+import BackToTopButton from "../components/BackToTopButton";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdDetails from "./pages/AdDetails";
@@ -56,6 +57,7 @@ const Admin: React.FC = () => {
   return (
     <AdminAuthProvider>
       <AdminApp />
+      <BackToTopButton />
     </AdminAuthProvider>
   );
 };
